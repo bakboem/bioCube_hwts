@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/service/cache_service.dart
  * Created Date: 2021-08-22 19:45:10
- * Last Modified: 2023-02-22 22:42:46
+ * Last Modified: 2023-02-23 00:13:14
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -59,7 +59,9 @@ class CacheService {
   static void deleteALL() {
     var filePath = getFaceModelFilePath();
     sharedPreferences?.clear();
-    saveFaceModelFilePath(filePath!);
+    if (filePath != null) {
+      saveFaceModelFilePath(filePath);
+    }
   }
 
   static getData(String key) {
