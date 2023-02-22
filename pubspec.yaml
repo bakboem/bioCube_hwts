@@ -1,0 +1,88 @@
+name: hwst
+description: A new Flutter project.
+publish_to: 'none' 
+version: 1.0.0+1
+
+environment:
+  sdk: '>=2.19.2 <3.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  connectivity_plus: ^3.0.2
+  device_info_plus: ^8.0.0
+  package_info_plus: ^3.0.1
+  json_serializable: ^6.5.4
+  json_annotation: ^4.7.0
+  tuple: ^2.0.1
+  path_provider: ^2.0.11
+  url_launcher: ^6.1.6
+  dio: ^4.0.6
+  provider: ^6.0.4
+  hive: ^2.2.3
+  hive_generator: ^2.0.0
+  hive_flutter: ^1.1.0
+  permission_handler: ^10.2.0
+  easy_localization: ^3.0.1
+  shimmer: ^2.0.0
+  flutter_svg: ^1.1.6
+  fluttertoast: ^8.1.1
+  logger: ^1.1.0
+  internet_connection_checker: ^1.0.0+1
+  flutter_native_splash: ^2.2.16
+  app_settings: ^4.1.8
+  platform_device_id: ^1.0.1
+  flutter_screenutil: ^5.5.4
+  geolocator: ^9.0.2
+  vibration: ^1.7.6
+  soundpool: ^2.3.0
+  # face_kit:
+  #   path: ../../face_kit
+  camera: ^0.10.3
+  cupertino_icons: ^1.0.2
+
+
+dev_dependencies:
+  flutter_launcher_icons: "^0.11.0"
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  build_runner: ^2.1.11
+
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/i18n/
+    - assets/icon/
+    - assets/images/
+    - assets/sound/
+    - assets/country/
+    - assets/face/
+    - assets/models/
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/icon/splash.png
+  icon_background_color: "#FFFFFF"
+  image_dark: assets/icon/splash.png
+  icon_background_color_dark:  "#FFFFFF"
+
+  android_12:
+    color: "#FFFFFF"
+    image: assets/images/splash-not-backgraound.png
+    icon_background_color: "#FFFFFF"
+    image_dark: assets/images/splash-not-backgraound.png
+    icon_background_color_dark: "#FFFFFF"
+  fullscreen: false
+  web: false
+
+
+
+flutter_icons:
+  image_path_android: "assets/images/icon-android.png"
+  image_path_ios: "assets/images/icon.png"
+  android: true # can specify file name here e.g. "ic_launcher"
+  ios: true # can specify file name here e.g. "My-L`auncher-Icon"
+  adaptive_icon_background: "#EA1111" 
+  min_sdk_android: 24
