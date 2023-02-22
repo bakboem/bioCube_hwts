@@ -48,13 +48,12 @@ dev_dependencies:
   flutter_lints: ^2.0.0
   build_runner: ^2.1.11
 
-
+# 0d2f7c
 flutter:
   uses-material-design: true
   assets:
     - assets/
     - assets/i18n/
-    - assets/icon/
     - assets/images/
     - assets/sound/
     - assets/country/
@@ -63,16 +62,16 @@ flutter:
 
 flutter_native_splash:
   color: "#FFFFFF"
-  image: assets/icon/splash.png
+  image: assets/images/hwst_splash.png
   icon_background_color: "#FFFFFF"
-  image_dark: assets/icon/splash.png
+  image_dark: assets/images/hwst_splash.png
   icon_background_color_dark:  "#FFFFFF"
 
   android_12:
     color: "#FFFFFF"
-    image: assets/images/splash-not-backgraound.png
+    image: assets/images/hwst_splash.png
     icon_background_color: "#FFFFFF"
-    image_dark: assets/images/splash-not-backgraound.png
+    image_dark: assets/images/hwst_splash.png
     icon_background_color_dark: "#FFFFFF"
   fullscreen: false
   web: false
@@ -80,9 +79,9 @@ flutter_native_splash:
 
 
 flutter_icons:
-  image_path_android: "assets/images/icon-android.png"
-  image_path_ios: "assets/images/icon.png"
+  image_path_android: "assets/images/hwst_app_icon.png"
+  image_path_ios: "assets/images/hwst_app_icon.png"
   android: true # can specify file name here e.g. "ic_launcher"
   ios: true # can specify file name here e.g. "My-L`auncher-Icon"
-  adaptive_icon_background: "#EA1111" 
+  adaptive_icon_background: "#0d2f7c" 
   min_sdk_android: 24
