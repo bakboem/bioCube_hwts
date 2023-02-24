@@ -29,21 +29,17 @@ import com.smavis.lib.*
 import com.smavis.lib.util.BluetoothUtils
 import com.smavis.lib.util.StringUtils
 import com.smavis.lib.util.UtilsCallBack
-import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.BasicMessageChannel
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.StringCodec
 import  io.flutter.plugin.common.BinaryMessenger
 @Suppress("CAST_NEVER_SUCCEEDS")
-class PassKitService :  MethodChannel.MethodCallHandler,UtilsCallBack  {
+class PassKitService : UtilsCallBack  {
     private val tag: String = PassKitService::class.java.simpleName
-    private lateinit var channel : MethodChannel
     private lateinit var  twoWay: BasicMessageChannel<String>
     private lateinit var  context: Context
 
     private var apduManager: HceApduManager? =null
-    private var tokenProcess: TokenProcess? =null
+    var tokenProcess: TokenProcess? =null
     private var mBluetoothAdapter: BluetoothAdapter? =null
     private var btScanner: BluetoothLeScanner? =null
 
@@ -51,11 +47,11 @@ class PassKitService :  MethodChannel.MethodCallHandler,UtilsCallBack  {
     private var settings: ScanSettings? = null
     private var filters: ArrayList<ScanFilter>?= null
     private var mGatt: BluetoothGatt?= null
-    private var rssiFromUserSettings : String ="50"
+    var rssiFromUserSettings : String ="50"
     private var bMsdValue: ByteArray? = null
 
-private  fun startListen(){
-    channel.setMethodCallHandler(this)
+fun startListen(){
+   
     apduManager = HceApduManager.getInstance(context).setCallBack(this)
     tokenProcess = TokenProcess(context)
     runnerHandler = object : Handler(Looper.getMainLooper()){}
@@ -71,12 +67,9 @@ private  fun startListen(){
         .setServiceUuid(ParcelUuid(Constants.SERVICE_UUID))
         .build()
     (filters as ArrayList<ScanFilter>).add(scanFilter)
-    channel.setMethodCallHandler(this)
-    twoWay.setMessageHandler { message, reply ->Log.i(tag, "Received: $message")
-        reply.reply("Hi from Android")  }
+
 }
-    private fun stopListen(){
-        channel.setMethodCallHandler(null)
+    fun stopListen(){
         twoWay.setMessageHandler(null)
         apduManager?.setCallBack(null)
         apduManager =null
@@ -86,14 +79,16 @@ private  fun startListen(){
         btScanner = null
         settings= null
         filters = null
-        channel.setMethodCallHandler(null)
         twoWay.setMessageHandler(null)
     }
 
     public fun init( contextt: Context, binary:BinaryMessenger){
         context = contextt
-        channel = MethodChannel(binary, "myapp/baseMethodChannel")
+
         twoWay = BasicMessageChannel( binary,"myapp/twoWay",StringCodec.INSTANCE )
+
+        twoWay.setMessageHandler { message, reply ->Log.i(tag, "Received: $message")
+            reply.reply("Hi from Android")  }
 
     }
 
@@ -117,14 +112,14 @@ private  fun startListen(){
         if (checkPermission())
         btScanner?.stopScan(leScanCallback)
     }
-    private fun bleScanningStart() {
+    fun bleScanningStart() {
         if (checkPermission())
         btScanner!!.startScan(filters, settings, leScanCallback)
         runnerHandler?.postDelayed({
             bleScanningStop()
         }, 5000)
     }
-    private fun nfcScanningStart(){
+    fun nfcScanningStart(){
         val intent = Intent(
             context,
             HceApduService::class.java
@@ -160,67 +155,7 @@ private  fun startListen(){
         }
     }
 
-    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        if (call.method == "initState") {
-            startListen()
-            result.success("success")
-        } else if(call.method == "getToken"){
-            var token = ""
-            if (!(TokenProcess. gMobilepassToken == null || TokenProcess.gMobilepassToken.isEmpty())) {
-                token =
-                    StringUtils.convertHexToString(StringUtils.hexStringFromByteArray(TokenProcess.gMobilepassToken))
-            }
-            result.success(token)
-        }
-        else if(call.method == "deleteToken"){
-            val resMap = tokenProcess!!.deleteToken()
-            val isDeleted =resMap["data"] as Boolean
-            if (isDeleted)
-            result.success("deleted") else result.success("faild")
-        }
-        else if(call.method == "saveToken"){
-            val resMap = tokenProcess!!.putToken(
-               call.arguments as String,
-              1000000
-            )
-            val isSaved = resMap["data"] as Boolean
-            result.success(isSaved)
-        }
-        else if(call.method == "updateToken") {
-            val deleteResMap = tokenProcess!!.deleteToken()
-            val isDeleted =deleteResMap["data"] as Boolean
-            var isSaved = false
-            if (isDeleted){
-                val saveResMap =  tokenProcess!!.putToken(
-                    call.arguments as String,
-                    1000000
-                )
-                isSaved = saveResMap["data"] as Boolean
 
-            }
-            result.success(isDeleted&& isSaved)
-        }
-        else if(call.method == "startBle") {
-            bleScanningStart()
-            result.success("success")
-        } else if(call.method == "startNfc") {
-            nfcScanningStart()
-            result.success("success")
-        } else if(call.method == "dispose") {
-            stopListen()
-            result.success("success")
-        }
-        else if(call.method == "isNfcOk") {
-            result.success("success")
-        }
-        else if(call.method == "setRssi") {
-            rssiFromUserSettings = call.arguments as String
-            result.success(System.getProperty("http.agent"))
-        }
-        else  {
-            result.notImplemented()
-        }
-    }
 
     // callback From com.smavis.lib.util.UtilsCallBack
     override fun onGetTerminalId(p0: String?): Boolean {
