@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">TruePass</string>
+    <string name="aid_description">Smartmecca HCE/BLE</string>
+    <string name="service_description">MobilePass</string>
+</resources>

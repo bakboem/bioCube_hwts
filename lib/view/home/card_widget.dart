@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/home/card_one_widget.dart
  * Created Date: 2023-02-04 20:19:38
- * Last Modified: 2023-02-22 23:23:26
+ * Last Modified: 2023-02-24 14:23:43
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -36,18 +36,6 @@ class CardWidget extends StatefulWidget {
 }
 
 class _CardWidgetState extends State<CardWidget> {
-  Widget _buildImage() {
-    return Padding(
-        padding: EdgeInsets.only(
-            bottom: widget.isOverThanIphone10
-                ? AppSize.appBarHeight
-                : AppSize.defaultListItemSpacing),
-        child: Image.asset(
-          ImageType.HWST.path,
-          height: AppSize.defaultTextFieldHeight,
-        ));
-  }
-
   Widget _buildCard1TopColorBox(double colorBoxHeight, double cardWidth) {
     var cardType = widget.cardType;
     return Container(
@@ -125,30 +113,23 @@ class _CardWidgetState extends State<CardWidget> {
         (userCard.mPhoto != null && userCard.mPhoto!.isNotEmpty);
     ImageProvider<Object>? assertImage =
         isUserCardImageNotNull ? null : AssetImage('assets/images/people.png');
+
     ImageProvider<Object>? networkImage =
         isUserCardImageNotNull ? NetworkImage(userCard.mPhoto!) : null;
     return Positioned(
         top: cardType == '1' ? colorBoxHeight * .3 : colorBoxHeight - avataSize,
         left: cardWidth / 2 - avataSize,
-        child: cardType == '3'
-            ? CircleAvatar(
-                radius: avataSize,
-                backgroundImage:
-                    isUserCardImageNotNull ? networkImage : assertImage,
-              )
-            : Container(
-                width: avataSize * 2,
-                height: avataSize * 2,
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: isUserCardImageNotNull
-                            ? networkImage!
-                            : assertImage!,
-                        fit: isUserCardImageNotNull
-                            ? BoxFit.cover
-                            : BoxFit.contain),
-                    borderRadius: BorderRadius.circular(AppSize.radius25)),
-              ));
+        child: Container(
+          width: avataSize * 2,
+          height: avataSize * 2,
+          decoration: BoxDecoration(
+              color: AppColors.primary,
+              image: DecorationImage(
+                  image: isUserCardImageNotNull ? networkImage! : assertImage!,
+                  fit: isUserCardImageNotNull ? BoxFit.cover : BoxFit.contain),
+              borderRadius: BorderRadius.circular(
+                  cardType == '3' ? (avataSize * 2) / 2 : AppSize.radius25)),
+        ));
   }
 
   Widget _buildCompanyLogo(
@@ -188,7 +169,7 @@ class _CardWidgetState extends State<CardWidget> {
         selector: (context, provider) => provider.isShowCamera,
         builder: (context, isShowCamera, _) {
           return Container(
-            width: cardWidth,
+            width: cardWidth + AppSize.elevation,
             height: cardHeight,
             alignment: Alignment.center,
             decoration: BoxDecoration(
@@ -200,7 +181,7 @@ class _CardWidgetState extends State<CardWidget> {
             margin: isNotCard2 ? EdgeInsets.all(10) : null,
             child: Card(
                 shadowColor: AppColors.textGrey,
-                elevation: 8,
+                elevation: AppSize.elevation,
                 shape: RoundedRectangleBorder(
                   borderRadius: isNotCard2
                       ? BorderRadius.all(Radius.circular(AppSize.radius15))
@@ -247,32 +228,10 @@ class _CardWidgetState extends State<CardWidget> {
 
   @override
   Widget build(BuildContext context) {
-    pr('widget.isOverThanIphone10?${widget.isOverThanIphone10}');
-    var isCard1 = widget.cardType == '1';
-    var isCard2 = widget.cardType == '2';
     var cardWidth = AppSize.defaultContentsWidth * .8;
     var cardHeight =
         widget.isOverThanIphone10 ? cardWidth * 1.65 : cardWidth * 1.55;
     pr(widget.cardType);
-    return Container(
-        alignment: Alignment.center,
-        width: AppSize.realWidth,
-        height: AppSize.realHeight - AppSize.appBarHeight,
-        decoration: BoxDecoration(
-            image: isCard1 || isCard2
-                ? DecorationImage(
-                    image: AssetImage(isCard1
-                        ? ImageType.CARD_ONE.path
-                        : ImageType.CARD_TWO.path),
-                    fit: BoxFit.cover)
-                : null),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            defaultSpacing(multiple: 2),
-            _buildImage(),
-            _buildCard(context, cardWidth, cardHeight)
-          ],
-        ));
+    return _buildCard(context, cardWidth, cardHeight);
   }
 }

@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/Documents/BioCube/biocube/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-02-22 23:23:26
+ * Last Modified: 2023-02-24 14:30:41
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -13,6 +13,7 @@
 
 import 'dart:io';
 import 'package:hwst/globalProvider/face_detection_provider.dart';
+import 'package:hwst/service/api_service.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -93,6 +94,10 @@ class _HomePageState extends State<HomePage> {
     _pageController.dispose();
     ConnectService.stopListener();
     super.dispose();
+  }
+
+  Future<void> downLoadProcess() async {
+    final apiService = ApiService();
   }
 
   Future<void> loadFaceDetectionAndDeepLearningFile(
@@ -266,6 +271,7 @@ class _HomePageState extends State<HomePage> {
           }
         },
         child: PageView(
+          physics: BouncingScrollPhysics(),
           controller: _pageController
             ..addListener(() {
               if (_pageController.initialPage != 3) {
@@ -289,7 +295,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildStartMatchButton(BuildContext context) {
-    var largFloatButtonWidth = 100.0;
+    var largFloatButtonWidth = AppSize.floatButtonWidth;
     return Positioned(
         bottom: AppSize.appBarHeight,
         left: AppSize.realWidth / 2 - largFloatButtonWidth / 2,
@@ -327,21 +333,61 @@ class _HomePageState extends State<HomePage> {
         ));
   }
 
-  Widget _buildContents(BuildContext context) {
+  Widget _buildLogoImage(BuildContext context) {
+    return Positioned(
+        top: AppSize.defaultListItemSpacing * 2,
+        child: SizedBox(
+          height: AppSize.defaultTextFieldHeight,
+          child: Center(
+            child: Image.asset(
+              ImageType.HWST.path,
+            ),
+          ),
+        ));
+  }
+
+  Widget _buidCardWidget(BuildContext context) {
     final p = context.read<HomePageProvider>();
     final userCard = CacheService.getUserCard();
-    return Stack(
-      children: [
-        CardWidget(
-          cardType: userCard!.mCardCode!,
-          isOverThanIphone10: p.isOverThanIphone10,
-        ),
-        const DefaultTitleDevider(),
-        _popupContents(context),
-        _buildStartMatchButton(context),
-        _buildTip()
-      ],
+    return Positioned(
+      bottom: AppSize.appBarHeight +
+          AppSize.floatButtonWidth / 2 -
+          AppSize.elevation,
+      left: (AppSize.defaultContentsWidth - AppSize.defaultContentsWidth * .8) /
+          2,
+      child: CardWidget(
+        cardType: userCard!.mCardCode!,
+        isOverThanIphone10: Platform.isIOS ? p.isOverThanIphone10 : false,
+      ),
     );
+  }
+
+  Widget _buildContents(BuildContext context) {
+    final userCard = CacheService.getUserCard()!;
+    var isCard1 = userCard.mCardCode == '1';
+    var isCard2 = userCard.mCardCode == '2';
+    return Container(
+        height: AppSize.realHeight - AppSize.appBarHeight,
+        decoration: BoxDecoration(
+            image: isCard1 || isCard2
+                ? DecorationImage(
+                    image: AssetImage(isCard1
+                        ? ImageType.CARD_ONE.path
+                        : ImageType.CARD_TWO.path),
+                    fit: BoxFit.cover)
+                : null),
+        child: Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            const DefaultTitleDevider(),
+            defaultSpacing(multiple: 2),
+            _popupContents(context),
+            _buildLogoImage(context),
+            _buidCardWidget(context),
+            _buildStartMatchButton(context),
+            _buildTip(),
+          ],
+        ));
   }
 
   void showLicense(BuildContext context) {

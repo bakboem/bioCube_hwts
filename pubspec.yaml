@@ -1,7 +1,7 @@
 name: hwst
 description: A new Flutter project.
 publish_to: 'none' 
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: '>=2.19.2 <3.0.0'
@@ -37,8 +37,9 @@ dependencies:
   soundpool: ^2.3.0
   # face_kit:
   #   path: ../../face_kit
-  camera: ^0.10.3
+  camera: ^0.10.3+1
   cupertino_icons: ^1.0.2
+  fl_mlkit_text_recognize: ^2.1.0
 
 
 dev_dependencies:

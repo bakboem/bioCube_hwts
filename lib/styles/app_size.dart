@@ -23,6 +23,7 @@ class AppSize {
   static double get cardBorderWidth => 5;
   static double get card1BorderWidth => 3;
   static double get smallButtonWidth => 70;
+  static double get floatButtonWidth => 100;
   static double get statusBarHeight => 24.h;
   static double get splashIconWidth => 56.h;
   static double get splashIconBottomSpacing => 32.h;
@@ -35,6 +36,7 @@ class AppSize {
   static double get calendarWidth => AppSize.realWidth;
   static double get weekDayNumberBoxHeight => 30;
   static double get avataWidth => 65;
+  static double get elevation => 8;
   static double get cardAvataWidth => 70;
   static double get defaultSpacingForTitleAndTextField => 5.w;
   static double get buttomPaddingForTitleAndTextField => 18.w;
