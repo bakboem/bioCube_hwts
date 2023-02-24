@@ -1,0 +1,2 @@
+ninja: Entering directory `/Users/bakbeom/work/bioCube/face_kit/hwst/android/app/.cxx/Debug/2x602y70/x86'
+[1/1] Linking CXX shared library /Users/bakbeom/work/bioCube/face_kit/hwst/build/app/intermediates/cxx/Debug/2x602y70/obj/x86/libhwst.so

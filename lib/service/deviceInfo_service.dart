@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/service/deviceInfo_service.dart
  * Created Date: 2021-08-16 21:01:02
- * Last Modified: 2023-02-22 22:42:45
+ * Last Modified: 2023-02-24 18:07:17
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -14,7 +14,6 @@
 import 'dart:io';
 import 'package:hwst/model/user/user_device_info.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:platform_device_id/platform_device_id.dart';
 
 class DeviceInfoService {
   factory DeviceInfoService() => _sharedInstance();
@@ -173,9 +172,9 @@ class DeviceInfoService {
     }
     if (Platform.isAndroid) {
       androidInfo = await deviceInfo.androidInfo;
-      String? deviceId = await PlatformDeviceId.getDeviceId;
+
       userDeviceInfo = UserDeviceInfo(
-          '${deviceId}',
+          '${androidInfo.id}',
           '${androidInfo.brand}',
           '${androidInfo.device}',
           '${androidInfo.model}',

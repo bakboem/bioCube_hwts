@@ -1,0 +1,4 @@
+# ninja log v5
+0	50	1677222942067364815	CMakeFiles/hwst.dir/hwst.cpp.o	777e7e951cf9c023
+50	130	1677222942145099910	/Users/bakbeom/work/bioCube/face_kit/hwst/build/app/intermediates/cxx/Debug/2x602y70/obj/x86_64/libhwst.so	40d20060da6891a
+0	85	1677223261750420697	/Users/bakbeom/work/bioCube/face_kit/hwst/build/app/intermediates/cxx/Debug/2x602y70/obj/x86_64/libhwst.so	40d20060da6891a

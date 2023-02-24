@@ -1,0 +1,3 @@
+/Users/bakbeom/work/bioCube/face_kit/hwst/android/app/.cxx/Debug/2x602y70/arm64-v8a/CMakeFiles/hwst.dir
+/Users/bakbeom/work/bioCube/face_kit/hwst/android/app/.cxx/Debug/2x602y70/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/bakbeom/work/bioCube/face_kit/hwst/android/app/.cxx/Debug/2x602y70/arm64-v8a/CMakeFiles/rebuild_cache.dir
