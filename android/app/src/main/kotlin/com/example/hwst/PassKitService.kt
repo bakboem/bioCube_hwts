@@ -10,18 +10,21 @@
 
 
 package com.example.hwst
+
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothManager
 import android.bluetooth.le.*
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import android.os.ParcelUuid
+import android.os.Vibrator
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getSystemService
@@ -30,9 +33,11 @@ import com.smavis.lib.util.BluetoothUtils
 import com.smavis.lib.util.StringUtils
 import com.smavis.lib.util.UtilsCallBack
 import io.flutter.plugin.common.BasicMessageChannel
+import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.StringCodec
-import  io.flutter.plugin.common.BinaryMessenger
-@Suppress("CAST_NEVER_SUCCEEDS")
+
+
+@Suppress("CAST_NEVER_SUCCEEDS", "DEPRECATION")
 class PassKitService : UtilsCallBack  {
     private val tag: String = PassKitService::class.java.simpleName
     private lateinit var  twoWay: BasicMessageChannel<String>
@@ -47,30 +52,29 @@ class PassKitService : UtilsCallBack  {
     private var settings: ScanSettings? = null
     private var filters: ArrayList<ScanFilter>?= null
     private var mGatt: BluetoothGatt?= null
-    var rssiFromUserSettings : String ="50"
+    var rssiFromUserSettings : String ="-100"
+    var token : String =""
+    var deviceName : String = ""
     private var bMsdValue: ByteArray? = null
 
-fun startListen(){
-   
-    apduManager = HceApduManager.getInstance(context).setCallBack(this)
-    tokenProcess = TokenProcess(context)
-    runnerHandler = object : Handler(Looper.getMainLooper()){}
-    (getSystemService(context, PassKitService::class.java) as BluetoothManager).also {
-        mBluetoothAdapter = it.adapter
-    }
-    btScanner = mBluetoothAdapter?.bluetoothLeScanner
-    settings = ScanSettings.Builder()
-        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-        .build()
-    filters = ArrayList()
-    val scanFilter = ScanFilter.Builder()
-        .setServiceUuid(ParcelUuid(Constants.SERVICE_UUID))
-        .build()
-    (filters as ArrayList<ScanFilter>).add(scanFilter)
+    fun startListen(){
+        apduManager = HceApduManager.getInstance(context).setCallBack(this)
+        tokenProcess = TokenProcess(context)
+        runnerHandler = object : Handler(Looper.getMainLooper()){}
+        mBluetoothAdapter =   BluetoothAdapter.getDefaultAdapter();
+        btScanner = mBluetoothAdapter?.bluetoothLeScanner
+        Log.d(tag, "==== btscanner ====" +"${ btScanner!=null}" )
+        settings = ScanSettings.Builder()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .build()
+        filters = ArrayList()
+        val scanFilter = ScanFilter.Builder()
+            .setServiceUuid(ParcelUuid(Constants.SERVICE_UUID))
+            .build()
+        (filters as ArrayList<ScanFilter>).add(scanFilter)
 
-}
+    }
     fun stopListen(){
-        twoWay.setMessageHandler(null)
         apduManager?.setCallBack(null)
         apduManager =null
         tokenProcess = null
@@ -79,45 +83,73 @@ fun startListen(){
         btScanner = null
         settings= null
         filters = null
-        twoWay.setMessageHandler(null)
     }
-
+    public  fun saveToken (t:String){
+        val resMap =  tokenProcess!!.putToken(
+           t,
+            1000000
+        )
+        val isSaved = resMap["data"] as Boolean
+       if (isSaved){
+           token =
+               StringUtils.convertHexToString(StringUtils.hexStringFromByteArray(TokenProcess.gMobilepassToken))
+       }
+    }
+    public  fun getToken (){
+        if (!(TokenProcess.gMobilepassToken == null || TokenProcess.gMobilepassToken.isEmpty())) {
+            token =
+                StringUtils.convertHexToString(StringUtils.hexStringFromByteArray(TokenProcess.gMobilepassToken))
+        }
+        sendMessage("token is $token")
+    }
     public fun init( contextt: Context, binary:BinaryMessenger){
         context = contextt
-
         twoWay = BasicMessageChannel( binary,"myapp/twoWay",StringCodec.INSTANCE )
-
-        twoWay.setMessageHandler { message, reply ->Log.i(tag, "Received: $message")
-            reply.reply("Hi from Android")  }
-
+    }
+    public fun updateToken (t:String){
+        val deleteResMap = tokenProcess!!.deleteToken()
+        val isDeleted = deleteResMap["data"] as Boolean
+        var isSaved = false
+        if (isDeleted) {
+            val saveResMap = tokenProcess!!.putToken(
+              t,
+              5000
+            )
+            isSaved = saveResMap["data"] as Boolean
+            if (isSaved){
+                token =
+                    StringUtils.convertHexToString(StringUtils.hexStringFromByteArray(TokenProcess.gMobilepassToken))
+                sendMessage("updateToken successful!~~")
+            }
+        }
+    }
+    public fun deleteToken(){
+        val resMap = tokenProcess!!.deleteToken()
+        val isDeleted = resMap["data"] as Boolean
+        if (isDeleted){
+            sendMessage("deleteToken successful!")
+        }
+    }
+    public fun setRssi(r:String){
+        rssiFromUserSettings = r
+    }
+    public fun sendMessage(str:String){
+           twoWay.send(str)
     }
 
-//    fun sendMessage(str:String){
-//        twoWay.send(str) { reply ->
-//            reply?.let { Log.i("MSG", it) }
-//        }
-//
-//    }
-
-    fun  checkPermission():Boolean{
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.BLUETOOTH_SCAN
-            ) != PackageManager.PERMISSION_GRANTED
-        )  return false
-        return true
-    }
+    @SuppressLint("MissingPermission")
     fun bleScanningStop() {
         Log.d(tag, "==== stop Ble scanning ====")
-        if (checkPermission())
         btScanner?.stopScan(leScanCallback)
     }
+    @SuppressLint("MissingPermission")
     fun bleScanningStart() {
-        if (checkPermission())
-        btScanner!!.startScan(filters, settings, leScanCallback)
-        runnerHandler?.postDelayed({
-            bleScanningStop()
-        }, 5000)
+        Log.d(tag, "==== start Ble scanning ====")
+            btScanner!!.startScan(filters, settings, leScanCallback)
+            runnerHandler?.postDelayed({
+                bleScanningStop()
+            }, 5000)
+
     }
     fun nfcScanningStart(){
         val intent = Intent(
@@ -126,26 +158,27 @@ fun startListen(){
         )
       context.startService(intent)
     }
+    @SuppressLint("MissingPermission")
     private fun connectDevice(device: BluetoothDevice) {
         Log.d(tag, "Connecting to " + device.address)
         val gattClient = GattClient(this)
-        if (checkPermission())
         mGatt = device.connectGatt(context, false, gattClient)
     }
-
+    @SuppressLint("MissingPermission")
     private val leScanCallback: ScanCallback = object : ScanCallback() {
         override fun onBatchScanResults(results: List<ScanResult>) {
             super.onBatchScanResults(results)
         }
         override fun onScanResult(callbackType: Int, result: ScanResult) {
-            val devicename = BluetoothUtils.getDeviceName(result)
-            if (checkPermission())
+            deviceName=""
+             deviceName = BluetoothUtils.getDeviceName(result)
             Log.i(tag,"find name : " + result.device.name)
             val rssi = BluetoothUtils.getRssi(result)
             val guideRssi: Int = rssiFromUserSettings.toInt()
-            Log.d(tag,"[BLE][scan] device Name : $devicename")
+            Log.d(tag,"[BLE][scan] device Name : $deviceName")
             Log.d(tag, "[BLE][scan] rssi : $rssi")
-            if (BluetoothUtils.checkTMobilepassDevice(rssi, guideRssi, devicename)) { //-45
+            if (BluetoothUtils.checkTMobilepassDevice(rssi, guideRssi, deviceName)) { //-45
+                sendMessage("bleSuccess:$deviceName")
                 bleScanningStop()
                 bMsdValue = BluetoothUtils.getMsdValue(result)
                 Log.d(tag, "[BLE][scan] MSD : " + StringUtils.hexStringFromByteArray(bMsdValue))
@@ -164,28 +197,53 @@ fun startListen(){
     }
 
     override fun authenticateWithToken() {
+        Log.d(TAG, "authenticateWithToken")
+
+        val bleprocess = BleProcess.getInstance()
+        var res = bleprocess.encryptToken(token.toByteArray(), bMsdValue) //jni
+
+        if (res["data"] as Boolean) {
+            Log.d(TAG, "encryptToken successful $token!")
+            res = BleProcess.writeBleData(mGatt)
+            val isCompleted = res["isCompleted"] as Boolean
+            Log.d(TAG, "isCompleted$isCompleted")
+            if (res["data"] as Boolean) {
+
+                Log.d(TAG, "success!???  ${res["data"] as Boolean}")
+            } else {
+                Log.d(TAG, "[BLE] write Data Fail[" + res["resultCode"].toString() + "]")
+            }
+        } else {
+            Log.d(TAG, "[BLE] Encrypt Token Fail[" + res["resultCode"].toString() + "]")
+        }
     }
 
     override fun authenticateWithTokenEnd() {
         val resMap = BleProcess.writeBleData(mGatt)
         val isCompleted = resMap["isCompleted"] as Boolean
         val sendSuccess = resMap["data"] as Boolean
+        Log.i(tag,"SendSuccess!? $sendSuccess")
         if (isCompleted) {
+
             disconnectGattServer()
+
+
         } else if (!sendSuccess) {
             disconnectGattServer()
         }
+
     }
 
+    @SuppressLint("MissingPermission")
     override fun disconnectGattServer() {
         if (mGatt!= null) {
-            if (checkPermission())
             mGatt!!.disconnect()
             mGatt!!.close()
+            Log.i(tag,"mGatt Closed! ")
         }
     }
 
     override fun processErrorCode(p0: MutableMap<String, Any>?) {
-        TODO("Not yet implemented")
+        Log.i(tag,"Error!? $p0")
     }
 }

@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/service/native_channel_service.dart
  * Created Date: 2023-01-25 11:52:53
- * Last Modified: 2023-02-22 22:44:40
+ * Last Modified: 2023-02-24 22:20:42
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -90,45 +90,44 @@ class NativeChannelService {
   }
 
   static Future<void> androidTwoWayChannelHandler(message) async {
-    // var context = KeyService.baseAppKey.currentContext;
+    var context = KeyService.baseAppKey.currentContext;
     message as String;
-    // if (context != null) {
-    //   final cp = context.read<CoreVerifyProcessProvider>();
-    //   final dp = context.read<DeviceStatusProvider>();
-    //   if (message.startsWith('bleSuccess:') ||
-    //       message.startsWith('nfcSuccess:')) {
-    //     pr('1');
-    //     var tid = message.substring(message.indexOf(':') + 1).trim();
-    //     if (CacheService.getTidList() == null ||
-    //         CacheService.getTidList()!
-    //             .where((element) => element.svtid == tid)
-    //             .isNotEmpty) {
-    //       cp.setTid(tid).then((_) async {
-    //         pr(cp.tid);
-    //         await cp.sendDataToSever();
-    //         cp.startTimer(
-    //             duration: message.startsWith('nfcSuccess:')
-    //                 ? Duration(seconds: 5)
-    //                 : null);
-    //       });
-    //     } else {
-    //       cp.setMessage('permisson_for_bidden');
-    //       cp.startTimer();
-    //     }
-    //   } else if (message.startsWith('Is')) {
-    //     pr('NFC::::: Status ${message}');
-    //     if (message == 'Is Powered On') {
-    //       dp.setNfcStatus(true);
-    //     } else {
-    //       dp.setNfcStatus(false);
-    //     }
-    //   } else if (message.contains('Timeout')) {
-    //     cp.setMessage(tr('faild_with_time_out'));
-    //     cp.startTimer();
-    //   } else {
-    //     cp.setMessage(message);
-    //   }
-    //   return Future.value('$message');
-    // }
+    if (context != null) {
+      final cp = context.read<CoreVerifyProcessProvider>();
+      final dp = context.read<DeviceStatusProvider>();
+      if (message.startsWith('bleSuccess:') ||
+          message.startsWith('nfcSuccess:')) {
+        var tid = message.substring(message.indexOf(':') + 1).trim();
+        if (CacheService.getTidList() == null ||
+            CacheService.getTidList()!
+                .where((element) => element.svtid == tid)
+                .isNotEmpty) {
+          cp.setTid(tid).then((_) async {
+            pr(cp.tid);
+            await cp.sendDataToSever();
+            cp.startTimer(
+                duration: message.startsWith('nfcSuccess:')
+                    ? Duration(seconds: 5)
+                    : null);
+          });
+        } else {
+          cp.setMessage('permisson_for_bidden');
+          cp.startTimer();
+        }
+      } else if (message.startsWith('Is')) {
+        pr('NFC::::: Status ${message}');
+        if (message == 'Is Powered On') {
+          dp.setNfcStatus(true);
+        } else {
+          dp.setNfcStatus(false);
+        }
+      } else if (message.contains('Timeout')) {
+        cp.setMessage(tr('faild_with_time_out'));
+        cp.startTimer();
+      } else {
+        cp.setMessage(message);
+      }
+      return Future.value('$message');
+    }
   }
 }
