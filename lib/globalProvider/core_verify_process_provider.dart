@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/home/provider/core_process_provider.dart
  * Created Date: 2023-01-25 12:24:10
- * Last Modified: 2023-02-25 22:43:47
+ * Last Modified: 2023-02-25 23:31:50
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -34,7 +34,7 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
   bool hasMore = false;
   bool isLoadData = false;
   bool isShowCamera = false;
-
+  bool isBackgroundMode = false;
   String? message;
   String tid = '';
   bool? isBleSuccess; // toast
@@ -49,6 +49,10 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
 
   void startTimer({Duration? duration}) {
     timer = Timer(duration ?? Duration(seconds: 3), () => reset());
+  }
+
+  void setIsBackgroundMode(bool val) {
+    isBackgroundMode = val;
   }
 
   void setMessage(String str) {
@@ -70,14 +74,14 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setTid(String? str) async {
+  void setTid(String? str) {
     tid = str ?? '';
     if (str != null) {
       tid = str.substring(str.lastIndexOf(':') + 1).trim();
     }
   }
 
-  Future<void> setVerifyType(VerifyType type) async {
+  void setVerifyType(VerifyType type) {
     verifyType = type;
   }
 

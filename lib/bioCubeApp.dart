@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/Documents/BioCube/biocube/lib/bioCubeApp.dart
  * Created Date: 2023-01-22 19:01:08
- * Last Modified: 2023-02-22 23:25:01
+ * Last Modified: 2023-02-25 23:13:34
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -85,6 +85,11 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
         });
       }
     } else if (_isDetached) {
+      var baseContext = KeyService.baseAppKey.currentContext;
+      if (baseContext != null) {
+        final cp = baseContext.read<CoreVerifyProcessProvider>();
+        cp.setIsBackgroundMode(true);
+      }
       SoundService.dispose();
       PassKitService.dispose();
       ConnectService.stopListener();

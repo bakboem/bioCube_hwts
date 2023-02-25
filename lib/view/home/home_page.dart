@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/Documents/BioCube/biocube/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-02-25 10:25:55
+ * Last Modified: 2023-02-25 23:49:50
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -94,10 +94,6 @@ class _HomePageState extends State<HomePage> {
     _pageController.dispose();
     ConnectService.stopListener();
     super.dispose();
-  }
-
-  Future<void> downLoadProcess() async {
-    final apiService = ApiService();
   }
 
   Future<void> loadFaceDetectionAndDeepLearningFile(
@@ -287,7 +283,7 @@ class _HomePageState extends State<HomePage> {
           },
           children: [
             _buildPageViewText(context, 'ble', isStatusOk: isBleOk, userEvn),
-            _buildPageViewText(context, 'nfc', isStatusOk: isNfcOk, userEvn),
+            // _buildPageViewText(context, 'nfc', isStatusOk: isNfcOk, userEvn),
             _buildPageViewText(
                 context, 'face', isStatusOk: userEvn?.isUseFace, userEvn),
           ],

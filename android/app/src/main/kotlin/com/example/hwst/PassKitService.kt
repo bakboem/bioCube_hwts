@@ -70,8 +70,8 @@ class PassKitService :  UtilsCallBack{
     }
 
     fun stopListen(){
-        apduManager =null
-        tokenProcess = null
+        // apduManager =null
+        // tokenProcess = null
         runnerHandler=null
         mBluetoothAdapter = null
         btScanner = null
@@ -81,7 +81,7 @@ class PassKitService :  UtilsCallBack{
     public  fun saveToken (t:String){
         val resMap =  tokenProcess!!.putToken(
            t,
-            5000
+            10000000
         )
         val isSaved = resMap["data"] as Boolean
        if (isSaved){
@@ -192,6 +192,7 @@ class PassKitService :  UtilsCallBack{
        var tid = StringUtils.convertHexToString(p0)
         Log.d(TAG, "onGetTerminalId $tid")
         sendMessage("nfcSuccess:$tid")
+        deleteToken()
         return true
     }
 
