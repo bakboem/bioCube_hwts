@@ -23,6 +23,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.ParcelUuid
 import android.util.Log
+import android.widget.Toast
 import com.smavis.lib.*
 import com.smavis.lib.util.BluetoothUtils
 import com.smavis.lib.util.StringUtils
@@ -32,7 +33,7 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.StringCodec
 
 @Suppress("CAST_NEVER_SUCCEEDS", "DEPRECATION")
-class PassKitService :  UtilsCallBack, HceApduService() {
+class PassKitService :  UtilsCallBack{
     private val tag: String = PassKitService::class.java.simpleName
     private lateinit var  twoWay: BasicMessageChannel<String>
     private lateinit var  context: Context
@@ -99,6 +100,7 @@ class PassKitService :  UtilsCallBack, HceApduService() {
     public fun init( contextt: Context, binary:BinaryMessenger){
         context = contextt
         twoWay = BasicMessageChannel( binary,"myapp/twoWay",StringCodec.INSTANCE )
+
     }
     public fun updateToken (t:String){
         val deleteResMap = tokenProcess!!.deleteToken()
@@ -137,21 +139,21 @@ class PassKitService :  UtilsCallBack, HceApduService() {
             runnerHandler?.postDelayed({
                 bleScanningStop()
             }, 5000)
-
     }
     fun nfcScanningStart(){
        if ( TokenProcess.gMobilepassToken == null || TokenProcess.gMobilepassToken.size == 0){
            Log.d(tag, "Not Token Find ")
            return
        }else{
-           Log.d(tag, "start NFC???? ")
+            saveToken(token)
+           getToken()
            val intent = Intent(
-            context.applicationContext,
+            context,
             HceApduService::class.java
            )
            context.startService(intent)
+        //    apduManager?.processApdu(TokenProcess.gMobilepassToken )
        }
-
     }
     @SuppressLint("MissingPermission")
     private fun connectDevice(device: BluetoothDevice) {
@@ -187,7 +189,9 @@ class PassKitService :  UtilsCallBack, HceApduService() {
 
     // callback From com.smavis.lib.util.UtilsCallBack
     override fun onGetTerminalId(p0: String?): Boolean {
-        Log.d(TAG, "onGetTerminalId $p0")
+       var tid = StringUtils.convertHexToString(p0)
+        Log.d(TAG, "onGetTerminalId $tid")
+        sendMessage("nfcSuccess:$tid")
         return true
     }
 

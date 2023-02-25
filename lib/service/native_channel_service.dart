@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/service/native_channel_service.dart
  * Created Date: 2023-01-25 11:52:53
- * Last Modified: 2023-02-25 08:58:27
+ * Last Modified: 2023-02-25 22:26:20
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -106,7 +106,7 @@ class NativeChannelService {
             await cp.sendDataToSever();
             cp.startTimer(
                 duration: message.startsWith('nfcSuccess:')
-                    ? Duration(seconds: 5)
+                    ? Duration(seconds: Platform.isAndroid ? 2 : 5)
                     : null);
           });
         } else {

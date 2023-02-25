@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/home/provider/core_process_provider.dart
  * Created Date: 2023-01-25 12:24:10
- * Last Modified: 2023-02-25 09:18:10
+ * Last Modified: 2023-02-25 22:43:47
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -106,9 +106,10 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
     );
 
     Map<String, dynamic> body = resultAuthorizedModel!.toJson();
+    pr(body);
     try {
       _api.init(RequestType.SEND_MATCH_RESULT);
-      pr('${CacheService.getSvUrl()}send_auth_result.php');
+      pr('${CacheService.getSvUrl()}/api/send_auth_result.php');
       final result = await _api.request(body: body);
       if (result == null || result.statusCode != 200) {
         isLoadData = false;

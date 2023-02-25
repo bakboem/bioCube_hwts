@@ -3,6 +3,8 @@ import android.content.Context
 import android.content.Intent
 import android.nfc.NfcAdapter
 import android.nfc.NfcManager
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.smavis.lib.HceApduService
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -11,6 +13,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
 
 class MainActivity : FlutterActivity() {
+ @RequiresApi(Build.VERSION_CODES.Q)
  override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
   GeneratedPluginRegistrant.registerWith(flutterEngine)
 //  flutterEngine.plugins.add(PassKitService())
@@ -66,15 +69,15 @@ class MainActivity : FlutterActivity() {
 
  }
 
- fun hasNfc(context: Context?): Boolean {
-  var bRet = false
-  if (context == null) return bRet
+ @RequiresApi(Build.VERSION_CODES.Q)
+ fun hasNfc(context: Context): Boolean {
+  var isSecureNfcOn = false
   val manager: NfcManager = context.getSystemService(Context.NFC_SERVICE) as NfcManager
   val adapter: NfcAdapter = manager.getDefaultAdapter()
-  if (adapter != null && adapter.isEnabled()) {
-   bRet = true
+  if (adapter != null ) {
+    isSecureNfcOn = true
   }
-  return bRet
+  return isSecureNfcOn
  }
 
 }
