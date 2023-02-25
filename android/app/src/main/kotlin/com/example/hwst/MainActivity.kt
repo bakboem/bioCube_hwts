@@ -1,13 +1,13 @@
 package com.example.hwst
-import com.example.hwst.PassKitService
-import com.smavis.lib.TokenProcess
-import com.smavis.lib.util.StringUtils
+import android.content.Context
+import android.content.Intent
+import android.nfc.NfcAdapter
+import android.nfc.NfcManager
+import com.smavis.lib.HceApduService
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.plugin.common.BasicMessageChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.StringCodec
 import io.flutter.plugins.GeneratedPluginRegistrant
 
 class MainActivity : FlutterActivity() {
@@ -45,7 +45,13 @@ class MainActivity : FlutterActivity() {
      passKit.stopListen()
      result.success("success")
     } else if (call.method == "isNfcOk") {
-     passKit.sendMessage("bluOK?")
+     if (hasNfc(context)){
+      passKit.sendMessage("Is Powered On")
+     }else{
+      passKit.sendMessage("Is None.")
+     }
+
+
      result.success("success")
     } else if (call.method == "setRssi") {
      passKit.setRssi(call.arguments as String)
@@ -60,9 +66,16 @@ class MainActivity : FlutterActivity() {
 
  }
 
-
-
-
+ fun hasNfc(context: Context?): Boolean {
+  var bRet = false
+  if (context == null) return bRet
+  val manager: NfcManager = context.getSystemService(Context.NFC_SERVICE) as NfcManager
+  val adapter: NfcAdapter = manager.getDefaultAdapter()
+  if (adapter != null && adapter.isEnabled()) {
+   bRet = true
+  }
+  return bRet
+ }
 
 }
 

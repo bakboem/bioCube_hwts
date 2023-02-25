@@ -11,7 +11,6 @@
 
 package com.example.hwst
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -20,14 +19,10 @@ import android.bluetooth.le.*
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import android.os.ParcelUuid
-import android.os.Vibrator
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat.getSystemService
 import com.smavis.lib.*
 import com.smavis.lib.util.BluetoothUtils
 import com.smavis.lib.util.StringUtils
@@ -36,18 +31,15 @@ import io.flutter.plugin.common.BasicMessageChannel
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.StringCodec
 
-
 @Suppress("CAST_NEVER_SUCCEEDS", "DEPRECATION")
-class PassKitService : UtilsCallBack  {
+class PassKitService :  UtilsCallBack, HceApduService() {
     private val tag: String = PassKitService::class.java.simpleName
     private lateinit var  twoWay: BasicMessageChannel<String>
     private lateinit var  context: Context
-
     private var apduManager: HceApduManager? =null
     var tokenProcess: TokenProcess? =null
     private var mBluetoothAdapter: BluetoothAdapter? =null
     private var btScanner: BluetoothLeScanner? =null
-
     private var runnerHandler: Handler? = null
     private var settings: ScanSettings? = null
     private var filters: ArrayList<ScanFilter>?= null
@@ -56,6 +48,7 @@ class PassKitService : UtilsCallBack  {
     var token : String =""
     var deviceName : String = ""
     private var bMsdValue: ByteArray? = null
+
 
     fun startListen(){
         apduManager = HceApduManager.getInstance(context).setCallBack(this)
@@ -74,8 +67,8 @@ class PassKitService : UtilsCallBack  {
         (filters as ArrayList<ScanFilter>).add(scanFilter)
 
     }
+
     fun stopListen(){
-        apduManager?.setCallBack(null)
         apduManager =null
         tokenProcess = null
         runnerHandler=null
@@ -87,12 +80,13 @@ class PassKitService : UtilsCallBack  {
     public  fun saveToken (t:String){
         val resMap =  tokenProcess!!.putToken(
            t,
-            1000000
+            5000
         )
         val isSaved = resMap["data"] as Boolean
        if (isSaved){
            token =
                StringUtils.convertHexToString(StringUtils.hexStringFromByteArray(TokenProcess.gMobilepassToken))
+           sendMessage("saveToken successful!~~ $token")
        }
     }
     public  fun getToken (){
@@ -109,26 +103,20 @@ class PassKitService : UtilsCallBack  {
     public fun updateToken (t:String){
         val deleteResMap = tokenProcess!!.deleteToken()
         val isDeleted = deleteResMap["data"] as Boolean
-        var isSaved = false
         if (isDeleted) {
-            val saveResMap = tokenProcess!!.putToken(
-              t,
-              5000
-            )
-            isSaved = saveResMap["data"] as Boolean
-            if (isSaved){
-                token =
-                    StringUtils.convertHexToString(StringUtils.hexStringFromByteArray(TokenProcess.gMobilepassToken))
-                sendMessage("updateToken successful!~~")
-            }
+            saveToken(t)
         }
     }
     public fun deleteToken(){
+       if(tokenProcess?.getToken()!=null && tokenProcess!!.getToken().isNotEmpty()){
         val resMap = tokenProcess!!.deleteToken()
         val isDeleted = resMap["data"] as Boolean
         if (isDeleted){
             sendMessage("deleteToken successful!")
         }
+       }else{
+           sendMessage("not token find!")
+       }
     }
     public fun setRssi(r:String){
         rssiFromUserSettings = r
@@ -152,11 +140,18 @@ class PassKitService : UtilsCallBack  {
 
     }
     fun nfcScanningStart(){
-        val intent = Intent(
-            context,
+       if ( TokenProcess.gMobilepassToken == null || TokenProcess.gMobilepassToken.size == 0){
+           Log.d(tag, "Not Token Find ")
+           return
+       }else{
+           Log.d(tag, "start NFC???? ")
+           val intent = Intent(
+            context.applicationContext,
             HceApduService::class.java
-        )
-      context.startService(intent)
+           )
+           context.startService(intent)
+       }
+
     }
     @SuppressLint("MissingPermission")
     private fun connectDevice(device: BluetoothDevice) {
@@ -167,10 +162,11 @@ class PassKitService : UtilsCallBack  {
     @SuppressLint("MissingPermission")
     private val leScanCallback: ScanCallback = object : ScanCallback() {
         override fun onBatchScanResults(results: List<ScanResult>) {
+            Log.d(tag, "onBatchScanResults " + results.toString())
             super.onBatchScanResults(results)
         }
         override fun onScanResult(callbackType: Int, result: ScanResult) {
-            deviceName=""
+             deviceName=""
              deviceName = BluetoothUtils.getDeviceName(result)
             Log.i(tag,"find name : " + result.device.name)
             val rssi = BluetoothUtils.getRssi(result)
@@ -189,27 +185,25 @@ class PassKitService : UtilsCallBack  {
     }
 
 
-
     // callback From com.smavis.lib.util.UtilsCallBack
     override fun onGetTerminalId(p0: String?): Boolean {
-        println(p0)
+        Log.d(TAG, "onGetTerminalId $p0")
         return true
     }
 
     override fun authenticateWithToken() {
         Log.d(TAG, "authenticateWithToken")
-
         val bleprocess = BleProcess.getInstance()
         var res = bleprocess.encryptToken(token.toByteArray(), bMsdValue) //jni
-
         if (res["data"] as Boolean) {
             Log.d(TAG, "encryptToken successful $token!")
             res = BleProcess.writeBleData(mGatt)
-            val isCompleted = res["isCompleted"] as Boolean
+            val isCompleted = res["isCompleted"] as Boolean?
             Log.d(TAG, "isCompleted$isCompleted")
             if (res["data"] as Boolean) {
-
                 Log.d(TAG, "success!???  ${res["data"] as Boolean}")
+                Log.d(TAG, "InstanceToken:::  ${tokenProcess?.token}")
+
             } else {
                 Log.d(TAG, "[BLE] write Data Fail[" + res["resultCode"].toString() + "]")
             }
@@ -224,10 +218,7 @@ class PassKitService : UtilsCallBack  {
         val sendSuccess = resMap["data"] as Boolean
         Log.i(tag,"SendSuccess!? $sendSuccess")
         if (isCompleted) {
-
             disconnectGattServer()
-
-
         } else if (!sendSuccess) {
             disconnectGattServer()
         }

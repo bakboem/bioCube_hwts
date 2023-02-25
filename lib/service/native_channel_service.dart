@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/service/native_channel_service.dart
  * Created Date: 2023-01-25 11:52:53
- * Last Modified: 2023-02-24 22:20:42
+ * Last Modified: 2023-02-25 08:58:27
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -32,7 +32,7 @@ class NativeChannelService {
   }
 
   static final BasicMessageChannel twoWayChannel = BasicMessageChannel(
-      BioCubeBuildConfig.TWO_WAY_MESSAGE_CHANNEL, StandardMessageCodec());
+      BioCubeBuildConfig.TWO_WAY_MESSAGE_CHANNEL, StringCodec());
   static final EventChannel eventChannel =
       EventChannel(BioCubeBuildConfig.BASE_EVENT_CHANNEL);
   static final MethodChannel methodChannel =
@@ -48,7 +48,6 @@ class NativeChannelService {
 
   static Future<void> iosTwoWayChannelHandler(message) async {
     var context = KeyService.baseAppKey.currentContext;
-    message as String;
     if (context != null) {
       final cp = context.read<CoreVerifyProcessProvider>();
       final dp = context.read<DeviceStatusProvider>();
@@ -85,13 +84,13 @@ class NativeChannelService {
       } else {
         cp.setMessage(message);
       }
-      return Future.value('$message');
+      return message;
     }
   }
 
   static Future<void> androidTwoWayChannelHandler(message) async {
     var context = KeyService.baseAppKey.currentContext;
-    message as String;
+    pr('from native :::${message}');
     if (context != null) {
       final cp = context.read<CoreVerifyProcessProvider>();
       final dp = context.read<DeviceStatusProvider>();
@@ -127,7 +126,7 @@ class NativeChannelService {
       } else {
         cp.setMessage(message);
       }
-      return Future.value('$message');
+      return message;
     }
   }
 }

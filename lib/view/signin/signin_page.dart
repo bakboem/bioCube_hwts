@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/Documents/BioCube/biocube/lib/view/auth/auth_page.dart
  * Created Date: 2023-01-22 19:10:16
- * Last Modified: 2023-02-22 23:23:26
+ * Last Modified: 2023-02-24 23:52:59
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -254,7 +254,6 @@ class _SigninPageState extends State<SigninPage> {
                       AppSettings.openLocationSettings();
                     }
                   } else {
-                    pr('sb');
                     await _loginProccess();
                   }
                 }
