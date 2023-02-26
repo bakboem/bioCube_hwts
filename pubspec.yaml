@@ -1,7 +1,7 @@
 name: hwst
 description: A new Flutter project.
 publish_to: 'none' 
-version: 1.0.0+2
+version: 1.0.1+1
 
 environment:
   sdk: '>=2.19.2 <3.0.0'
@@ -84,9 +84,9 @@ flutter_native_splash:
 
 
 flutter_icons:
+  android: "launcher_icon"
   image_path_android: "assets/images/hwst_app_icon.png"
   image_path_ios: "assets/images/hwst_app_icon.png"
-  android: true # can specify file name here e.g. "ic_launcher"
   ios: true # can specify file name here e.g. "My-L`auncher-Icon"
   adaptive_icon_background: "#0d2f7c" 
-  min_sdk_android: 24
+  min_sdk_android: 23

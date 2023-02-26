@@ -1,3 +1,11 @@
+/*
+ * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
+ * @Date: 2023-02-24 16:05:37
+ * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
+ * @LastEditTime: 2023-02-26 13:43:58
+ * @FilePath: /hwst/lib/main.dart
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hwst/bioCubeApp.dart';
@@ -10,12 +18,12 @@ import 'package:hwst/service/native_channel_service.dart';
 import 'package:hwst/buildConfig/biocube_build_config.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  await WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  NativeChannelService.init();
   await Hive.initFlutter();
+  NativeChannelService.init();
+  SoundService.init();
   CacheService.init();
-  await SoundService.init();
   setSystemOverlay();
   start();
 }

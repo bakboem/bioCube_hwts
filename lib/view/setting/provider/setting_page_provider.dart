@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/setting/provider/setting_page_provider.dart
  * Created Date: 2023-01-27 12:15:53
- * Last Modified: 2023-02-22 22:44:43
+ * Last Modified: 2023-02-26 15:44:03
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -12,6 +12,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:hwst/service/pass_kit_service.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/service/key_service.dart';
 import 'package:hwst/service/cache_service.dart';
@@ -29,9 +30,13 @@ class SettinPageProivder extends ChangeNotifier {
   String? currenGuideMethod;
   String? currenVeirfyRadioStr;
   String? combinationVeifyRadioStr;
+  int? rssi;
+  int? sessionSettingTime;
+
   var veifyRadioList = [];
   var combinationVeifyRadioList = [];
   var guideMethodRadioList = [];
+
   void setUserEnvrionment() {
     final ap = KeyService.baseAppKey.currentContext!.read<AuthProvider>();
     var temp = UserEnvironmentModel(
@@ -41,7 +46,9 @@ class SettinPageProivder extends ChangeNotifier {
         nfcSwichVal,
         combinationVeifyRadioStr == null
             ? veifyRadioList.indexOf(currenVeirfyRadioStr!)
-            : combinationVeifyRadioList.indexOf(combinationVeifyRadioStr!) + 2);
+            : combinationVeifyRadioList.indexOf(combinationVeifyRadioStr!) + 2,
+        rssi,
+        sessionSettingTime);
     pr(temp.toJson());
     CacheService.saveUserEnvironment(temp.toJson());
     ap.setUserEnvironment(temp);
@@ -60,6 +67,16 @@ class SettinPageProivder extends ChangeNotifier {
 
   void setCombinationVeifyRadioStr(List<String> list, int index) {
     combinationVeifyRadioStr = list[index];
+    notifyListeners();
+  }
+
+  void setRssi(int val) {
+    rssi = val;
+    notifyListeners();
+  }
+
+  void setSessionTime(int val) {
+    sessionSettingTime = val;
     notifyListeners();
   }
 
@@ -88,6 +105,8 @@ class SettinPageProivder extends ChangeNotifier {
       currenVeirfyRadioStr = tr('personal');
       bleSwichVal = true;
       nfcSwichVal = true;
+      sessionSettingTime = 60;
+      rssi = -40;
     } else {
       nfcSwichVal = userEvn.isUseNfc!;
       bleSwichVal = userEvn.isUseBle!;
@@ -99,6 +118,8 @@ class SettinPageProivder extends ChangeNotifier {
       combinationVeifyRadioStr = userEvn.useType! > 1
           ? combinationVeifyRadioList[userEvn.useType! - veifyRadioList.length]
           : null;
+      sessionSettingTime = userEvn.sessionTime;
+      rssi = userEvn.rssi;
     }
     return ResultModel(true);
   }

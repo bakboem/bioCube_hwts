@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/history/history_page.dart
  * Created Date: 2023-01-29 17:56:27
- * Last Modified: 2023-02-22 22:44:42
+ * Last Modified: 2023-02-26 11:48:22
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -226,7 +226,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     : tr('plz_select_server_type'));
           } else {
             final tp = context.read<TimerProvider>();
-            if (tp.isRunning == null || !tp.isRunning!) {
+            if (!tp.isRunning) {
               tp.perdict(Future.delayed(Duration.zero, () async {
                 p.refresh();
               }));

@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/home/provider/core_process_provider.dart
  * Created Date: 2023-01-25 12:24:10
- * Last Modified: 2023-02-26 10:06:11
+ * Last Modified: 2023-02-26 14:37:20
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -21,7 +21,6 @@ import 'package:hwst/service/api_service.dart';
 import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/service/location_service.dart';
 import 'package:hwst/model/common/result_model.dart';
-import 'package:hwst/service/deviceInfo_service.dart';
 import 'package:hwst/service/permission_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:hwst/view/common/function_of_print.dart';
@@ -37,9 +36,11 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
   bool isBackgroundMode = false;
   String? message;
   String tid = '';
+
   bool? isBleSuccess; // toast
   bool? isNfcSuccess; // toast
   Timer? timer;
+  Timer? sessionTimer;
   var verifyType = VerifyType.BLE;
   final _api = ApiService();
   bool get isTimerRunning => timer != null ? timer!.isActive : false;
@@ -49,6 +50,19 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
 
   void startTimer({Duration? duration}) {
     timer = Timer(duration ?? Duration(seconds: 3), () => reset());
+  }
+
+  void startSettionTimer() {
+    var temp = CacheService.getUserEnvironment()!.sessionTime;
+    if (sessionTimer == null) {
+      sessionTimer = Timer.periodic(Duration(seconds: 1), (t) {
+        if (t == temp) {
+          t.cancel();
+          sessionTimer = null;
+        }
+        notifyListeners();
+      });
+    }
   }
 
   void setIsBackgroundMode(bool val) {
@@ -162,6 +176,7 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
   @override
   void dispose() {
     timer?.cancel();
+    sessionTimer?.cancel();
     super.dispose();
   }
 }

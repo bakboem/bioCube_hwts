@@ -2,7 +2,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-02-24 16:22:08
  * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2023-02-26 11:18:37
+ * @LastEditTime: 2023-02-26 12:49:38
  * @FilePath: /hwst/lib/service/native_channel_service.dart
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -70,6 +70,10 @@ class NativeChannelService {
       final tp = context.read<TimerProvider>();
       if (message.startsWith('bleSuccess:') ||
           message.startsWith('nfcSuccess:')) {
+        if (!tp.isPassKitTimerRunning) {
+          tp.passKitProcess(PassKitService.updateToken,
+              duration: Duration(seconds: 3));
+        }
         var tid = message.substring(message.indexOf(':') + 1).trim();
         if (CacheService.getTidList() == null ||
             CacheService.getTidList()!
@@ -80,14 +84,6 @@ class NativeChannelService {
           var setType = () {
             if (message.startsWith('nfcSuccess:')) {
               cp.setVerifyType(VerifyType.NFC);
-
-              if (tp.isRunning == null || !tp.isRunning!) {
-                tp.perdict(
-                    Future.delayed(Duration(seconds: 10), () async {
-                      PassKitService.initKit();
-                    }),
-                    duration: Duration.zero);
-              }
             } else if (message.startsWith('bleSuccess:')) {
               cp.setVerifyType(VerifyType.BLE);
             }
@@ -98,7 +94,7 @@ class NativeChannelService {
             thread.reuqest(Future.delayed(
                 Duration.zero, () => cp.sendDataToSeverFromBackground()));
           } else {
-            if (tp.isRunning == null || !tp.isRunning!) {
+            if (!tp.isRunning) {
               tp.perdict(
                 Future.delayed(Duration.zero, () async {
                   cp.sendDataToSever().then((result) {

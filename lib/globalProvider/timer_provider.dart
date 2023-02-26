@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/sm/si/medsalesportal/lib/globalProvider/timer_provider.dart
  * Created Date: 2022-07-08 14:36:43
- * Last Modified: 2023-02-22 22:40:59
+ * Last Modified: 2023-02-26 14:22:00
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -20,17 +20,21 @@ import 'package:hwst/view/common/function_of_print.dart';
 class TimerProvider extends ChangeNotifier {
   String? lastToastText;
   Timer? _timer;
+  Timer? _passKitTimer;
   Timer? _exitAppTimer;
   Timer? _toastTimer;
   Timer? get getTimer => _timer;
-  bool? get isRunning => _timer?.isActive;
+  bool get isRunning => _timer == null ? false : _timer!.isActive;
+  bool get isToastRunnint =>
+      _toastTimer == null ? false : _toastTimer!.isActive;
+  bool get isPassKitTimerRunning =>
+      _passKitTimer == null ? false : _passKitTimer!.isActive;
   // 영업시간 설정
   final startWorkingHour = 00;
   final stopWorkingHour = 23;
   final startMinute = 00;
   final stopMinute = 59;
-  bool get isToastRunnint =>
-      _toastTimer == null ? false : _toastTimer!.isActive;
+
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  영업시간 제한
   DateTime? lastActionTime;
   bool get isNotWorkingTime {
@@ -86,12 +90,22 @@ class TimerProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> toastprocess(Function process, {Duration? duration}) async {
+  void passKitProcess(Function process, {Duration? duration}) {
+    _passKitTimer = Timer.periodic(duration ?? const Duration(seconds: 3), (t) {
+      process.call();
+      t.cancel();
+      pr('_passkitTimer stoped');
+      _passKitTimer = null;
+    });
+  }
+
+  void toastProcess(Function process, {Duration? duration}) {
     process.call();
     _toastTimer = Timer.periodic(duration ?? const Duration(seconds: 3), (t) {
       t.cancel();
       _toastTimer = null;
     });
+    notifyListeners();
   }
 
   Future<void> perdict(Future<void> future, {Duration? duration}) async {
@@ -140,6 +154,7 @@ class TimerProvider extends ChangeNotifier {
     _timer?.cancel();
     _exitAppTimer?.cancel();
     _toastTimer?.cancel();
+    _passKitTimer?.cancel();
     super.dispose();
   }
 }

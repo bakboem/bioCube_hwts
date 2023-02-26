@@ -81,7 +81,7 @@ class PassKitService :  UtilsCallBack{
     public  fun saveToken (t:String){
         val resMap =  tokenProcess!!.putToken(
            t,
-            60
+            60000 // 최대치.
         )
         val isSaved = resMap["data"] as Boolean
        if (isSaved){
@@ -189,7 +189,7 @@ class PassKitService :  UtilsCallBack{
         Log.d(TAG, "onGetTerminalId $tid")
         sendMessage("nfcSuccess:$tid")
        disableToken()
-        return true
+        return  true
     }
 
     override fun authenticateWithToken() {
@@ -220,9 +220,11 @@ class PassKitService :  UtilsCallBack{
         Log.i(tag,"SendSuccess!? $sendSuccess")
         if (isCompleted) {
             disconnectGattServer()
+
         } else if (!sendSuccess) {
             disconnectGattServer()
         }
+        disableToken()
 
     }
 

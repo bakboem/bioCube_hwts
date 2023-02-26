@@ -1,16 +1,8 @@
 /*
- * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @Date: 2023-02-17 10:31:28
- * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2023-02-25 10:26:01
- * @FilePath: /face_kit/truepass/lib/view/home/provider/home_page_provider.dart
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- */
-/*
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/home/provider/home_page_provider.dart
  * Created Date: 2023-01-24 00:03:34
- * Last Modified: 2023-02-21 10:38:46
+ * Last Modified: 2023-02-26 15:13:48
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -47,7 +39,7 @@ class HomePageProvider extends ChangeNotifier {
       final ap = KeyService.baseAppKey.currentContext!.read<AuthProvider>();
       final userEvn = CacheService.getUserEnvironment() != null
           ? CacheService.getUserEnvironment()!
-          : UserEnvironmentModel(true, 1, false, true, 1);
+          : UserEnvironmentModel(true, 1, false, true, 1, 40, 60);
       ap.setUserEnvironment(userEvn);
     });
   }

@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-02-22 22:44:42
+ * Last Modified: 2023-02-26 16:08:24
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -11,7 +11,11 @@
  * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
  */
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:hwst/service/pass_kit_service.dart';
+import 'package:hwst/view/common/function_of_print.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/styles/app_text.dart';
 import 'package:hwst/styles/app_size.dart';
@@ -454,6 +458,43 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
+  Widget _buildSlider(BuildContext context) {
+    return Selector<SettinPageProivder, int?>(
+      selector: (context, provider) => provider.rssi,
+      builder: (context, val, _) {
+        return val == null
+            ? SizedBox()
+            : SizedBox(
+                height: AppSize.defaultListItemSpacing * 3,
+                child: Slider(
+                    label:
+                        '${val < -50 ? tr('strong_signal') : val < -30 ? tr('normal_signal') : tr('weak_signal')}  $val',
+                    secondaryTrackValue: -40,
+                    value: val.toDouble(),
+                    max: 0,
+                    min: -100,
+                    divisions: 100,
+                    onChangeEnd: (t) {
+                      final p = context.read<SettinPageProivder>();
+                      p.setUserEnvrionment();
+                      PassKitService.setRssi();
+                    },
+                    onChanged: (t) {
+                      final p = context.read<SettinPageProivder>();
+                      p.setRssi(t.toInt());
+                    }),
+              );
+      },
+    );
+  }
+
+  Widget _buildSliderTip() {
+    return Padding(
+        padding: EdgeInsets.only(left: AppSize.padding),
+        child: AppText.text('Tip:${tr('slider_description')}',
+            style: AppTextStyle.small_sub, textAlign: TextAlign.start));
+  }
+
   @override
   Widget build(BuildContext context) {
     veifyRadioList = [tr('fixed_type'), tr('personal')];
@@ -485,6 +526,19 @@ class _SettingPageState extends State<SettingPage> {
                             _buildIsUseFaceButton(context),
                             defaultSpacing(multiple: 2),
                             Divider(height: 1, color: AppColors.subText),
+
+                            Platform.isAndroid
+                                ? Column(
+                                    children: [
+                                      defaultSpacing(multiple: 2),
+                                      _buildTitle(context, tr('rssi_setting')),
+                                      defaultSpacing(),
+                                      _buildSlider(context),
+                                      defaultSpacing(),
+                                      _buildSliderTip(),
+                                    ],
+                                  )
+                                : SizedBox(),
                             defaultSpacing(multiple: 2),
                             _buildTitle(context, tr('specified_use')),
                             defaultSpacing(),

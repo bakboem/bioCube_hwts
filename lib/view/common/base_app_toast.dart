@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/common/app_toast.dart
  * Created Date: 2021-10-01 14:02:55
- * Last Modified: 2023-02-22 22:42:50
+ * Last Modified: 2023-02-26 11:51:01
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -60,7 +60,7 @@ class AppToast {
         toastDuration: const Duration(seconds: 3),
       );
     } else if (!tp.isToastRunnint) {
-      return tp.toastprocess(() {
+      return tp.toastProcess(() {
         fToast!.showToast(
           child: toast,
           gravity: ToastGravity.TOP,

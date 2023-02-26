@@ -2,7 +2,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-02-01 10:23:22
  * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2023-02-26 10:58:22
+ * @LastEditTime: 2023-02-26 15:52:44
  * @FilePath: /hwst/lib/service/pass_kit_service.dart
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -40,6 +40,7 @@ class PassKitService {
 
   static Future<void> initKit() async {
     await NativeChannelService.methodChannel.invokeMethod('initState');
+    await setRssi();
     await isNfcOk();
     Platform.isAndroid ? await updateToken() : await saveToken();
     Platform.isAndroid ? await activeToken() : DoNothingAction();
@@ -57,13 +58,17 @@ class PassKitService {
     if (CacheService.getUserCard() != null) {
       await NativeChannelService.methodChannel.invokeMethod(
           'saveToken', CacheService.getUserCard()!.mCardKey ?? '');
+      Platform.isAndroid ? await activeToken() : DoNothingAction();
     }
   }
 
   static Future<void> updateToken() async {
+    await setRssi();
     if (CacheService.getUserCard() != null) {
       await NativeChannelService.methodChannel.invokeMethod(
           'updateToken', CacheService.getUserCard()!.mCardKey ?? '');
+      Platform.isAndroid ? await getToken() : DoNothingAction();
+      Platform.isAndroid ? await activeToken() : DoNothingAction();
     }
   }
 
@@ -72,6 +77,7 @@ class PassKitService {
   }
 
   static Future<void> startBle() async {
+    await setRssi();
     Platform.isAndroid ? await updateToken() : await saveToken();
     Platform.isAndroid ? await activeToken() : DoNothingAction();
     final cp =
@@ -82,8 +88,9 @@ class PassKitService {
   }
 
   static Future<void> startNfc() async {
+    await setRssi();
     Platform.isAndroid ? await updateToken() : await saveToken();
-    await activeToken();
+    Platform.isAndroid ? await activeToken() : DoNothingAction();
     final cp =
         KeyService.baseAppKey.currentContext!.read<CoreVerifyProcessProvider>();
     cp.setVerifyType(VerifyType.NFC);
@@ -97,6 +104,16 @@ class PassKitService {
   static Future<void> activeToken() async {
     if (Platform.isAndroid) {
       await NativeChannelService.methodChannel.invokeMethod('activeToken');
+    }
+  }
+
+  static Future<void> setRssi() async {
+    if (Platform.isAndroid) {
+      await NativeChannelService.methodChannel.invokeMethod(
+          'setRssi',
+          CacheService.getUserEnvironment() != null
+              ? CacheService.getUserEnvironment()!.rssi.toString()
+              : '-40');
     }
   }
 

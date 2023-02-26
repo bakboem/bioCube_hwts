@@ -103,5 +103,10 @@
     "all":"전체",
     "permisson_for_bidden":"관리자에게 문의 바랍니다.(권한부족).",
     "plz_check_email":"이메일 형식 오류입니다. \n확인후 진행해주세요.",
-    "face_detection":"얼굴인식"
+    "face_detection":"얼굴인식",
+    "strong_signal":"신호강함",
+    "weak_signal":"신호약함",
+    "normal_signal":"신호보통",
+    "rssi_setting":"BLE신호강도 설정",
+    "slider_description":"신호가 약할수록 장비에 더 가까이 있어야 합니다."
 }

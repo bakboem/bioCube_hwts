@@ -14,6 +14,8 @@ UserEnvironmentModel _$UserEnvironmentModelFromJson(
       json['isUseFace'] as bool?,
       json['isUseNfc'] as bool?,
       json['useType'] as int?,
+      json['rssi'] as int?,
+      json['sessionTime'] as int?,
     );
 
 Map<String, dynamic> _$UserEnvironmentModelToJson(
@@ -24,4 +26,6 @@ Map<String, dynamic> _$UserEnvironmentModelToJson(
       'isUseFace': instance.isUseFace,
       'useType': instance.useType,
       'alarmType': instance.alarmType,
+      'rssi': instance.rssi,
+      'sessionTime': instance.sessionTime
     };
