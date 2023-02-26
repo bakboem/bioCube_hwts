@@ -14,7 +14,7 @@ UserEnvironmentModel _$UserEnvironmentModelFromJson(
       json['isUseFace'] as bool?,
       json['isUseNfc'] as bool?,
       json['useType'] as int?,
-      json['rssi'] as int?,
+      json['rssi'] as String?,
       json['sessionTime'] as int?,
     );
 

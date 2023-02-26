@@ -48,6 +48,7 @@ class PassKitService :  UtilsCallBack{
     var rssiFromUserSettings : String ="-100"
     var token : String =""
     var deviceName : String = ""
+    var  setSessionTimeVlue : Int = 60
     private var bMsdValue: ByteArray? = null
 
 
@@ -81,7 +82,7 @@ class PassKitService :  UtilsCallBack{
     public  fun saveToken (t:String){
         val resMap =  tokenProcess!!.putToken(
            t,
-            60000 // 최대치.
+            setSessionTimeVlue*1000 // 최대치.
         )
         val isSaved = resMap["data"] as Boolean
        if (isSaved){
@@ -124,6 +125,9 @@ class PassKitService :  UtilsCallBack{
     }
     public fun setRssi(r:String){
         rssiFromUserSettings = r
+    }
+    public fun  setSessionTime (s:Int){
+        setSessionTimeVlue = s
     }
     public fun sendMessage(str:String){
            twoWay.send(str)

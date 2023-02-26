@@ -2,7 +2,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-02-01 10:23:22
  * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2023-02-26 15:52:44
+ * @LastEditTime: 2023-02-26 17:04:09
  * @FilePath: /hwst/lib/service/pass_kit_service.dart
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -112,8 +112,18 @@ class PassKitService {
       await NativeChannelService.methodChannel.invokeMethod(
           'setRssi',
           CacheService.getUserEnvironment() != null
-              ? CacheService.getUserEnvironment()!.rssi.toString()
+              ? CacheService.getUserEnvironment()!.rssi ?? '-40'
               : '-40');
+    }
+  }
+
+  static Future<void> setSessionTime() async {
+    if (Platform.isAndroid) {
+      await NativeChannelService.methodChannel.invokeMethod(
+          'setSessionTime',
+          CacheService.getUserEnvironment() != null
+              ? CacheService.getUserEnvironment()!.sessionTime ?? 60
+              : 60);
     }
   }
 

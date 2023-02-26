@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-02-26 16:08:24
+ * Last Modified: 2023-02-26 17:13:51
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -337,7 +337,9 @@ class _SettingPageState extends State<SettingPage> {
                   },
                 ),
               ),
-              Padding(padding: EdgeInsets.only(right: AppSize.padding)),
+              Padding(
+                  padding:
+                      EdgeInsets.only(right: AppSize.defaultListItemSpacing)),
               Expanded(
                 child: AppText.text(guideMethodRadioList[index],
                     style: currenStr == guideMethodRadioList[index]
@@ -459,40 +461,88 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Widget _buildSlider(BuildContext context) {
-    return Selector<SettinPageProivder, int?>(
+    return Selector<SettinPageProivder, String?>(
       selector: (context, provider) => provider.rssi,
       builder: (context, val, _) {
         return val == null
             ? SizedBox()
-            : SizedBox(
-                height: AppSize.defaultListItemSpacing * 3,
-                child: Slider(
-                    label:
-                        '${val < -50 ? tr('strong_signal') : val < -30 ? tr('normal_signal') : tr('weak_signal')}  $val',
-                    secondaryTrackValue: -40,
-                    value: val.toDouble(),
-                    max: 0,
-                    min: -100,
-                    divisions: 100,
-                    onChangeEnd: (t) {
-                      final p = context.read<SettinPageProivder>();
-                      p.setUserEnvrionment();
-                      PassKitService.setRssi();
-                    },
-                    onChanged: (t) {
-                      final p = context.read<SettinPageProivder>();
-                      p.setRssi(t.toInt());
-                    }),
-              );
+            : Slider(
+                label:
+                    '${double.parse(val).toInt() < -50 ? tr('strong_signal') : double.parse(val).toInt() < -30 ? tr('normal_signal') : tr('weak_signal')}  $val',
+                secondaryTrackValue: -40,
+                value: double.parse(val),
+                max: 0,
+                min: -100,
+                divisions: 100,
+                onChangeEnd: (t) {
+                  final p = context.read<SettinPageProivder>();
+                  p.setUserEnvrionment();
+                  PassKitService.setRssi();
+                },
+                onChanged: (t) {
+                  final p = context.read<SettinPageProivder>();
+                  p.setRssi(t.toInt().toString());
+                });
       },
     );
   }
 
-  Widget _buildSliderTip() {
+  Widget _buildTips(String str) {
     return Padding(
-        padding: EdgeInsets.only(left: AppSize.padding),
-        child: AppText.text('Tip:${tr('slider_description')}',
-            style: AppTextStyle.small_sub, textAlign: TextAlign.start));
+        padding: EdgeInsets.symmetric(horizontal: AppSize.padding),
+        child: AppText.text('Tip:$str',
+            style: AppTextStyle.small_sub,
+            textAlign: TextAlign.start,
+            maxLines: 2));
+  }
+
+  Widget _buildSessionTimeInput(BuildContext context) {
+    return Selector<SettinPageProivder, int?>(
+      selector: (context, provider) => provider.sessionSettingTime,
+      builder: (context, session, _) {
+        return Slider(
+            max: 60,
+            min: 0,
+            divisions: 60,
+            label: '${session?.toInt()} sec',
+            value: session != null ? session.toDouble() : 0,
+            onChangeEnd: (s) {
+              final p = context.read<SettinPageProivder>();
+              p.setUserEnvrionment();
+              PassKitService.setSessionTime();
+            },
+            onChanged: (s) {
+              final p = context.read<SettinPageProivder>();
+              p.setSessionTime(s.toInt());
+            });
+      },
+    );
+  }
+
+  Widget _buildTitleRow(BuildContext context, String title,
+      {required bool isRssi}) {
+    return Padding(
+      padding: EdgeInsets.only(right: AppSize.padding),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          AppText.text(title),
+          isRssi
+              ? Selector<SettinPageProivder, String?>(
+                  selector: (context, provider) => provider.rssi,
+                  builder: (context, val, _) {
+                    return AppText.text('$val dBm');
+                  },
+                )
+              : Selector<SettinPageProivder, int?>(
+                  selector: (context, provider) => provider.sessionSettingTime,
+                  builder: (context, val, _) {
+                    return AppText.text('$val sec');
+                  },
+                )
+        ],
+      ),
+    );
   }
 
   @override
@@ -518,7 +568,7 @@ class _SettingPageState extends State<SettingPage> {
                         Expanded(
                             child: ListView(
                           padding: AppSize.defaultSidePadding,
-                          physics: NeverScrollableScrollPhysics(),
+                          // physics: NeverScrollableScrollPhysics(),
                           children: [
                             _buildLangugeSelector(context),
                             _buildIsUseNfcButton(context),
@@ -529,13 +579,24 @@ class _SettingPageState extends State<SettingPage> {
 
                             Platform.isAndroid
                                 ? Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       defaultSpacing(multiple: 2),
-                                      _buildTitle(context, tr('rssi_setting')),
+                                      _buildTitleRow(
+                                          context, tr('rssi_setting'),
+                                          isRssi: true),
                                       defaultSpacing(),
                                       _buildSlider(context),
                                       defaultSpacing(),
-                                      _buildSliderTip(),
+                                      _buildTips(tr('slider_description')),
+                                      defaultSpacing(),
+                                      _buildTitleRow(
+                                          context, tr('session_setting'),
+                                          isRssi: false),
+                                      _buildSessionTimeInput(context),
+                                      defaultSpacing(),
+                                      _buildTips(tr('session_description')),
                                     ],
                                   )
                                 : SizedBox(),
@@ -552,7 +613,8 @@ class _SettingPageState extends State<SettingPage> {
                             defaultSpacing(multiple: 2),
                             _buildTitle(context, tr('stop_using_request')),
                             defaultSpacing(),
-                            _buidStopUsingRequestWidget(context)
+                            _buidStopUsingRequestWidget(context),
+                            defaultSpacing(height: AppSize.appBarHeight)
                           ],
                         ))
                       ],

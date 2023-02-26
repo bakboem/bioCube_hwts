@@ -108,5 +108,8 @@
     "weak_signal":"신호약함",
     "normal_signal":"신호보통",
     "rssi_setting":"BLE신호강도 설정",
+    "session_setting":"BLE세션 설정",
+    "second":"sec",
+    "session_description":"세션이 끝나면 다시 앱을 열거나 인증버튼을 눌러 인증해야 합니다.",
     "slider_description":"신호가 약할수록 장비에 더 가까이 있어야 합니다."
 }

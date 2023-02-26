@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/setting/provider/setting_page_provider.dart
  * Created Date: 2023-01-27 12:15:53
- * Last Modified: 2023-02-26 15:44:03
+ * Last Modified: 2023-02-26 16:59:37
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -12,7 +12,6 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:hwst/service/pass_kit_service.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/service/key_service.dart';
 import 'package:hwst/service/cache_service.dart';
@@ -30,7 +29,7 @@ class SettinPageProivder extends ChangeNotifier {
   String? currenGuideMethod;
   String? currenVeirfyRadioStr;
   String? combinationVeifyRadioStr;
-  int? rssi;
+  String? rssi;
   int? sessionSettingTime;
 
   var veifyRadioList = [];
@@ -70,7 +69,7 @@ class SettinPageProivder extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setRssi(int val) {
+  void setRssi(String val) {
     rssi = val;
     notifyListeners();
   }
@@ -106,7 +105,7 @@ class SettinPageProivder extends ChangeNotifier {
       bleSwichVal = true;
       nfcSwichVal = true;
       sessionSettingTime = 60;
-      rssi = -40;
+      rssi = '-40';
     } else {
       nfcSwichVal = userEvn.isUseNfc!;
       bleSwichVal = userEvn.isUseBle!;

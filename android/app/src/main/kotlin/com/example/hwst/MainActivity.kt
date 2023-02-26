@@ -63,7 +63,12 @@ class MainActivity : FlutterActivity() {
      }else if (call.method == "setRssi") {
      passKit.setRssi(call.arguments as String)
      result.success("success")
-    } else {
+     
+    }
+    else if (call.method == "setSessionTime") {
+      passKit.setSessionTime(call.arguments as Int)
+      result.success("success")
+     } else {
      result.notImplemented()
     }
    }
