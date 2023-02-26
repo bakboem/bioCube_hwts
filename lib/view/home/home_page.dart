@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/Documents/BioCube/biocube/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-02-25 23:49:50
+ * Last Modified: 2023-02-26 11:08:03
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -210,7 +210,7 @@ class _HomePageState extends State<HomePage> {
           final p = context.read<HomePageProvider>();
           final isSelectedBlue = p.currenPage == 0;
           final isSelectedNfc = p.currenPage == 1;
-          final isSelectedFace = p.currenPage == 2;
+          final isSelectedFace = (p.currenPage == 2);
           if (isLocationOk) {
             if (!cp.isTimerRunning) {
               if (isSelectedBlue && isBleOk && userEvn!.isUseBle!) {
@@ -278,14 +278,13 @@ class _HomePageState extends State<HomePage> {
             }),
           onPageChanged: (index) {
             final p = context.read<HomePageProvider>();
-            pr(index);
             p.setCurrenPage(index);
           },
           children: [
             _buildPageViewText(context, 'ble', isStatusOk: isBleOk, userEvn),
-            // _buildPageViewText(context, 'nfc', isStatusOk: isNfcOk, userEvn),
-            _buildPageViewText(
-                context, 'face', isStatusOk: userEvn?.isUseFace, userEvn),
+            _buildPageViewText(context, 'nfc', isStatusOk: isNfcOk, userEvn),
+            // _buildPageViewText(
+            //     context, 'face', isStatusOk: userEvn?.isUseFace, userEvn),
           ],
         ));
   }

@@ -72,16 +72,16 @@ class PassKitService :  UtilsCallBack{
     fun stopListen(){
         // apduManager =null
         // tokenProcess = null
-        runnerHandler=null
-        mBluetoothAdapter = null
-        btScanner = null
-        settings= null
-        filters = null
+        // runnerHandler=null
+        // mBluetoothAdapter = null
+        // btScanner = null
+        // settings= null
+        // filters = null
     }
     public  fun saveToken (t:String){
         val resMap =  tokenProcess!!.putToken(
            t,
-            10000000
+            60
         )
         val isSaved = resMap["data"] as Boolean
        if (isSaved){
@@ -100,14 +100,16 @@ class PassKitService :  UtilsCallBack{
     public fun init( contextt: Context, binary:BinaryMessenger){
         context = contextt
         twoWay = BasicMessageChannel( binary,"myapp/twoWay",StringCodec.INSTANCE )
-
     }
     public fun updateToken (t:String){
-        val deleteResMap = tokenProcess!!.deleteToken()
-        val isDeleted = deleteResMap["data"] as Boolean
-        if (isDeleted) {
-            saveToken(t)
-        }
+        deleteToken()
+        saveToken(t)
+    }
+    public fun disableToken(){
+        tokenProcess?.setDisableToken()
+    }
+    public fun activeToken(){
+        tokenProcess?.setActiveToken()
     }
     public fun deleteToken(){
        if(tokenProcess?.getToken()!=null && tokenProcess!!.getToken().isNotEmpty()){
@@ -134,6 +136,7 @@ class PassKitService :  UtilsCallBack{
     }
     @SuppressLint("MissingPermission")
     fun bleScanningStart() {
+        sendMessage("bleStart")
         Log.d(tag, "==== start Ble scanning ====")
             btScanner!!.startScan(filters, settings, leScanCallback)
             runnerHandler?.postDelayed({
@@ -141,23 +144,16 @@ class PassKitService :  UtilsCallBack{
             }, 5000)
     }
     fun nfcScanningStart(){
-       if ( TokenProcess.gMobilepassToken == null || TokenProcess.gMobilepassToken.size == 0){
-           Log.d(tag, "Not Token Find ")
-           return
-       }else{
-            saveToken(token)
-           getToken()
-           val intent = Intent(
+        val intent = Intent(
             context,
             HceApduService::class.java
-           )
-           context.startService(intent)
-        //    apduManager?.processApdu(TokenProcess.gMobilepassToken )
-       }
+        )
+        context.startService(intent)
     }
     @SuppressLint("MissingPermission")
     private fun connectDevice(device: BluetoothDevice) {
         Log.d(tag, "Connecting to " + device.address)
+        sendMessage("peripheral Ready")
         val gattClient = GattClient(this)
         mGatt = device.connectGatt(context, false, gattClient)
     }
@@ -192,7 +188,7 @@ class PassKitService :  UtilsCallBack{
        var tid = StringUtils.convertHexToString(p0)
         Log.d(TAG, "onGetTerminalId $tid")
         sendMessage("nfcSuccess:$tid")
-        deleteToken()
+       disableToken()
         return true
     }
 

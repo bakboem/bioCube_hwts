@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/service/cache_service.dart
  * Created Date: 2021-08-22 19:45:10
- * Last Modified: 2023-02-23 00:13:14
+ * Last Modified: 2023-02-26 10:03:41
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -13,6 +13,7 @@
 
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
+import 'package:hwst/model/user/user_device_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hwst/enums/language_type.dart';
 import 'package:hwst/model/access/access_info.dart';
@@ -95,6 +96,15 @@ class CacheService {
   static AccessInfo? getAccessInfo() {
     var temp = getData('AccessInfo');
     return temp != null ? AccessInfo.fromJson(jsonDecode(temp)) : null;
+  }
+
+  static void saveDeviceInfo(Map<String, dynamic> info) {
+    saveData('DeviceInfo', jsonEncode(info));
+  }
+
+  static UserDeviceInfo? getDeviceInfo() {
+    var temp = getData('DeviceInfo');
+    return temp != null ? UserDeviceInfo.fromJson(jsonDecode(temp)) : null;
   }
 
   static void saveSvUrl(String url) {

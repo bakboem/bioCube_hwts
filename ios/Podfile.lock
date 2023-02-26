@@ -1,13 +1,11 @@
 PODS:
   - "app_settings (3.0.0+1)":
     - Flutter
-  - camera_avfoundation (0.0.1):
+  - camera (0.0.1):
     - Flutter
   - connectivity_plus (0.0.1):
     - Flutter
     - ReachabilitySwift
-  - device_info (0.0.1):
-    - Flutter
   - device_info_plus (0.0.1):
     - Flutter
   - fl_camera (0.0.1):
@@ -122,8 +120,6 @@ PODS:
     - FlutterMacOS
   - permission_handler_apple (9.0.4):
     - Flutter
-  - platform_device_id (0.0.1):
-    - Flutter
   - PromisesObjC (2.1.1)
   - Protobuf (3.21.12)
   - ReachabilitySwift (5.0.0)
@@ -140,9 +136,8 @@ PODS:
 
 DEPENDENCIES:
   - app_settings (from `.symlinks/plugins/app_settings/ios`)
-  - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
+  - camera (from `.symlinks/plugins/camera/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
-  - device_info (from `.symlinks/plugins/device_info/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - fl_camera (from `.symlinks/plugins/fl_camera/ios`)
   - fl_mlkit_text_recognize (from `.symlinks/plugins/fl_mlkit_text_recognize/ios`)
@@ -153,7 +148,6 @@ DEPENDENCIES:
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
-  - platform_device_id (from `.symlinks/plugins/platform_device_id/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/ios`)
   - soundpool (from `.symlinks/plugins/soundpool/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
@@ -185,12 +179,10 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   app_settings:
     :path: ".symlinks/plugins/app_settings/ios"
-  camera_avfoundation:
-    :path: ".symlinks/plugins/camera_avfoundation/ios"
+  camera:
+    :path: ".symlinks/plugins/camera/ios"
   connectivity_plus:
     :path: ".symlinks/plugins/connectivity_plus/ios"
-  device_info:
-    :path: ".symlinks/plugins/device_info/ios"
   device_info_plus:
     :path: ".symlinks/plugins/device_info_plus/ios"
   fl_camera:
@@ -211,8 +203,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_foundation/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
-  platform_device_id:
-    :path: ".symlinks/plugins/platform_device_id/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/ios"
   soundpool:
@@ -224,9 +214,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   app_settings: d103828c9f5d515c4df9ee754dabd443f7cedcf3
-  camera_avfoundation: 07c77549ea54ad95d8581be86617c094a46280d9
+  camera: fe33292aff715a981eb34d7ce7b35b54337ff34c
   connectivity_plus: 413a8857dd5d9f1c399a39130850d02fe0feaf7e
-  device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
   device_info_plus: e5c5da33f982a436e103237c0c85f9031142abed
   fl_camera: fae9c06295706dae18fdf6a489b9d2dadaddd712
   fl_mlkit_text_recognize: 5a453f93ee029baa6fb188e3dbe620fa76c61c25
@@ -253,7 +242,6 @@ SPEC CHECKSUMS:
   package_info_plus: 6c92f08e1f853dc01228d6f553146438dafcd14e
   path_provider_foundation: 37748e03f12783f9de2cb2c4eadfaa25fe6d4852
   permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
-  platform_device_id: 81b3e2993881f87d0c82ef151dc274df4869aef5
   PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
   Protobuf: 120350fc38646e2dedc26f49ecba778184ea1de2
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825

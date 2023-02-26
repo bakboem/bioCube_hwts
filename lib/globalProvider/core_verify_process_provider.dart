@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/home/provider/core_process_provider.dart
  * Created Date: 2023-01-25 12:24:10
- * Last Modified: 2023-02-25 23:31:50
+ * Last Modified: 2023-02-26 10:06:11
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -92,7 +92,7 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
       return ResultModel(false);
     }
     pr(CacheService.getUserCard()?.toJson());
-    var deviceInfo = await DeviceInfoService.getDeviceInfo();
+    var deviceInfo = CacheService.getDeviceInfo();
     var userCard = CacheService.getUserCard();
     var AccessInfo = CacheService.getAccessInfo()!;
     resultAuthorizedModel = ResultAuthorizedModel(
@@ -103,7 +103,7 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
       lDate: DateUtil.now(),
       lPhoto: userCard != null ? userCard.mPhoto ?? '' : '',
       lResult: '0',
-      lSerial: deviceInfo.deviceId.trim(),
+      lSerial: deviceInfo?.deviceId.trim(),
       lTid: tid.trim(),
       mPerson: userCard != null ? userCard.mPerson?.trim() : '',
       lGps: '${position?.latitude},${position?.longitude}',
@@ -134,6 +134,29 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
       pr(e);
     }
     return ResultModel(false);
+  }
+
+  void sendDataToSeverFromBackground() {
+    var deviceInfo = CacheService.getDeviceInfo();
+    var userCard = CacheService.getUserCard();
+    var AccessInfo = CacheService.getAccessInfo()!;
+    resultAuthorizedModel = ResultAuthorizedModel(
+      lOs: Platform.isIOS ? 'iOS' : 'Android',
+      lType: verifyType.code.trim(),
+      siteCode: AccessInfo.siteCode?.trim(),
+      mobileId: userCard?.mCardKey?.trim(),
+      lDate: DateUtil.now(),
+      lPhoto: userCard != null ? userCard.mPhoto ?? '' : '',
+      lResult: '0',
+      lSerial: deviceInfo?.deviceId.trim(),
+      lTid: tid.trim(),
+      mPerson: userCard != null ? userCard.mPerson?.trim() : '',
+      lGps: '${position?.latitude},${position?.longitude}',
+    );
+
+    Map<String, dynamic> body = resultAuthorizedModel!.toJson();
+    _api.init(RequestType.SEND_MATCH_RESULT);
+    _api.request(body: body);
   }
 
   @override

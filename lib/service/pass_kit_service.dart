@@ -2,7 +2,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-02-01 10:23:22
  * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2023-02-26 00:07:18
+ * @LastEditTime: 2023-02-26 10:58:22
  * @FilePath: /hwst/lib/service/pass_kit_service.dart
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -21,6 +21,7 @@
 
 import 'dart:io';
 
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/enums/verify_type.dart';
 import 'package:hwst/service/key_service.dart';
@@ -39,43 +40,50 @@ class PassKitService {
 
   static Future<void> initKit() async {
     await NativeChannelService.methodChannel.invokeMethod('initState');
-    await NativeChannelService.methodChannel.invokeMethod('isNfcOk');
-    await NativeChannelService.methodChannel.invokeMethod(
-        'updateToken', CacheService.getUserCard()!.mCardKey ?? '');
+    await isNfcOk();
+    Platform.isAndroid ? await updateToken() : await saveToken();
+    Platform.isAndroid ? await activeToken() : DoNothingAction();
   }
 
   static Future<String?> getToken() async {
     return await NativeChannelService.methodChannel.invokeMethod('getToken');
   }
 
-  static void deleteToken() async {
+  static Future<void> deleteToken() async {
     await NativeChannelService.methodChannel.invokeMethod('deleteToken');
   }
 
-  static void saveToken({String? tk}) async {
-    await NativeChannelService.methodChannel
-        .invokeMethod('saveToken', CacheService.getUserCard()!.mCardKey ?? '');
+  static Future<void> saveToken() async {
+    if (CacheService.getUserCard() != null) {
+      await NativeChannelService.methodChannel.invokeMethod(
+          'saveToken', CacheService.getUserCard()!.mCardKey ?? '');
+    }
   }
 
-  static void updateToken({String? tk}) async {
-    await NativeChannelService.methodChannel.invokeMethod(
-        'updateToken', CacheService.getUserCard()!.mCardKey ?? '');
+  static Future<void> updateToken() async {
+    if (CacheService.getUserCard() != null) {
+      await NativeChannelService.methodChannel.invokeMethod(
+          'updateToken', CacheService.getUserCard()!.mCardKey ?? '');
+    }
   }
 
-  static void isNfcOk() async {
+  static Future<void> isNfcOk() async {
     await NativeChannelService.methodChannel.invokeMethod('isNfcOk');
   }
 
-  static void startBle() async {
-    saveToken();
+  static Future<void> startBle() async {
+    Platform.isAndroid ? await updateToken() : await saveToken();
+    Platform.isAndroid ? await activeToken() : DoNothingAction();
     final cp =
         KeyService.baseAppKey.currentContext!.read<CoreVerifyProcessProvider>();
     cp.setVerifyType(VerifyType.BLE);
+
     await NativeChannelService.methodChannel.invokeMethod('startBle');
   }
 
-  static void startNfc() async {
-    saveToken();
+  static Future<void> startNfc() async {
+    Platform.isAndroid ? await updateToken() : await saveToken();
+    await activeToken();
     final cp =
         KeyService.baseAppKey.currentContext!.read<CoreVerifyProcessProvider>();
     cp.setVerifyType(VerifyType.NFC);
@@ -84,5 +92,17 @@ class PassKitService {
 
   static Future<void> dispose() async {
     await NativeChannelService.methodChannel.invokeMethod('dispose');
+  }
+
+  static Future<void> activeToken() async {
+    if (Platform.isAndroid) {
+      await NativeChannelService.methodChannel.invokeMethod('activeToken');
+    }
+  }
+
+  static Future<void> disableToken() async {
+    if (Platform.isAndroid) {
+      await NativeChannelService.methodChannel.invokeMethod('disableToken');
+    }
   }
 }

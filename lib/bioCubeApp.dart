@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/Documents/BioCube/biocube/lib/bioCubeApp.dart
  * Created Date: 2023-01-22 19:01:08
- * Last Modified: 2023-02-25 23:13:34
+ * Last Modified: 2023-02-26 10:41:19
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -13,6 +13,7 @@
 
 import 'package:hwst/router.dart';
 import 'package:flutter/material.dart';
+import 'package:hwst/view/common/function_of_print.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/view/auth/auth_page.dart';
 import 'package:hwst/service/key_service.dart';
@@ -68,12 +69,14 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
       }
     }
     if (_isForeground) {
-      await PassKitService.initKit();
+      PassKitService.initKit();
       var baseContext = KeyService.baseAppKey.currentContext;
       if (baseContext != null) {
         isCardValid(context).then((isValid) {
           if (isValid) {
             hideKeyboard(context);
+            final cp = baseContext.read<CoreVerifyProcessProvider>();
+            cp.setIsBackgroundMode(false);
             final dp = baseContext.read<DeviceStatusProvider>();
             Future.delayed(Duration.zero, () {
               PermissionService.checkPermissionStatus(Permission.bluetooth)
@@ -85,15 +88,19 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
         });
       }
     } else if (_isDetached) {
+      pr('_isDetached ');
+      SoundService.dispose();
+      PassKitService.dispose();
+      ConnectService.stopListener();
+    } else if (_isBackground) {
+      pr('isBackground');
+      PassKitService.initKit();
       var baseContext = KeyService.baseAppKey.currentContext;
       if (baseContext != null) {
         final cp = baseContext.read<CoreVerifyProcessProvider>();
         cp.setIsBackgroundMode(true);
       }
-      SoundService.dispose();
-      PassKitService.dispose();
-      ConnectService.stopListener();
-    } else if (_isBackground) {}
+    }
   }
 
   @override

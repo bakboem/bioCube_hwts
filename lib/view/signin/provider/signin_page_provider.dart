@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/signin/provider/signin_page_provider.dart
  * Created Date: 2023-01-25 12:36:45
- * Last Modified: 2023-02-22 22:44:45
+ * Last Modified: 2023-02-26 10:02:51
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -19,6 +19,7 @@ import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/model/access/access_info.dart';
 import 'package:hwst/model/common/result_model.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:hwst/service/deviceInfo_service.dart';
 import 'package:hwst/util/regular.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/model/access/access_response_model.dart';
@@ -121,6 +122,8 @@ class SigninPageProvider extends ChangeNotifier {
         temp.data!.createDateByLocal = DateTime.now();
         var accessInfo = AccessInfo(siteCodeInputStr, loginAccountInputStr,
             signinType.code, accessKeyInputStr);
+        var deviceInfo = await DeviceInfoService.getDeviceInfo();
+        CacheService.saveDeviceInfo(deviceInfo.toJson());
         CacheService.saveAccessInfo(accessInfo.toJson());
         CacheService.saveUserCard(temp.data!.toJson());
         CacheService.saveTidList(temp.data!.svTidList);

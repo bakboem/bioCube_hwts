@@ -2,7 +2,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-02-24 16:22:08
  * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2023-02-26 00:13:06
+ * @LastEditTime: 2023-02-26 11:18:37
  * @FilePath: /hwst/lib/service/native_channel_service.dart
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -21,6 +21,7 @@
 
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:hwst/enums/verify_type.dart';
 import 'package:hwst/globalProvider/timer_provider.dart';
 import 'package:hwst/service/pass_kit_service.dart';
@@ -43,8 +44,11 @@ class NativeChannelService {
     return _instance!;
   }
 
-  static final BasicMessageChannel twoWayChannel = BasicMessageChannel(
-      BioCubeBuildConfig.TWO_WAY_MESSAGE_CHANNEL, StringCodec());
+  static final BasicMessageChannel twoWayChannel = Platform.isAndroid
+      ? BasicMessageChannel(
+          BioCubeBuildConfig.TWO_WAY_MESSAGE_CHANNEL, StringCodec())
+      : BasicMessageChannel(
+          BioCubeBuildConfig.TWO_WAY_MESSAGE_CHANNEL, StandardMessageCodec());
   static final EventChannel eventChannel =
       EventChannel(BioCubeBuildConfig.BASE_EVENT_CHANNEL);
   static final MethodChannel methodChannel =
@@ -63,6 +67,7 @@ class NativeChannelService {
     if (context != null) {
       final cp = context.read<CoreVerifyProcessProvider>();
       final dp = context.read<DeviceStatusProvider>();
+      final tp = context.read<TimerProvider>();
       if (message.startsWith('bleSuccess:') ||
           message.startsWith('nfcSuccess:')) {
         var tid = message.substring(message.indexOf(':') + 1).trim();
@@ -75,7 +80,7 @@ class NativeChannelService {
           var setType = () {
             if (message.startsWith('nfcSuccess:')) {
               cp.setVerifyType(VerifyType.NFC);
-              final tp = context.read<TimerProvider>();
+
               if (tp.isRunning == null || !tp.isRunning!) {
                 tp.perdict(
                     Future.delayed(Duration(seconds: 10), () async {
@@ -88,11 +93,26 @@ class NativeChannelService {
             }
           };
           final thread = ThreadService.one();
-          setType.call();
-          thread.reuqest(cp.sendDataToSever()).whenComplete(() => cp.startTimer(
-              duration: message.startsWith('nfcSuccess:')
-                  ? Duration(seconds: Platform.isAndroid ? 2 : 5)
-                  : null));
+          Platform.isAndroid ? setType.call() : DoNothingAction();
+          if (cp.isBackgroundMode && Platform.isAndroid) {
+            thread.reuqest(Future.delayed(
+                Duration.zero, () => cp.sendDataToSeverFromBackground()));
+          } else {
+            if (tp.isRunning == null || !tp.isRunning!) {
+              tp.perdict(
+                Future.delayed(Duration.zero, () async {
+                  cp.sendDataToSever().then((result) {
+                    if (result.isSuccessful) {
+                      cp.startTimer(
+                          duration: message.startsWith('nfcSuccess:')
+                              ? Duration(seconds: Platform.isAndroid ? 2 : 5)
+                              : null);
+                    }
+                  });
+                }),
+              );
+            }
+          }
         } else {
           cp.setMessage('permisson_for_bidden');
           cp.startTimer();

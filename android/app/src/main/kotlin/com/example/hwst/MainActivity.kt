@@ -50,13 +50,17 @@ class MainActivity : FlutterActivity() {
     } else if (call.method == "isNfcOk") {
      if (hasNfc(context)){
       passKit.sendMessage("Is Powered On")
-     }else{
+     } else{
       passKit.sendMessage("Is None.")
      }
-
-
      result.success("success")
-    } else if (call.method == "setRssi") {
+    } else if (call.method == "disableToken") {
+      passKit.disableToken()
+      result.success("success")
+     }else if (call.method == "activeToken") {
+      passKit.activeToken()
+      result.success("success")
+     }else if (call.method == "setRssi") {
      passKit.setRssi(call.arguments as String)
      result.success("success")
     } else {
