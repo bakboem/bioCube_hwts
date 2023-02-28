@@ -145,7 +145,8 @@ class PassKitService :  UtilsCallBack{
             btScanner!!.startScan(filters, settings, leScanCallback)
             runnerHandler?.postDelayed({
                 bleScanningStop()
-            }, 5000)
+                sendMessage("Timeout")
+            }, 2000)
     }
     fun nfcScanningStart(){
         val intent = Intent(

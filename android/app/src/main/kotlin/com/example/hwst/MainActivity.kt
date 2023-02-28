@@ -51,7 +51,7 @@ class MainActivity : FlutterActivity() {
      if (hasNfc(context)){
       passKit.sendMessage("Is Powered On")
      } else{
-      passKit.sendMessage("Is None.")
+      passKit.sendMessage("Is Not Support")
      }
      result.success("success")
     } else if (call.method == "disableToken") {
@@ -81,8 +81,8 @@ class MainActivity : FlutterActivity() {
  @RequiresApi(Build.VERSION_CODES.Q)
  fun hasNfc(context: Context): Boolean {
   var isSecureNfcOn = false
-  val manager: NfcManager = context.getSystemService(Context.NFC_SERVICE) as NfcManager
-  val adapter: NfcAdapter = manager.getDefaultAdapter()
+  val manager: NfcManager? = context.getSystemService(Context.NFC_SERVICE) as NfcManager?
+  val adapter: NfcAdapter? = manager?.getDefaultAdapter()
   if (adapter != null ) {
     isSecureNfcOn = true
   }

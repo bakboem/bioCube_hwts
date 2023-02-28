@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/service/permission_service.dart
  * Created Date: 2021-08-13 11:38:37
- * Last Modified: 2023-02-22 22:42:46
+ * Last Modified: 2023-02-28 13:03:25
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -11,11 +11,13 @@
  * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
  */
 
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:hwst/globalProvider/device_status_provider.dart';
 import 'package:hwst/service/key_service.dart';
+import 'package:hwst/service/deviceInfo_service.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:hwst/globalProvider/device_status_provider.dart';
 
 //*  앱 권한 요청.
 class PermissionService {
@@ -80,6 +82,29 @@ class PermissionService {
       });
     }
     return temp1 || temp2 || temp3;
+  }
+
+  // BLE 체크.
+  static Future<bool> checkBlePermission() async {
+    var isGranted = false;
+    final deviceInfo = await DeviceInfoService.getDeviceInfo();
+    if (Platform.isAndroid) {
+      if (int.parse(deviceInfo.deviceVersion) <= 30) {
+        isGranted = await Permission.bluetooth.isGranted;
+        if (!isGranted) {}
+      }
+      if (int.parse(deviceInfo.deviceVersion) > 30) {
+        var scanGranted = await requestPermission(Permission.bluetoothScan);
+        var connectGranted =
+            await requestPermission(Permission.bluetoothConnect);
+        var advertiseGranted =
+            await await requestPermission(Permission.bluetoothAdvertise);
+        isGranted = scanGranted && connectGranted && advertiseGranted;
+      }
+    } else {
+      isGranted = await checkPermissionStatus(Permission.bluetooth);
+    }
+    return isGranted;
   }
 
   //  권한 상태 체크.

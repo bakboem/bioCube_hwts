@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/Documents/BioCube/biocube/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-02-26 11:08:03
+ * Last Modified: 2023-02-28 13:04:58
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -12,8 +12,6 @@
  */
 
 import 'dart:io';
-import 'package:hwst/globalProvider/face_detection_provider.dart';
-import 'package:hwst/service/api_service.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +22,6 @@ import 'package:hwst/styles/export_common.dart';
 import 'package:hwst/service/sound_service.dart';
 import 'package:hwst/view/home/card_widget.dart';
 import 'package:hwst/service/cache_service.dart';
-import 'package:hwst/service/thread_service.dart';
 import 'package:hwst/enums/drawer_icon_type.dart';
 import 'package:hwst/service/connect_service.dart';
 import 'package:hwst/service/pass_kit_service.dart';
@@ -32,18 +29,19 @@ import 'package:hwst/model/common/result_model.dart';
 import 'package:hwst/service/vibration_service.dart';
 import 'package:hwst/view/setting/setting_page.dart';
 import 'package:hwst/service/permission_service.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/view/common/base_app_toast.dart';
 import 'package:hwst/view/common/base_app_dialog.dart';
 import 'package:hwst/service/local_file_servicer.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:hwst/globalProvider/auth_provider.dart';
 import 'package:hwst/view/common/function_of_print.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:hwst/buildConfig/biocube_build_config.dart';
 import 'package:hwst/model/user/user_environment_model.dart';
 import 'package:hwst/view/common/widget_of_divider_line.dart';
 import 'package:hwst/view/common/widget_of_loading_view.dart';
 import 'package:hwst/view/common/widget_of_dialog_contents.dart';
+import 'package:hwst/globalProvider/face_detection_provider.dart';
 import 'package:hwst/view/common/widget_of_default_spacing.dart';
 import 'package:hwst/globalProvider/device_status_provider.dart';
 import 'package:hwst/view/home/provider/home_page_provider.dart';
@@ -64,28 +62,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
-
     pr('init home');
-    var thread = ThreadService.one();
-    thread.reuqest(loadFaceDetectionAndDeepLearningFile(
-        'face', ['haarcascade_frontalface_alt2.xml']));
-    // var thread2 = ThreadService.one();
-    // thread2.reuqest(loadFaceDetectionAndDeepLearningFile('models', [
-    //   'arcfaceresnet100-8.onnx',
-    //   'det1.caffemodel',
-    //   'det1.mnn',
-    //   'det1.prototxt',
-    //   'det2.caffemodel',
-    //   'det2.mnn',
-    //   'det2.prototxt',
-    //   'det3.caffemodel',
-    //   'det3.mnn',
-    //   'det3.prototxt',
-    //   'FaceCubePlusDetect.mnn',
-    //   'fbface_opt12fp16.mnn',
-    //   'fbface_opt12fp16.mnn--'
-    // ]));
-
     ConnectService.startListener();
   }
 
@@ -166,6 +143,7 @@ class _HomePageState extends State<HomePage> {
         isStatusOk != null &&
         isStatusOk &&
         userEvn!.isUseFace!;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -242,7 +220,7 @@ class _HomePageState extends State<HomePage> {
                 }
               } else {
                 if (!userEvn!.isUseBle! || !userEvn.isUseNfc!) {
-                  await Navigator.pushNamed(context, SettingPage.routeName);
+                  Navigator.pushNamed(context, SettingPage.routeName);
                 } else {
                   final result = await AppDialog.showPopup(
                       context,
@@ -255,7 +233,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           callback: () => 'success'));
                   if (result == 'success') {
-                    await AppSettings.openBluetoothSettings();
+                    AppSettings.openBluetoothSettings();
                   }
                 }
               }
@@ -266,26 +244,38 @@ class _HomePageState extends State<HomePage> {
             showLocationFaildPopup(context);
           }
         },
-        child: PageView(
-          physics: BouncingScrollPhysics(),
-          controller: _pageController
-            ..addListener(() {
-              if (_pageController.initialPage != 3) {
-                if (cp.isShowCamera) {
-                  cp.setIsShowCamera(val: false);
-                }
-              }
-            }),
-          onPageChanged: (index) {
-            final p = context.read<HomePageProvider>();
-            p.setCurrenPage(index);
+        child: Selector<DeviceStatusProvider, bool>(
+          selector: (context, provider) => provider.isSuppertNfc,
+          builder: (context, isSupportNfc, _) {
+            return PageView(
+              physics: BouncingScrollPhysics(),
+              controller: _pageController
+                ..addListener(() {
+                  if (_pageController.initialPage != 3) {
+                    if (cp.isShowCamera) {
+                      cp.setIsShowCamera(val: false);
+                    }
+                  }
+                }),
+              onPageChanged: (index) {
+                final p = context.read<HomePageProvider>();
+                p.setCurrenPage(index);
+              },
+              children: isSupportNfc
+                  ? [
+                      _buildPageViewText(
+                          context, 'ble', isStatusOk: isBleOk, userEvn),
+                      _buildPageViewText(
+                          context, 'nfc', isStatusOk: isNfcOk, userEvn),
+                      // _buildPageViewText(
+                      //     context, 'face', isStatusOk: userEvn?.isUseFace, userEvn),
+                    ]
+                  : [
+                      _buildPageViewText(
+                          context, 'ble', isStatusOk: isBleOk, userEvn),
+                    ],
+            );
           },
-          children: [
-            _buildPageViewText(context, 'ble', isStatusOk: isBleOk, userEvn),
-            _buildPageViewText(context, 'nfc', isStatusOk: isNfcOk, userEvn),
-            // _buildPageViewText(
-            //     context, 'face', isStatusOk: userEvn?.isUseFace, userEvn),
-          ],
         ));
   }
 
@@ -349,7 +339,8 @@ class _HomePageState extends State<HomePage> {
           AppSize.floatButtonWidth / 2 -
           AppSize.elevation,
       left: (AppSize.defaultContentsWidth - AppSize.defaultContentsWidth * .8) /
-          2,
+              2 +
+          AppSize.elevation,
       child: CardWidget(
         cardType: userCard!.mCardCode!,
         isOverThanIphone10: Platform.isIOS ? p.isOverThanIphone10 : false,
@@ -600,6 +591,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    pr(CacheService.getDeviceInfo()?.toJson());
     Permission.camera.request();
     PassKitService.initKit();
     return ChangeNotifierProvider(

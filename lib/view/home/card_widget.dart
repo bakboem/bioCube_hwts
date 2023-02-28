@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/home/card_one_widget.dart
  * Created Date: 2023-02-04 20:19:38
- * Last Modified: 2023-02-24 14:23:43
+ * Last Modified: 2023-02-28 14:29:32
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -10,6 +10,8 @@
  * 												Discription													
  * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
  */
+
+import 'dart:io';
 
 import 'package:tuple/tuple.dart';
 import 'package:flutter/material.dart';
@@ -113,7 +115,6 @@ class _CardWidgetState extends State<CardWidget> {
         (userCard.mPhoto != null && userCard.mPhoto!.isNotEmpty);
     ImageProvider<Object>? assertImage =
         isUserCardImageNotNull ? null : AssetImage('assets/images/people.png');
-
     ImageProvider<Object>? networkImage =
         isUserCardImageNotNull ? NetworkImage(userCard.mPhoto!) : null;
     return Positioned(
@@ -169,7 +170,7 @@ class _CardWidgetState extends State<CardWidget> {
         selector: (context, provider) => provider.isShowCamera,
         builder: (context, isShowCamera, _) {
           return Container(
-            width: cardWidth + AppSize.elevation,
+            width: cardWidth,
             height: cardHeight,
             alignment: Alignment.center,
             decoration: BoxDecoration(
@@ -229,8 +230,13 @@ class _CardWidgetState extends State<CardWidget> {
   @override
   Widget build(BuildContext context) {
     var cardWidth = AppSize.defaultContentsWidth * .8;
-    var cardHeight =
-        widget.isOverThanIphone10 ? cardWidth * 1.65 : cardWidth * 1.55;
+    var cardHeight = widget.isOverThanIphone10
+        ? cardWidth * 1.65
+        : Platform.isAndroid
+            ? AppSize.realWidth > 600
+                ? cardWidth * 1.4
+                : cardWidth * 1.55
+            : cardWidth * 1.55;
     pr(widget.cardType);
     return _buildCard(context, cardWidth, cardHeight);
   }

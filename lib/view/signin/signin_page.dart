@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/Documents/BioCube/biocube/lib/view/auth/auth_page.dart
  * Created Date: 2023-01-22 19:10:16
- * Last Modified: 2023-02-26 11:48:33
+ * Last Modified: 2023-02-28 13:05:34
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -57,7 +57,7 @@ class _SigninPageState extends State<SigninPage> {
     var dp = context.read<DeviceStatusProvider>();
     ap.checkIsLogedIn(false);
     Future.delayed(Duration.zero, () async {
-      PermissionService.checkPermissionStatus(Permission.bluetooth)
+      PermissionService.checkBlePermission()
           .then((value) => dp.setBleStatus(value));
     });
     Future.delayed(Duration.zero, () async {
@@ -221,8 +221,6 @@ class _SigninPageState extends State<SigninPage> {
                     CacheService.deleteALL();
                   }
                 } else {
-                  pr('${result.errorMassage}');
-
                   await AppDialog.showDangermessage(
                       context,
                       result.errorMassage != null &&
@@ -239,22 +237,21 @@ class _SigninPageState extends State<SigninPage> {
 
             if (sp.isValidate && (!tp.isRunning)) {
               tp.perdict(Future.delayed(Duration.zero, () async {
-                if (await PermissionService.checkLocationPermission() &&
-                    await PermissionService.checkPermissionStatus(
-                        Permission.bluetooth)) {
-                  await _loginProccess();
+                var isLocationGranted =
+                    await PermissionService.checkLocationPermission();
+                var isBleGranted = await PermissionService.checkBlePermission();
+                if (isLocationGranted && isBleGranted) {
+                  _loginProccess();
                 } else {
-                  var permissionResult =
-                      await PermissionService.requestPermission(
-                          Permission.bluetooth);
-                  if (!permissionResult) {
-                    final result = await AppDialog.showDangermessage(
-                        context, '${tr('not_use_location_permission_text')}');
-                    if (result != null && result) {
-                      AppSettings.openLocationSettings();
-                    }
-                  } else {
-                    await _loginProccess();
+                  final result = await AppDialog.showDangermessage(
+                      context,
+                      !isLocationGranted
+                          ? '${tr('not_use_location_permission_text')}'
+                          : '${tr('not_use_ble_permission_text')}');
+                  if (result != null && result) {
+                    !isLocationGranted
+                        ? AppSettings.openLocationSettings()
+                        : AppSettings.openBluetoothSettings();
                   }
                 }
               }));

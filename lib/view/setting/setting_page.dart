@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-02-26 17:13:51
+ * Last Modified: 2023-02-28 13:26:38
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -12,10 +12,8 @@
  */
 
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:hwst/service/pass_kit_service.dart';
-import 'package:hwst/view/common/function_of_print.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/styles/app_text.dart';
 import 'package:hwst/styles/app_size.dart';
@@ -468,8 +466,8 @@ class _SettingPageState extends State<SettingPage> {
             ? SizedBox()
             : Slider(
                 label:
-                    '${double.parse(val).toInt() < -50 ? tr('strong_signal') : double.parse(val).toInt() < -30 ? tr('normal_signal') : tr('weak_signal')}  $val',
-                secondaryTrackValue: -40,
+                    '${double.parse(val).toInt() < -70 ? tr('strong_signal') : double.parse(val).toInt() < -50 ? tr('normal_signal') : tr('weak_signal')}  $val',
+                secondaryTrackValue: -80,
                 value: double.parse(val),
                 max: 0,
                 min: -100,

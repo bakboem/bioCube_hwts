@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/home/provider/home_page_provider.dart
  * Created Date: 2023-01-24 00:03:34
- * Last Modified: 2023-02-26 17:02:37
+ * Last Modified: 2023-02-28 13:12:18
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -39,7 +39,7 @@ class HomePageProvider extends ChangeNotifier {
       final ap = KeyService.baseAppKey.currentContext!.read<AuthProvider>();
       final userEvn = CacheService.getUserEnvironment() != null
           ? CacheService.getUserEnvironment()!
-          : UserEnvironmentModel(true, 1, false, true, 1, '-40', 60);
+          : UserEnvironmentModel(true, 1, false, true, 1, '-80', 60);
       ap.setUserEnvironment(userEvn);
     });
   }

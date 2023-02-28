@@ -1,16 +1,8 @@
 /*
- * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @Date: 2023-02-01 10:23:22
- * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2023-02-26 17:04:09
- * @FilePath: /hwst/lib/service/pass_kit_service.dart
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- */
-/*
  * Project Name:  [koreaJob]
  * File: /Users/bakbeom/work/hwst/lib/service/pass_kit_service.dart
  * Created Date: 2023-01-22 10:14:14
- * Last Modified: 2023-02-22 22:43:39
+ * Last Modified: 2023-02-28 13:11:51
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  MOMONETWORK ALL RIGHTS RESERVED. 
@@ -20,7 +12,6 @@
  */
 
 import 'dart:io';
-
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/enums/verify_type.dart';
@@ -112,8 +103,8 @@ class PassKitService {
       await NativeChannelService.methodChannel.invokeMethod(
           'setRssi',
           CacheService.getUserEnvironment() != null
-              ? CacheService.getUserEnvironment()!.rssi ?? '-40'
-              : '-40');
+              ? CacheService.getUserEnvironment()!.rssi ?? '-80'
+              : '-80');
     }
   }
 

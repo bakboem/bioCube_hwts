@@ -1,16 +1,8 @@
 /*
- * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @Date: 2023-02-24 16:22:08
- * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2023-02-26 12:49:38
- * @FilePath: /hwst/lib/service/native_channel_service.dart
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- */
-/*
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/service/native_channel_service.dart
  * Created Date: 2023-01-25 11:52:53
- * Last Modified: 2023-02-25 23:58:20
+ * Last Modified: 2023-02-28 13:02:40
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -117,6 +109,8 @@ class NativeChannelService {
         pr('NFC::::: Status ${message}');
         if (message == 'Is Powered On') {
           dp.setNfcStatus(true);
+        } else if (message == 'Is Not Support') {
+          dp.setIsSuppertNfc(false);
         } else {
           dp.setNfcStatus(false);
         }

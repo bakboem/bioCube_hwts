@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/view/setting/provider/setting_page_provider.dart
  * Created Date: 2023-01-27 12:15:53
- * Last Modified: 2023-02-26 16:59:37
+ * Last Modified: 2023-02-28 13:26:38
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -105,7 +105,7 @@ class SettinPageProivder extends ChangeNotifier {
       bleSwichVal = true;
       nfcSwichVal = true;
       sessionSettingTime = 60;
-      rssi = '-40';
+      rssi = '-80';
     } else {
       nfcSwichVal = userEvn.isUseNfc!;
       bleSwichVal = userEvn.isUseBle!;
