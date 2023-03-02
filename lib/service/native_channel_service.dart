@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/truepass/lib/service/native_channel_service.dart
  * Created Date: 2023-01-25 11:52:53
- * Last Modified: 2023-03-02 23:15:42
+ * Last Modified: 2023-03-02 23:31:02
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -78,9 +78,9 @@ class NativeChannelService {
           pr(tid);
           var setType = () {
             if (isBlueSuccess) {
-              cp.setVerifyType(VerifyType.NFC);
-            } else if (isNfcSuccess) {
               cp.setVerifyType(VerifyType.BLE);
+            } else if (isNfcSuccess) {
+              cp.setVerifyType(VerifyType.NFC);
             }
           };
           final thread = ThreadService.one();
