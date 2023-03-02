@@ -2,7 +2,7 @@
  * Project Name:  [koreaJob]
  * File: /Users/bakbeom/work/sm/si/medsalesportal/lib/view/common/fuction_of_check_working_time.dart
  * Created Date: 2022-11-01 17:25:02
- * Last Modified: 2023-02-22 22:37:47
+ * Last Modified: 2023-03-02 18:58:32
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2022  MOMONETWORK ALL RIGHTS RESERVED. 

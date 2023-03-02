@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
+ * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/view/common/base_null_data_widget.dart
  * Created Date: 2021-09-18 18:25:35
- * Last Modified: 2023-02-22 22:42:56
+ * Last Modified: 2023-03-02 19:15:15
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 

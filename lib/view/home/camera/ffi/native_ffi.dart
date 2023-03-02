@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
+ * Project Name:  [HWST]
  * File: /Users/bakbeom/work/face_kit/truepass/lib/view/home/ffi/native_ffi.dart
  * Created Date: 2023-02-17 11:18:19
- * Last Modified: 2023-02-26 00:28:45
+ * Last Modified: 2023-03-02 19:00:03
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -153,7 +153,10 @@ int detectTest(int width, int height, int rotation, Uint8List yBuffer,
 ffi.DynamicLibrary _openDynamicLibrary() {
   if (Platform.isAndroid) {
     return ffi.DynamicLibrary.open('libnative_opencv.so');
+  } else if (Platform.isWindows) {
+    return ffi.DynamicLibrary.open("native_opencv_windows_plugin.dll");
   }
+
   return ffi.DynamicLibrary.process();
 }
 

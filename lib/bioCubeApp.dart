@@ -1,8 +1,8 @@
 /*
  * Project Name:  [BIOCUBE] - HWST
- * File: /Users/bakbeom/Documents/BioCube/biocube/lib/bioCubeApp.dart
+ * File: /Users/bakbeom/work/shwt/lib/bioCubeApp.dart
  * Created Date: 2023-01-22 19:01:08
- * Last Modified: 2023-02-26 13:44:06
+ * Last Modified: 2023-03-02 20:12:56
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -61,32 +61,21 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
     final _isForeground = (lifeCycle == AppLifecycleState.resumed);
     final _isBackground = (lifeCycle == AppLifecycleState.paused);
     final _isDetached = (lifeCycle == AppLifecycleState.detached);
+    var baseContext = KeyService.baseAppKey.currentContext;
+    if (baseContext == null) return;
+    final cp = baseContext.read<CoreVerifyProcessProvider>();
+    final dp = baseContext.read<DeviceStatusProvider>();
+    final isValidate = await isCardValidate(context);
     if (!_isForeground) {
-      var baseContext = KeyService.baseAppKey.currentContext;
-      if (baseContext != null) {
-        final cp = baseContext.read<CoreVerifyProcessProvider>();
-        cp.setIsShowCamera(val: false);
-      }
+      cp.setIsShowCamera(val: false);
     }
-    if (_isForeground) {
+    if (_isForeground && isValidate) {
       PassKitService.initKit();
-      var baseContext = KeyService.baseAppKey.currentContext;
-      if (baseContext != null) {
-        isCardValid(context).then((isValid) {
-          if (isValid) {
-            hideKeyboard(context);
-            final cp = baseContext.read<CoreVerifyProcessProvider>();
-            cp.setIsBackgroundMode(false);
-            final dp = baseContext.read<DeviceStatusProvider>();
-            Future.delayed(Duration.zero, () {
-              PermissionService.checkPermissionStatus(Permission.bluetooth)
-                  .then((status) => dp.setBleStatus(status));
-              PermissionService.checkLocationPermission()
-                  .then((status) => dp.setLocationStatus(status));
-            });
-          }
-        });
-      }
+      hideKeyboard(context);
+      cp.setIsBackgroundMode(false);
+      PermissionService.checkPermissionStatus(Permission.bluetooth)
+          .then(dp.setBleStatus);
+      PermissionService.checkLocationPermission().then(dp.setLocationStatus);
     } else if (_isDetached) {
       pr('_isDetached ');
       SoundService.dispose();
@@ -94,12 +83,8 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
       ConnectService.stopListener();
     } else if (_isBackground) {
       pr('isBackground');
+      cp.setIsBackgroundMode(true);
       PassKitService.initKit();
-      var baseContext = KeyService.baseAppKey.currentContext;
-      if (baseContext != null) {
-        final cp = baseContext.read<CoreVerifyProcessProvider>();
-        cp.setIsBackgroundMode(true);
-      }
     }
   }
 

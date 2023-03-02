@@ -1,10 +1,10 @@
 // ignore_for_file: deprecated_member_use
 
 /*
- * Project Name:  [BIOCUBE] - HWST
+ * Project Name:  [mKolon3.0] - MedicalSalesPortal
  * File: /Users/bakbeom/work/sm/si/medsalesportal/lib/styles/app_text.dart
  * Created Date: 2022-07-03 14:42:12
- * Last Modified: 2023-02-22 22:40:53
+ * Last Modified: 2023-03-02 19:14:57
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 

@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
- * File: /Users/bakbeom/work/hwst/lib/view/setting/setting_page.dart
+ * Project Name:  [HWST]
+ * File: /Users/bakbeom/work/truepass/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-02-28 13:26:38
+ * Last Modified: 2023-03-02 19:00:03
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -12,9 +12,10 @@
  */
 
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:hwst/service/pass_kit_service.dart';
 import 'package:provider/provider.dart';
+import 'package:hwst/service/pass_kit_service.dart';
 import 'package:hwst/styles/app_text.dart';
 import 'package:hwst/styles/app_size.dart';
 import 'package:hwst/enums/swich_type.dart';

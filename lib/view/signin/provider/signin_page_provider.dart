@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
- * File: /Users/bakbeom/work/hwst/lib/view/signin/provider/signin_page_provider.dart
+ * Project Name:  [HWST]
+ * File: /Users/bakbeom/work/truepass/lib/view/signin/provider/signin_page_provider.dart
  * Created Date: 2023-01-25 12:36:45
- * Last Modified: 2023-02-26 10:02:51
+ * Last Modified: 2023-03-02 19:00:03
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -14,6 +14,7 @@
 import 'package:flutter/material.dart';
 import 'package:hwst/enums/signin_type.dart';
 import 'package:hwst/enums/request_type.dart';
+import 'package:hwst/model/user/user_environment_model.dart';
 import 'package:hwst/service/api_service.dart';
 import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/model/access/access_info.dart';
@@ -122,7 +123,9 @@ class SigninPageProvider extends ChangeNotifier {
         temp.data!.createDateByLocal = DateTime.now();
         var accessInfo = AccessInfo(siteCodeInputStr, loginAccountInputStr,
             signinType.code, accessKeyInputStr);
+        var userEvn = UserEnvironmentModel(true, 1, false, true, 1, '-80', 60);
         var deviceInfo = await DeviceInfoService.getDeviceInfo();
+        CacheService.saveUserEnvironment(userEvn.toJson());
         CacheService.saveDeviceInfo(deviceInfo.toJson());
         CacheService.saveAccessInfo(accessInfo.toJson());
         CacheService.saveUserCard(temp.data!.toJson());

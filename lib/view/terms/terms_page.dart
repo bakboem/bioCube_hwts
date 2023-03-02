@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
- * File: /Users/bakbeom/work/hwst/lib/view/signin/terms_page.dart
+ * Project Name:  [HWST]
+ * File: /Users/bakbeom/work/truepass/lib/view/signin/terms_page.dart
  * Created Date: 2023-01-27 22:48:10
- * Last Modified: 2023-02-22 22:44:46
+ * Last Modified: 2023-03-02 19:00:03
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 

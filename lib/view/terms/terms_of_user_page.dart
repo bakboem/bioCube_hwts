@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
- * File: /Users/bakbeom/work/hwst/lib/view/terms/terms_of_user_page.dart
+ * Project Name:  [HWST]
+ * File: /Users/bakbeom/work/truepass/lib/view/terms/terms_of_user_page.dart
  * Created Date: 2023-01-27 22:55:21
- * Last Modified: 2023-02-22 22:44:46
+ * Last Modified: 2023-03-02 19:00:03
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -29,7 +29,7 @@ class TermsOfUserPage extends StatelessWidget {
 Updated:
 November 9, 2022
 
-본 약관(이하 ‘본 약관’이라 함)은 주식회사 아이디테크(이하 ‘회사’라 함)이 제공하는 Moflex 모바일 액세스와 관련된 모든 제품 및 서비스(이하 ‘본 서비스’라 함)를 이용하는 고객(이하 ‘고객’이라 함)과 회사간에 본 서비스 이용에 관하여 정하는 것입니다.
+본 약관(이하 ‘본 약관’이라 함)은 주식회사 아이디테크(이하 ‘회사’라 함)이 제공하는 HWST 모바일 액세스와 관련된 모든 제품 및 서비스(이하 ‘본 서비스’라 함)를 이용하는 고객(이하 ‘고객’이라 함)과 회사간에 본 서비스 이용에 관하여 정하는 것입니다.
 본 약관에서는 다음 용어를 사용합니다.
 
 ''';

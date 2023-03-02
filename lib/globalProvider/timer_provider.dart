@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
+ * Project Name:  [mKolon3.0] - MedicalSalesPortal
  * File: /Users/bakbeom/work/sm/si/medsalesportal/lib/globalProvider/timer_provider.dart
  * Created Date: 2022-07-08 14:36:43
- * Last Modified: 2023-02-26 14:22:00
+ * Last Modified: 2023-03-02 19:14:57
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 

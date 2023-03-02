@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
- * File: /Users/bakbeom/work/hwst/lib/service/vibration_service.dart
+ * Project Name:  [TruePass]
+ * File: /Users/bakbeom/work/truepass/lib/service/vibration_service.dart
  * Created Date: 2023-01-29 10:57:32
- * Last Modified: 2023-02-22 22:44:41
+ * Last Modified: 2023-01-29 12:21:29
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 

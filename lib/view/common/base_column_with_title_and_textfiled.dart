@@ -1,6 +1,6 @@
 /*
- * Filename: /Users/bakbeom/work/sm/si/SalesPortal/lib/view/common/base_
- * Path: /Users/bakbeom/work/sm/si/SalesPortal/lib/view/common
+ * Filename: /Users/bakbeom/work/hwst/lib/view/common/base_
+ * Path: /Users/bakbeom/work/hwst/lib/view/common
  * Created Date: Sunday, October 3rd 2021, 3:43:31 pm
  * Author: bakbeom
  * 

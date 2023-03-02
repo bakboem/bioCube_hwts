@@ -1,8 +1,16 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
+ * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
+ * @Date: 2023-01-28 15:03:49
+ * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
+ * @LastEditTime: 2023-02-26 17:45:14
+ * @FilePath: /truepass/lib/view/common/base_app_toast.dart
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
+/*
+ * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/view/common/app_toast.dart
  * Created Date: 2021-10-01 14:02:55
- * Last Modified: 2023-02-26 11:51:01
+ * Last Modified: 2023-02-26 17:45:13
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 

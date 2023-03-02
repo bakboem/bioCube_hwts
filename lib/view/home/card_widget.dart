@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
- * File: /Users/bakbeom/work/hwst/lib/view/home/card_one_widget.dart
+ * Project Name:  [HWST]
+ * File: /Users/bakbeom/work/truepass/lib/view/home/card_one_widget.dart
  * Created Date: 2023-02-04 20:19:38
- * Last Modified: 2023-02-28 14:29:32
+ * Last Modified: 2023-03-02 20:18:12
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -62,7 +62,7 @@ class _CardWidgetState extends State<CardWidget> {
         }
         if (tuple.item3 != null) {
           return AppText.text(
-              tuple.item3 == 'NFC 통신 시작' || tuple.item3 == 'bleStart'
+              tuple.item3 == 'nfcStart' || tuple.item3 == 'bleStart'
                   ? tr('start')
                   : tuple.item3 == 'nfc passReady' ||
                           tuple.item3 == 'peripheral Ready'
@@ -94,11 +94,11 @@ class _CardWidgetState extends State<CardWidget> {
               height: cardType == '1'
                   ? AppSize.defaultListItemSpacing * 3
                   : avataSize),
-          defaultSpacing(multiple: 3),
+          defaultSpacing(multiple: 2),
           AppText.text(userCard.mName!, style: AppTextStyle.bold30),
           defaultSpacing(),
           AppText.text(userCard.mCoName!, style: AppTextStyle.bold_16),
-          defaultSpacing(multiple: 3),
+          defaultSpacing(multiple: 2),
           _buildMessageWidget(context)
         ],
       ),
@@ -170,7 +170,7 @@ class _CardWidgetState extends State<CardWidget> {
         selector: (context, provider) => provider.isShowCamera,
         builder: (context, isShowCamera, _) {
           return Container(
-            width: cardWidth,
+            width: cardWidth + AppSize.elevation,
             height: cardHeight,
             alignment: Alignment.center,
             decoration: BoxDecoration(

@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
- * File: /Users/bakbeom/work/hwst/lib/service/location_service.dart
+ * Project Name:  [TruePass]
+ * File: /Users/bakbeom/work/truepass/lib/service/location_service.dart
  * Created Date: 2023-01-24 08:24:46
- * Last Modified: 2023-02-22 22:44:41
+ * Last Modified: 2023-01-26 18:42:37
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 

@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
- * File: /Users/bakbeom/Documents/BioCube/biocube/lib/view/auth/auth_page.dart
+ * Project Name:  [HWST]
+ * File: /Users/bakbeom/work/shwt/lib/view/auth/auth_page.dart
  * Created Date: 2023-01-22 19:10:16
- * Last Modified: 2023-02-28 13:05:34
+ * Last Modified: 2023-03-02 19:00:56
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -11,6 +11,7 @@
  * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
  */
 
+import 'package:hwst/view/common/function_of_print.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +34,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/view/common/base_app_dialog.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:hwst/globalProvider/auth_provider.dart';
-import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/globalProvider/timer_provider.dart';
 import 'package:hwst/view/common/base_input_widget.dart';
 import 'package:hwst/globalProvider/device_status_provider.dart';
@@ -56,15 +56,17 @@ class _SigninPageState extends State<SigninPage> {
     final ap = context.read<AuthProvider>();
     var dp = context.read<DeviceStatusProvider>();
     ap.checkIsLogedIn(false);
-    Future.delayed(Duration.zero, () async {
-      PermissionService.checkBlePermission()
-          .then((value) => dp.setBleStatus(value));
+    PermissionService.requestPermission(Permission.location).then((isGranted) {
+      dp.setLocationStatus(isGranted);
+      pr('isLocationGranted $isGranted');
+      if (isGranted) {
+        PermissionService.checkBlePermission().then((isBleGranted) {
+          dp.setBleStatus(isGranted);
+          pr('isBleGranted $isBleGranted');
+        });
+      }
     });
-    Future.delayed(Duration.zero, () async {
-      PermissionService.checkLocationPermission()
-          .then((value) => dp.setLocationStatus(value));
-    });
-    PermissionService.requestPermission(Permission.location);
+
     super.initState();
   }
 
@@ -237,23 +239,30 @@ class _SigninPageState extends State<SigninPage> {
 
             if (sp.isValidate && (!tp.isRunning)) {
               tp.perdict(Future.delayed(Duration.zero, () async {
-                var isLocationGranted =
-                    await PermissionService.checkLocationPermission();
-                var isBleGranted = await PermissionService.checkBlePermission();
-                if (isLocationGranted && isBleGranted) {
-                  _loginProccess();
-                } else {
-                  final result = await AppDialog.showDangermessage(
-                      context,
-                      !isLocationGranted
-                          ? '${tr('not_use_location_permission_text')}'
-                          : '${tr('not_use_ble_permission_text')}');
-                  if (result != null && result) {
-                    !isLocationGranted
-                        ? AppSettings.openLocationSettings()
-                        : AppSettings.openBluetoothSettings();
+                await PermissionService.checkPermissionStatus(
+                        Permission.location)
+                    .then((isLocationGranted) async {
+                  if (isLocationGranted) {
+                    await PermissionService.checkBlePermission()
+                        .then((isBleGranted) async {
+                      if (isBleGranted) {
+                        _loginProccess();
+                      } else {
+                        var result = await AppDialog.showDangermessage(
+                            context, '${tr('not_use_ble_permission_text')}');
+                        if (result) {
+                          AppSettings.openBluetoothSettings();
+                        }
+                      }
+                    });
+                  } else {
+                    var result = await AppDialog.showDangermessage(
+                        context, '${tr('not_use_location_permission_text')}');
+                    if (result) {
+                      AppSettings.openLocationSettings();
+                    }
                   }
-                }
+                });
               }));
             }
           }, selfHeight: AppSize.defaultTextFieldHeight),

@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
- * File: /Users/bakbeom/Documents/BioCube/biocube/lib/view/home/home_page.dart
+ * Project Name:  [HWST]
+ * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-02 17:26:22
+ * Last Modified: 2023-03-02 20:12:00
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -29,22 +29,22 @@ import 'package:hwst/model/common/result_model.dart';
 import 'package:hwst/service/vibration_service.dart';
 import 'package:hwst/view/setting/setting_page.dart';
 import 'package:hwst/service/permission_service.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/view/common/base_app_toast.dart';
 import 'package:hwst/view/common/base_app_dialog.dart';
 import 'package:hwst/service/local_file_servicer.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:hwst/globalProvider/auth_provider.dart';
 import 'package:hwst/view/common/function_of_print.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:hwst/buildConfig/biocube_build_config.dart';
 import 'package:hwst/model/user/user_environment_model.dart';
 import 'package:hwst/view/common/widget_of_divider_line.dart';
 import 'package:hwst/view/common/widget_of_loading_view.dart';
 import 'package:hwst/view/common/widget_of_dialog_contents.dart';
-import 'package:hwst/globalProvider/face_detection_provider.dart';
 import 'package:hwst/view/common/widget_of_default_spacing.dart';
 import 'package:hwst/globalProvider/device_status_provider.dart';
 import 'package:hwst/view/home/provider/home_page_provider.dart';
+import 'package:hwst/globalProvider/face_detection_provider.dart';
 import 'package:hwst/globalProvider/core_verify_process_provider.dart';
 import 'package:hwst/view/common/function_of_check_card_is_valid.dart';
 import 'package:hwst/view/common/method_of_show_location_faild_popup.dart';
@@ -188,7 +188,7 @@ class _HomePageState extends State<HomePage> {
           final p = context.read<HomePageProvider>();
           final isSelectedBlue = p.currenPage == 0;
           final isSelectedNfc = p.currenPage == 1;
-          final isSelectedFace = p.currenPage == 2;
+          final isSelectedFace = (p.currenPage == 2);
           if (isLocationOk) {
             if (!cp.isTimerRunning) {
               if (isSelectedBlue && isBleOk && userEvn!.isUseBle!) {
@@ -267,11 +267,8 @@ class _HomePageState extends State<HomePage> {
                           context, 'ble', isStatusOk: isBleOk, userEvn),
                       _buildPageViewText(
                           context, 'nfc', isStatusOk: isNfcOk, userEvn),
-                      _buildPageViewText(
-                          context,
-                          'face',
-                          isStatusOk: userEvn?.isUseFace,
-                          userEvn),
+                      // _buildPageViewText(
+                      //     context, 'face', isStatusOk: userEvn?.isUseFace, userEvn),
                     ]
                   : [
                       _buildPageViewText(
@@ -340,10 +337,10 @@ class _HomePageState extends State<HomePage> {
     return Positioned(
       bottom: AppSize.appBarHeight +
           AppSize.floatButtonWidth / 2 -
-          AppSize.elevation,
+          AppSize.elevation * 2,
       left: (AppSize.defaultContentsWidth - AppSize.defaultContentsWidth * .8) /
               2 +
-          AppSize.elevation,
+          AppSize.elevation / 2,
       child: CardWidget(
         cardType: userCard!.mCardCode!,
         isOverThanIphone10: Platform.isIOS ? p.isOverThanIphone10 : false,
@@ -387,7 +384,8 @@ class _HomePageState extends State<HomePage> {
                 cardColor: AppColors.homeBgColor,
                 appBarTheme: AppBarTheme(
                     backgroundColor: AppColors.whiteText,
-                    titleSpacing: Platform.isAndroid ? 100 : null,
+                    titleSpacing:
+                        Platform.isAndroid ? AppSize.realWidth / 2 - 100 : null,
                     titleTextStyle: AppTextStyle.bold_22,
                     iconTheme: IconThemeData(color: AppColors.subText))),
             child: LicensePage(
@@ -459,7 +457,7 @@ class _HomePageState extends State<HomePage> {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        isCardValid(context).then((isValid) {
+        isCardValidate(context).then((isValid) {
           if (isValid) {
             if (type == DrawerIconType.HOME) {
               Navigator.pop(context);

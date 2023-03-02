@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
+ * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/view/common/base_info_row_by_key_and_value.dart
  * Created Date: 2021-10-03 02:10:59
- * Last Modified: 2023-02-22 22:42:53
+ * Last Modified: 2023-03-02 19:15:15
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 

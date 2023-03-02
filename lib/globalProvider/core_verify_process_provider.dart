@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
- * File: /Users/bakbeom/work/hwst/lib/view/home/provider/core_process_provider.dart
+ * Project Name:  [TruePass]
+ * File: /Users/bakbeom/work/truepass/lib/view/home/provider/core_process_provider.dart
  * Created Date: 2023-01-25 12:24:10
- * Last Modified: 2023-02-26 18:12:08
+ * Last Modified: 2023-03-02 19:32:18
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -21,6 +21,7 @@ import 'package:hwst/service/api_service.dart';
 import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/service/location_service.dart';
 import 'package:hwst/model/common/result_model.dart';
+import 'package:hwst/service/deviceInfo_service.dart';
 import 'package:hwst/service/permission_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:hwst/view/common/function_of_print.dart';
@@ -105,7 +106,6 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
     } else {
       return ResultModel(false);
     }
-    pr(CacheService.getUserCard()?.toJson());
     var deviceInfo = CacheService.getDeviceInfo();
     var userCard = CacheService.getUserCard();
     var AccessInfo = CacheService.getAccessInfo()!;
@@ -124,10 +124,8 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
     );
 
     Map<String, dynamic> body = resultAuthorizedModel!.toJson();
-    pr(body);
     try {
       _api.init(RequestType.SEND_MATCH_RESULT);
-      pr('${CacheService.getSvUrl()}/api/send_auth_result.php');
       final result = await _api.request(body: body);
       if (result == null || result.statusCode != 200) {
         isLoadData = false;
@@ -137,7 +135,7 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
             isServerError: result?.statusCode == -1);
       }
       if (result.statusCode == 200 && result.body['result'] == 'success') {
-        pr('what????${result.body}');
+        pr('body:::${result.body}');
         verifyType == VerifyType.BLE
             ? isBleSuccess = true
             : isNfcSuccess = true;

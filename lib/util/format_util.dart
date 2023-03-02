@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
+ * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/util/number_format.dart
  * Created Date: 2021-09-08 09:34:02
- * Last Modified: 2023-02-22 22:42:59
+ * Last Modified: 2023-03-02 19:15:36
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 

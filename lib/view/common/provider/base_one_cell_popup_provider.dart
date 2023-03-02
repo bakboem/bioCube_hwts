@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
+ * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/view/common/provider/base_one_cell_popup_provider.dart
  * Created Date: 2021-10-17 23:22:48
- * Last Modified: 2023-02-22 22:42:57
+ * Last Modified: 2023-03-02 19:15:15
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 

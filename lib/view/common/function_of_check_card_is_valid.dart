@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
- * File: /Users/bakbeom/work/hwst/lib/view/common/function_of_check_card_is_valid.dart
+ * Project Name:  [HWST]
+ * File: /Users/bakbeom/work/truepass/lib/view/common/function_of_check_card_is_valid.dart
  * Created Date: 2023-02-04 10:26:09
- * Last Modified: 2023-02-22 22:44:43
+ * Last Modified: 2023-03-02 20:12:00
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -18,7 +18,7 @@ import 'package:hwst/globalProvider/auth_provider.dart';
 import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/view/common/base_app_dialog.dart';
 
-Future<bool> isCardValid(BuildContext context) async {
+Future<bool> isCardValidate(BuildContext context) async {
   final userCard = CacheService.getUserCard();
   if (userCard != null &&
       DateTime.parse(userCard.mCardKeyEdate!).isBefore(DateTime.now())) {

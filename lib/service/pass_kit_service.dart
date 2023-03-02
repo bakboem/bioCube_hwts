@@ -1,8 +1,8 @@
 /*
  * Project Name:  [koreaJob]
- * File: /Users/bakbeom/work/hwst/lib/service/pass_kit_service.dart
+ * File: /Users/bakbeom/work/sm/koreajob/lib/service/pass_kit_service.dart
  * Created Date: 2023-01-22 10:14:14
- * Last Modified: 2023-02-28 13:11:51
+ * Last Modified: 2023-03-02 19:23:28
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  MOMONETWORK ALL RIGHTS RESERVED. 
@@ -12,7 +12,7 @@
  */
 
 import 'dart:io';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/enums/verify_type.dart';
 import 'package:hwst/service/key_service.dart';
@@ -31,8 +31,9 @@ class PassKitService {
 
   static Future<void> initKit() async {
     await NativeChannelService.methodChannel.invokeMethod('initState');
-    await setRssi();
-    await isNfcOk();
+    setRssi();
+    setSessionTime();
+    isNfcOk();
     Platform.isAndroid ? await updateToken() : await saveToken();
     Platform.isAndroid ? await activeToken() : DoNothingAction();
   }
@@ -54,7 +55,7 @@ class PassKitService {
   }
 
   static Future<void> updateToken() async {
-    await setRssi();
+    setRssi();
     if (CacheService.getUserCard() != null) {
       await NativeChannelService.methodChannel.invokeMethod(
           'updateToken', CacheService.getUserCard()!.mCardKey ?? '');
@@ -68,9 +69,10 @@ class PassKitService {
   }
 
   static Future<void> startBle() async {
-    await setRssi();
-    Platform.isAndroid ? await updateToken() : await saveToken();
-    Platform.isAndroid ? await activeToken() : DoNothingAction();
+    setRssi();
+    setSessionTime();
+    Platform.isAndroid ? updateToken() : saveToken();
+    Platform.isAndroid ? activeToken() : DoNothingAction();
     final cp =
         KeyService.baseAppKey.currentContext!.read<CoreVerifyProcessProvider>();
     cp.setVerifyType(VerifyType.BLE);
@@ -79,9 +81,10 @@ class PassKitService {
   }
 
   static Future<void> startNfc() async {
-    await setRssi();
-    Platform.isAndroid ? await updateToken() : await saveToken();
-    Platform.isAndroid ? await activeToken() : DoNothingAction();
+    setRssi();
+    setSessionTime();
+    Platform.isAndroid ? updateToken() : saveToken();
+    Platform.isAndroid ? activeToken() : DoNothingAction();
     final cp =
         KeyService.baseAppKey.currentContext!.read<CoreVerifyProcessProvider>();
     cp.setVerifyType(VerifyType.NFC);

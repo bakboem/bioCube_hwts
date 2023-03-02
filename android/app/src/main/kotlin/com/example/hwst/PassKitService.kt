@@ -137,6 +137,7 @@ class PassKitService :  UtilsCallBack{
     fun bleScanningStop() {
         Log.d(tag, "==== stop Ble scanning ====")
         btScanner?.stopScan(leScanCallback)
+        
     }
     @SuppressLint("MissingPermission")
     fun bleScanningStart() {
@@ -146,7 +147,7 @@ class PassKitService :  UtilsCallBack{
             runnerHandler?.postDelayed({
                 bleScanningStop()
                 sendMessage("Timeout")
-            }, 2000)
+            }, 5000)
     }
     fun nfcScanningStart(){
         val intent = Intent(

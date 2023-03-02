@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
+ * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/service/deviceInfo_service.dart
  * Created Date: 2021-08-16 21:01:02
- * Last Modified: 2023-02-24 18:07:17
+ * Last Modified: 2023-03-02 19:15:36
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 

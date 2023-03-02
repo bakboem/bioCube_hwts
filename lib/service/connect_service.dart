@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
+ * Project Name:  [mKolon3.0] - MedicalSalesPortal
  * File: /Users/bakbeom/work/sm/si/medsalesportal/lib/service/connect_service.dart
  * Created Date: 2022-10-26 05:30:46
- * Last Modified: 2023-02-22 22:40:53
+ * Last Modified: 2023-03-02 19:14:56
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 

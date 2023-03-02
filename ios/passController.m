@@ -77,7 +77,7 @@
         bool isTokenConverted = [_nfcService setTokenWithToken:_mobilePassToken];
         if (isTokenConverted) {
 //            NSLog(@"NFC 통신 시작");
-            [self sendData:@"NFC 통신 시작"];
+            [self sendData:@"nfcStart"];
             [_nfcService beginSession];
         }else{
             [self sendData:@"convertTokenError"];
@@ -96,7 +96,7 @@
      
     }else{
         // NSLog(@" NFC 통신 실패");
-        [self sendData:@"nfcFaild"];
+        [self sendData:@"TimeOut"];
     }
 }
 
@@ -246,7 +246,7 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC) ,dispatch_get_main_queue(), ^{
         if (self->_centralManager.isScanning) {
             [self stopBleScan];
-            [self sendData:@"BLE 통신 종료(Scan Timeout)"];
+            [self sendData:@"Timeout"];
             // NSLog(@"BLE 통신 종료(Scan Timeout)");
         }
     });

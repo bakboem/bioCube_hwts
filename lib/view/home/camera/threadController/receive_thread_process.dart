@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:isolate';
+import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:hwst/service/cache_service.dart';

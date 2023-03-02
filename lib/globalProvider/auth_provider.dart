@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
+ * Project Name:  [mKolon3.0] - MedicalSalesPortal
  * File: /Users/bakbeom/work/sm/si/medsalesportal/lib/globalProvider/login_provider.dart
  * Created Date: 2022-10-18 00:31:14
- * Last Modified: 2023-02-22 22:40:59
+ * Last Modified: 2023-03-02 19:14:57
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 

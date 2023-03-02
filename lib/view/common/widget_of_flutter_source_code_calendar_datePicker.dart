@@ -1,10 +1,10 @@
 // ignore_for_file: deprecated_member_use
 
 /*
- * Project Name:  [BIOCUBE] - HWST
+ * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/view/common/flutter_source_code_calinda_body.dart
  * Created Date: 2021-10-02 03:20:12
- * Last Modified: 2023-02-22 22:42:52
+ * Last Modified: 2023-03-02 19:15:15
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 

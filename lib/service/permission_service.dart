@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
+ * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/service/permission_service.dart
  * Created Date: 2021-08-13 11:38:37
- * Last Modified: 2023-02-28 13:03:25
+ * Last Modified: 2023-03-02 19:24:45
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -13,11 +13,11 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:hwst/service/key_service.dart';
-import 'package:hwst/service/deviceInfo_service.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:hwst/globalProvider/device_status_provider.dart';
+import 'package:hwst/service/deviceInfo_service.dart';
+import 'package:hwst/service/key_service.dart';
 
 //*  앱 권한 요청.
 class PermissionService {
@@ -91,14 +91,31 @@ class PermissionService {
     if (Platform.isAndroid) {
       if (int.parse(deviceInfo.deviceVersion) <= 30) {
         isGranted = await Permission.bluetooth.isGranted;
-        if (!isGranted) {}
       }
       if (int.parse(deviceInfo.deviceVersion) > 30) {
-        var scanGranted = await requestPermission(Permission.bluetoothScan);
+        var scanGranted = await checkPermissionStatus(Permission.bluetoothScan);
         var connectGranted =
-            await requestPermission(Permission.bluetoothConnect);
+            await checkPermissionStatus(Permission.bluetoothConnect);
         var advertiseGranted =
-            await await requestPermission(Permission.bluetoothAdvertise);
+            await checkPermissionStatus(Permission.bluetoothAdvertise);
+        if (!scanGranted) {
+          await Future.delayed(Duration(milliseconds: 300), () async {
+            scanGranted = await requestPermission(Permission.bluetoothScan);
+          });
+        }
+        if (!connectGranted) {
+          await Future.delayed(Duration(milliseconds: 600), () async {
+            connectGranted =
+                await requestPermission(Permission.bluetoothConnect);
+          });
+        }
+
+        if (!advertiseGranted) {
+          await Future.delayed(Duration(milliseconds: 900), () async {
+            advertiseGranted =
+                await requestPermission(Permission.bluetoothAdvertise);
+          });
+        }
         isGranted = scanGranted && connectGranted && advertiseGranted;
       }
     } else {

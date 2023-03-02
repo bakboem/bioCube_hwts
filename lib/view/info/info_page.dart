@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
- * File: /Users/bakbeom/work/hwst/lib/view/info/info_page.dart
+ * Project Name:  [HWST]
+ * File: /Users/bakbeom/work/truepass/lib/view/info/info_page.dart
  * Created Date: 2023-02-02 14:44:43
- * Last Modified: 2023-02-22 23:23:27
+ * Last Modified: 2023-03-02 19:00:03
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:hwst/buildConfig/biocube_build_config.dart';
 import 'package:hwst/enums/image_type.dart';
 import 'package:hwst/model/user/user_device_info.dart';
+import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/service/deviceInfo_service.dart';
 import 'package:hwst/styles/export_common.dart';
 import 'package:hwst/view/common/base_layout.dart';
@@ -66,20 +67,13 @@ class InfoPage extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildAppinfoList(
-      BuildContext context, AsyncSnapshot<UserDeviceInfo> snapshot) {
-    var hasData =
-        snapshot.hasData && snapshot.connectionState == ConnectionState.done;
+  List<Widget> _buildAppinfoList(BuildContext context) {
+    var deviceInfo = CacheService.getDeviceInfo()!;
     return [
       _buildAppinfoRow(tr('app_name'), BioCubeBuildConfig.APP_NAME),
       _buildAppinfoRow(tr('app_version'), BioCubeBuildConfig.APP_VERSION_NAME),
-      _buildAppinfoRow(
-          tr('platform'),
-          hasData
-              ? '${Platform.isIOS ? '${snapshot.data!.deviceVersion}' : ''}'
-              : ''),
-      _buildAppinfoRow(
-          tr('device_model'), hasData ? snapshot.data!.deviceModel : ''),
+      _buildAppinfoRow(tr('platform'), deviceInfo.deviceVersion),
+      _buildAppinfoRow(tr('device_model'), deviceInfo.deviceModel),
     ];
   }
 
@@ -89,28 +83,24 @@ class InfoPage extends StatelessWidget {
         hasForm: false,
         appBar:
             appBarContents(context, isUseActionIcon: true, text: tr('info')),
-        child: FutureBuilder<UserDeviceInfo>(
-            future: DeviceInfoService.getDeviceInfo(),
-            builder: (context, snapshot) {
-              return Stack(
-                children: [
-                  ListView(
-                    padding: AppSize.defaultSidePadding,
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    children: [
-                      defaultSpacing(multiple: 3),
-                      _buildLogoImage(),
-                      defaultSpacing(height: AppSize.appBarHeight / 2),
-                      _buildCompanyImage(),
-                      _buildCompanyDescription(),
-                      defaultSpacing(multiple: 3),
-                      ..._buildAppinfoList(context, snapshot)
-                    ],
-                  ),
-                  const DefaultTitleDevider(),
-                ],
-              );
-            }));
+        child: Stack(
+          children: [
+            ListView(
+              padding: AppSize.defaultSidePadding,
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              children: [
+                defaultSpacing(multiple: 3),
+                _buildLogoImage(),
+                defaultSpacing(height: AppSize.appBarHeight / 2),
+                _buildCompanyImage(),
+                _buildCompanyDescription(),
+                defaultSpacing(multiple: 3),
+                ..._buildAppinfoList(context)
+              ],
+            ),
+            const DefaultTitleDevider(),
+          ],
+        ));
   }
 }

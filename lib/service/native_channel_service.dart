@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
- * File: /Users/bakbeom/work/hwst/lib/service/native_channel_service.dart
+ * Project Name:  [TruePass]
+ * File: /Users/bakbeom/work/truepass/lib/service/native_channel_service.dart
  * Created Date: 2023-01-25 11:52:53
- * Last Modified: 2023-02-28 13:02:40
+ * Last Modified: 2023-03-02 19:56:44
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -12,16 +12,16 @@
  */
 
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:hwst/enums/verify_type.dart';
 import 'package:hwst/globalProvider/timer_provider.dart';
-import 'package:hwst/service/pass_kit_service.dart';
-import 'package:hwst/service/thread_service.dart';
-import 'package:provider/provider.dart';
 import 'package:hwst/service/key_service.dart';
 import 'package:hwst/service/cache_service.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:hwst/service/pass_kit_service.dart';
+import 'package:hwst/service/thread_service.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/buildConfig/biocube_build_config.dart';
 import 'package:hwst/globalProvider/device_status_provider.dart';
@@ -87,18 +87,14 @@ class NativeChannelService {
                 Duration.zero, () => cp.sendDataToSeverFromBackground()));
           } else {
             if (!tp.isRunning) {
-              tp.perdict(
-                Future.delayed(Duration.zero, () async {
-                  cp.sendDataToSever().then((result) {
-                    if (result.isSuccessful) {
-                      cp.startTimer(
-                          duration: message.startsWith('nfcSuccess:')
-                              ? Duration(seconds: Platform.isAndroid ? 2 : 5)
-                              : null);
-                    }
-                  });
-                }),
-              );
+              tp.perdict(cp.sendDataToSever().then((result) {
+                if (result.isSuccessful) {
+                  cp.startTimer(
+                      duration: message.startsWith('nfcSuccess:')
+                          ? Duration(seconds: Platform.isAndroid ? 2 : 5)
+                          : null);
+                }
+              }));
             }
           }
         } else {

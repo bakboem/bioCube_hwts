@@ -1,8 +1,8 @@
 /*
- * Project Name:  [BIOCUBE] - HWST
+ * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/bioCube/face_kit/truepass/lib/util/thread_service.dart
  * Created Date: 2023-02-20 22:29:57
- * Last Modified: 2023-02-22 22:44:41
+ * Last Modified: 2023-02-26 17:44:54
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
