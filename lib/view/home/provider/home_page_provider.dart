@@ -47,7 +47,7 @@ class HomePageProvider extends ChangeNotifier {
       final ap = KeyService.baseAppKey.currentContext!.read<AuthProvider>();
       final userEvn = CacheService.getUserEnvironment() != null
           ? CacheService.getUserEnvironment()!
-          : UserEnvironmentModel(true, 1, false, true, 1, '-80', 60);
+          : UserEnvironmentModel(true, 1, false, true, 1, '-80', 20);
       ap.setUserEnvironment(userEvn);
     });
   }

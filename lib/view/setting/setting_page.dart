@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-03-02 19:00:03
+ * Last Modified: 2023-03-02 23:27:25
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -501,10 +501,10 @@ class _SettingPageState extends State<SettingPage> {
       builder: (context, session, _) {
         return Slider(
             max: 60,
-            min: 0,
+            min: 20,
             divisions: 60,
             label: '${session?.toInt()} sec',
-            value: session != null ? session.toDouble() : 0,
+            value: session != null ? session.toDouble() : 20,
             onChangeEnd: (s) {
               final p = context.read<SettinPageProivder>();
               p.setUserEnvrionment();

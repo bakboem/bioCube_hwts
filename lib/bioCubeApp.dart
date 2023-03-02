@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/shwt/lib/bioCubeApp.dart
  * Created Date: 2023-01-22 19:01:08
- * Last Modified: 2023-03-02 20:12:56
+ * Last Modified: 2023-03-02 23:21:44
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -11,23 +11,23 @@
  * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
  */
 
+import 'package:hwst/enums/verify_type.dart';
 import 'package:hwst/router.dart';
 import 'package:flutter/material.dart';
-import 'package:hwst/view/common/function_of_print.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/view/auth/auth_page.dart';
 import 'package:hwst/service/key_service.dart';
 import 'package:hwst/service/sound_service.dart';
 import 'package:hwst/service/connect_service.dart';
 import 'package:hwst/service/pass_kit_service.dart';
-import 'package:hwst/service/permission_service.dart';
 import 'view/common/function_of_hidden_key_borad.dart';
 import 'package:hwst/globalProvider/auth_provider.dart';
+import 'package:hwst/view/common/function_of_print.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/globalProvider/timer_provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:hwst/globalProvider/app_theme_provider.dart';
+import 'view/common/function_of_checkBleAndLocationStatus.dart';
 import 'package:hwst/globalProvider/device_status_provider.dart';
 import 'package:hwst/globalProvider/face_detection_provider.dart';
 import 'package:hwst/globalProvider/connect_status_provider.dart';
@@ -61,21 +61,23 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
     final _isForeground = (lifeCycle == AppLifecycleState.resumed);
     final _isBackground = (lifeCycle == AppLifecycleState.paused);
     final _isDetached = (lifeCycle == AppLifecycleState.detached);
+
     var baseContext = KeyService.baseAppKey.currentContext;
     if (baseContext == null) return;
     final cp = baseContext.read<CoreVerifyProcessProvider>();
-    final dp = baseContext.read<DeviceStatusProvider>();
     final isValidate = await isCardValidate(context);
     if (!_isForeground) {
       cp.setIsShowCamera(val: false);
     }
     if (_isForeground && isValidate) {
-      PassKitService.initKit();
       hideKeyboard(context);
       cp.setIsBackgroundMode(false);
-      PermissionService.checkPermissionStatus(Permission.bluetooth)
-          .then(dp.setBleStatus);
-      PermissionService.checkLocationPermission().then(dp.setLocationStatus);
+      checkBleAndLocationStatus();
+      Future.delayed(
+          Duration(seconds: 1),
+          () => cp.lastVerfyType == VerifyType.BLE
+              ? PassKitService.initKit(isWithStartBle: true)
+              : DoNothingAction());
     } else if (_isDetached) {
       pr('_isDetached ');
       SoundService.dispose();
@@ -84,7 +86,6 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
     } else if (_isBackground) {
       pr('isBackground');
       cp.setIsBackgroundMode(true);
-      PassKitService.initKit();
     }
   }
 

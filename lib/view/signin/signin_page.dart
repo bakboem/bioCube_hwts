@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/auth/auth_page.dart
  * Created Date: 2023-01-22 19:10:16
- * Last Modified: 2023-03-02 19:00:56
+ * Last Modified: 2023-03-02 20:40:24
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -11,6 +11,7 @@
  * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
  */
 
+import 'package:hwst/view/common/function_of_checkBleAndLocationStatus.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/material.dart';
@@ -54,19 +55,8 @@ class _SigninPageState extends State<SigninPage> {
   @override
   void initState() {
     final ap = context.read<AuthProvider>();
-    var dp = context.read<DeviceStatusProvider>();
     ap.checkIsLogedIn(false);
-    PermissionService.requestPermission(Permission.location).then((isGranted) {
-      dp.setLocationStatus(isGranted);
-      pr('isLocationGranted $isGranted');
-      if (isGranted) {
-        PermissionService.checkBlePermission().then((isBleGranted) {
-          dp.setBleStatus(isGranted);
-          pr('isBleGranted $isBleGranted');
-        });
-      }
-    });
-
+    checkBleAndLocationStatus();
     super.initState();
   }
 
@@ -237,33 +227,34 @@ class _SigninPageState extends State<SigninPage> {
               }
             };
 
-            if (sp.isValidate && (!tp.isRunning)) {
-              tp.perdict(Future.delayed(Duration.zero, () async {
-                await PermissionService.checkPermissionStatus(
-                        Permission.location)
-                    .then((isLocationGranted) async {
-                  if (isLocationGranted) {
-                    await PermissionService.checkBlePermission()
-                        .then((isBleGranted) async {
-                      if (isBleGranted) {
-                        _loginProccess();
-                      } else {
-                        var result = await AppDialog.showDangermessage(
-                            context, '${tr('not_use_ble_permission_text')}');
-                        if (result) {
-                          AppSettings.openBluetoothSettings();
-                        }
+            var permissonProccess = () async {
+              PermissionService.checkPermissionStatus(Permission.location)
+                  .then((isLocationGranted) async {
+                if (isLocationGranted) {
+                  PermissionService.checkBlePermission()
+                      .then((isBleGranted) async {
+                    if (isBleGranted) {
+                      _loginProccess();
+                    } else {
+                      var result = await AppDialog.showDangermessage(
+                          context, '${tr('not_use_ble_permission_text')}');
+                      if (result) {
+                        AppSettings.openBluetoothSettings();
                       }
-                    });
-                  } else {
-                    var result = await AppDialog.showDangermessage(
-                        context, '${tr('not_use_location_permission_text')}');
-                    if (result) {
-                      AppSettings.openLocationSettings();
                     }
+                  });
+                } else {
+                  var result = await AppDialog.showDangermessage(
+                      context, '${tr('not_use_location_permission_text')}');
+                  if (result) {
+                    AppSettings.openLocationSettings();
                   }
-                });
-              }));
+                }
+              });
+            };
+
+            if (sp.isValidate && (!tp.isRunning)) {
+              tp.perdict(permissonProccess.call());
             }
           }, selfHeight: AppSize.defaultTextFieldHeight),
         );

@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-02 20:12:00
+ * Last Modified: 2023-03-02 22:54:24
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -64,6 +64,14 @@ class _HomePageState extends State<HomePage> {
     _pageController = PageController(initialPage: 0);
     pr('init home');
     ConnectService.startListener();
+    runBleStart();
+  }
+
+  runBleStart() {
+    var dp = context.read<DeviceStatusProvider>();
+    if (dp.isBleOk && dp.isLocationOk) {
+      PassKitService.initKit(isWithStartBle: true);
+    }
   }
 
   @override
@@ -73,31 +81,31 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  Future<void> loadFaceDetectionAndDeepLearningFile(
-      String dirName, List<String> fileNames) async {
-    final fileService = LocalFileService();
-    for (var fileName in fileNames) {
-      final bytes = await rootBundle.load('assets/$dirName/$fileName');
-      File? file;
-      Directory? dir;
-      if (await fileService.checkDirectoryExits(dirName)) {
-        dir = await fileService.getDir(dirName);
-      } else {
-        dir = await fileService.createDirectory(dirName);
-      }
-      file = await fileService.createFile(dir!.path + '/$fileName');
-      if (await file.length() == 0) {
-        await file.writeAsBytes(bytes.buffer.asUint8List()).then((f) =>
-            dirName == 'face'
-                ? CacheService.saveFaceModelFilePath(f.path)
-                : DoNothingAction());
-      } else {
-        dirName == 'face'
-            ? CacheService.saveFaceModelFilePath(file.path)
-            : DoNothingAction();
-      }
-    }
-  }
+  // Future<void> loadFaceDetectionAndDeepLearningFile(
+  //     String dirName, List<String> fileNames) async {
+  //   final fileService = LocalFileService();
+  //   for (var fileName in fileNames) {
+  //     final bytes = await rootBundle.load('assets/$dirName/$fileName');
+  //     File? file;
+  //     Directory? dir;
+  //     if (await fileService.checkDirectoryExits(dirName)) {
+  //       dir = await fileService.getDir(dirName);
+  //     } else {
+  //       dir = await fileService.createDirectory(dirName);
+  //     }
+  //     file = await fileService.createFile(dir!.path + '/$fileName');
+  //     if (await file.length() == 0) {
+  //       await file.writeAsBytes(bytes.buffer.asUint8List()).then((f) =>
+  //           dirName == 'face'
+  //               ? CacheService.saveFaceModelFilePath(f.path)
+  //               : DoNothingAction());
+  //     } else {
+  //       dirName == 'face'
+  //           ? CacheService.saveFaceModelFilePath(file.path)
+  //           : DoNothingAction();
+  //     }
+  //   }
+  // }
 
   Widget _popupContents(BuildContext context) {
     return Selector<CoreVerifyProcessProvider, Tuple2<bool?, bool?>>(
@@ -594,7 +602,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     pr(CacheService.getDeviceInfo()?.toJson());
     Permission.camera.request();
-    PassKitService.initKit();
     return ChangeNotifierProvider(
       create: (context) => HomePageProvider(),
       builder: (context, _) {

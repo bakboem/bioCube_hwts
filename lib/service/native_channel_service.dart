@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/truepass/lib/service/native_channel_service.dart
  * Created Date: 2023-01-25 11:52:53
- * Last Modified: 2023-03-02 19:56:44
+ * Last Modified: 2023-03-02 23:15:42
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -60,29 +60,33 @@ class NativeChannelService {
       final cp = context.read<CoreVerifyProcessProvider>();
       final dp = context.read<DeviceStatusProvider>();
       final tp = context.read<TimerProvider>();
-      if (message.startsWith('bleSuccess:') ||
-          message.startsWith('nfcSuccess:')) {
-        if (!tp.isPassKitTimerRunning) {
-          tp.passKitProcess(PassKitService.updateToken,
-              duration: Duration(seconds: 3));
-        }
-        var tid = message.substring(message.indexOf(':') + 1).trim();
-        if (CacheService.getTidList() == null ||
+      final isBlueSuccess = message.startsWith('bleSuccess:');
+      final isNfcSuccess = message.startsWith('nfcSuccess:');
+      if (isBlueSuccess || isNfcSuccess) {
+        // if (!tp.isPassKitTimerRunning) {
+        //   tp.passKitProcess(PassKitService.updateToken,
+        //       duration: Duration(seconds: 5));
+        // }
+        cp.setLastVerfyType(isBlueSuccess ? VerifyType.BLE : VerifyType.NFC);
+        final tid = message.substring(message.indexOf(':') + 1).trim();
+        final isAuthorized = CacheService.getTidList() == null ||
             CacheService.getTidList()!
                 .where((element) => element.svtid == tid)
-                .isNotEmpty) {
+                .isNotEmpty;
+        if (isAuthorized) {
           cp.setTid(tid);
           pr(tid);
           var setType = () {
-            if (message.startsWith('nfcSuccess:')) {
+            if (isBlueSuccess) {
               cp.setVerifyType(VerifyType.NFC);
-            } else if (message.startsWith('bleSuccess:')) {
+            } else if (isNfcSuccess) {
               cp.setVerifyType(VerifyType.BLE);
             }
           };
           final thread = ThreadService.one();
           Platform.isAndroid ? setType.call() : DoNothingAction();
-          if (cp.isBackgroundMode && Platform.isAndroid) {
+
+          if (cp.isBackgroundMode && Platform.isAndroid && !tp.isRunning) {
             thread.reuqest(Future.delayed(
                 Duration.zero, () => cp.sendDataToSeverFromBackground()));
           } else {
@@ -110,9 +114,6 @@ class NativeChannelService {
         } else {
           dp.setNfcStatus(false);
         }
-      } else if (message.contains('Timeout')) {
-        cp.setMessage(tr('faild_with_time_out'));
-        cp.startTimer();
       } else {
         cp.setMessage(message);
       }

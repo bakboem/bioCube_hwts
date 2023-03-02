@@ -194,7 +194,7 @@ class PassKitService :  UtilsCallBack{
        var tid = StringUtils.convertHexToString(p0)
         Log.d(TAG, "onGetTerminalId $tid")
         sendMessage("nfcSuccess:$tid")
-       disableToken()
+        // disableToken()
         return  true
     }
 
@@ -230,7 +230,7 @@ class PassKitService :  UtilsCallBack{
         } else if (!sendSuccess) {
             disconnectGattServer()
         }
-        disableToken()
+        // disableToken()
 
     }
 

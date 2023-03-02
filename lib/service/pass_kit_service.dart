@@ -2,7 +2,7 @@
  * Project Name:  [koreaJob]
  * File: /Users/bakbeom/work/sm/koreajob/lib/service/pass_kit_service.dart
  * Created Date: 2023-01-22 10:14:14
- * Last Modified: 2023-03-02 19:23:28
+ * Last Modified: 2023-03-02 22:29:12
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  MOMONETWORK ALL RIGHTS RESERVED. 
@@ -29,13 +29,14 @@ class PassKitService {
     return _instance!;
   }
 
-  static Future<void> initKit() async {
+  static Future<void> initKit({required bool isWithStartBle}) async {
     await NativeChannelService.methodChannel.invokeMethod('initState');
     setRssi();
     setSessionTime();
     isNfcOk();
     Platform.isAndroid ? await updateToken() : await saveToken();
     Platform.isAndroid ? await activeToken() : DoNothingAction();
+    isWithStartBle ? startBle() : DoNothingAction();
   }
 
   static Future<String?> getToken() async {

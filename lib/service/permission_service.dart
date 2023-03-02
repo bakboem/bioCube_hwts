@@ -2,7 +2,7 @@
  * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/service/permission_service.dart
  * Created Date: 2021-08-13 11:38:37
- * Last Modified: 2023-03-02 19:24:45
+ * Last Modified: 2023-03-02 22:06:25
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -12,12 +12,8 @@
  */
 
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
-import 'package:hwst/globalProvider/device_status_provider.dart';
 import 'package:hwst/service/deviceInfo_service.dart';
-import 'package:hwst/service/key_service.dart';
 
 //*  앱 권한 요청.
 class PermissionService {
@@ -32,18 +28,12 @@ class PermissionService {
   ];
   static var getIosBlePermission = [
     Permission.bluetooth,
-    Permission.bluetoothConnect,
-    Permission.bluetoothScan,
   ];
   static var getAndroidBlePermission = [
     Permission.bluetooth,
     Permission.bluetoothConnect,
     Permission.bluetoothScan,
   ];
-  // 위치 권한 상태 체크 및 요청.
-  // static Future<bool?> checkLocationPermisson() async {
-  //   return await requestPermission(Permission.location);
-  // }
 
   // 포토 & 라이브러리 권한 부여상태 체크 및 요청.
   static Future<bool?> checkPhotoAndLibrayPermisson() async {
@@ -65,23 +55,16 @@ class PermissionService {
   }
 
   static Future<bool> checkLocationPermission() async {
-    var temp1 =
-        await PermissionService.checkPermissionStatus(Permission.location);
-    var temp2 = await PermissionService.checkPermissionStatus(
-        Permission.locationAlways);
-    var temp3 = await PermissionService.checkPermissionStatus(
-        Permission.locationWhenInUse);
-    if (temp3) {
-      Future.delayed(Duration(milliseconds: 200), () async {
-        var baseContext = KeyService.baseAppKey.currentContext;
-        final dp = baseContext?.read<DeviceStatusProvider>();
-        await PermissionService.requestPermission(Permission.locationWhenInUse)
-            .then((status) => baseContext != null
-                ? dp!.setLocationStatus(status)
-                : DoNothingAction());
-      });
+    var isGranted = await checkPermissionStatus(Permission.location);
+    if (isGranted) return true;
+    isGranted = await checkPermissionStatus(Permission.locationAlways);
+    if (isGranted) return true;
+    isGranted = await checkPermissionStatus(Permission.locationWhenInUse);
+    if (isGranted) {
+      return true;
+    } else {
+      return await requestPermission(Permission.locationWhenInUse);
     }
-    return temp1 || temp2 || temp3;
   }
 
   // BLE 체크.
@@ -89,34 +72,20 @@ class PermissionService {
     var isGranted = false;
     final deviceInfo = await DeviceInfoService.getDeviceInfo();
     if (Platform.isAndroid) {
-      if (int.parse(deviceInfo.deviceVersion) <= 30) {
-        isGranted = await Permission.bluetooth.isGranted;
-      }
+      if (int.parse(deviceInfo.deviceVersion) <= 30) isGranted = true;
       if (int.parse(deviceInfo.deviceVersion) > 30) {
         var scanGranted = await checkPermissionStatus(Permission.bluetoothScan);
         var connectGranted =
             await checkPermissionStatus(Permission.bluetoothConnect);
-        var advertiseGranted =
-            await checkPermissionStatus(Permission.bluetoothAdvertise);
-        if (!scanGranted) {
-          await Future.delayed(Duration(milliseconds: 300), () async {
-            scanGranted = await requestPermission(Permission.bluetoothScan);
-          });
-        }
-        if (!connectGranted) {
-          await Future.delayed(Duration(milliseconds: 600), () async {
-            connectGranted =
-                await requestPermission(Permission.bluetoothConnect);
-          });
-        }
-
-        if (!advertiseGranted) {
-          await Future.delayed(Duration(milliseconds: 900), () async {
-            advertiseGranted =
-                await requestPermission(Permission.bluetoothAdvertise);
-          });
-        }
-        isGranted = scanGranted && connectGranted && advertiseGranted;
+        if (!scanGranted)
+          scanGranted = await Permission.bluetoothScan
+              .request()
+              .then((status) => status.isGranted);
+        if (!connectGranted)
+          connectGranted = await Permission.bluetoothConnect
+              .request()
+              .then((status) => status.isGranted);
+        isGranted = scanGranted && connectGranted;
       }
     } else {
       isGranted = await checkPermissionStatus(Permission.bluetooth);

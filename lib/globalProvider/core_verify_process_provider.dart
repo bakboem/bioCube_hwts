@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/truepass/lib/view/home/provider/core_process_provider.dart
  * Created Date: 2023-01-25 12:24:10
- * Last Modified: 2023-03-02 19:32:18
+ * Last Modified: 2023-03-02 22:58:18
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -21,7 +21,6 @@ import 'package:hwst/service/api_service.dart';
 import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/service/location_service.dart';
 import 'package:hwst/model/common/result_model.dart';
-import 'package:hwst/service/deviceInfo_service.dart';
 import 'package:hwst/service/permission_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:hwst/view/common/function_of_print.dart';
@@ -35,6 +34,7 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
   bool isLoadData = false;
   bool isShowCamera = false;
   bool isBackgroundMode = false;
+  VerifyType lastVerfyType = VerifyType.BLE;
   String? message;
   String tid = '';
 
@@ -51,6 +51,11 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
 
   void startTimer({Duration? duration}) {
     timer = Timer(duration ?? Duration(seconds: 3), () => reset());
+  }
+
+  void setLastVerfyType(VerifyType type) {
+    lastVerfyType = type;
+    notifyListeners();
   }
 
   void startSettionTimer() {
