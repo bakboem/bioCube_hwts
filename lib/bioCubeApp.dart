@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/shwt/lib/bioCubeApp.dart
  * Created Date: 2023-01-22 19:01:08
- * Last Modified: 2023-03-02 23:33:09
+ * Last Modified: 2023-03-03 11:00:04
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -73,10 +73,8 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
       hideKeyboard(context);
       cp.setIsBackgroundMode(false);
       checkBleAndLocationStatus();
-      Future.delayed(
-          Duration(seconds: 1),
-          () => PassKitService.initKit(
-              isWithStartBle: cp.lastVerfyType == VerifyType.BLE));
+      PassKitService.initKit(
+          isWithStartBle: cp.lastVerfyType == VerifyType.BLE);
     } else if (_isDetached) {
       pr('_isDetached ');
       SoundService.dispose();

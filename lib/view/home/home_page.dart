@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-02 22:54:24
+ * Last Modified: 2023-03-03 13:04:00
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -64,6 +64,10 @@ class _HomePageState extends State<HomePage> {
     _pageController = PageController(initialPage: 0);
     pr('init home');
     ConnectService.startListener();
+    loadFaceDetectionAndDeepLearningFile('face', [
+      'haarcascade_frontalface_alt2.xml',
+      'haarcascade_frontalface_default.xml'
+    ]);
     runBleStart();
   }
 
@@ -81,31 +85,31 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  // Future<void> loadFaceDetectionAndDeepLearningFile(
-  //     String dirName, List<String> fileNames) async {
-  //   final fileService = LocalFileService();
-  //   for (var fileName in fileNames) {
-  //     final bytes = await rootBundle.load('assets/$dirName/$fileName');
-  //     File? file;
-  //     Directory? dir;
-  //     if (await fileService.checkDirectoryExits(dirName)) {
-  //       dir = await fileService.getDir(dirName);
-  //     } else {
-  //       dir = await fileService.createDirectory(dirName);
-  //     }
-  //     file = await fileService.createFile(dir!.path + '/$fileName');
-  //     if (await file.length() == 0) {
-  //       await file.writeAsBytes(bytes.buffer.asUint8List()).then((f) =>
-  //           dirName == 'face'
-  //               ? CacheService.saveFaceModelFilePath(f.path)
-  //               : DoNothingAction());
-  //     } else {
-  //       dirName == 'face'
-  //           ? CacheService.saveFaceModelFilePath(file.path)
-  //           : DoNothingAction();
-  //     }
-  //   }
-  // }
+  Future<void> loadFaceDetectionAndDeepLearningFile(
+      String dirName, List<String> fileNames) async {
+    final fileService = LocalFileService();
+    for (var fileName in fileNames) {
+      final bytes = await rootBundle.load('assets/$dirName/$fileName');
+      File? file;
+      Directory? dir;
+      if (await fileService.checkDirectoryExits(dirName)) {
+        dir = await fileService.getDir(dirName);
+      } else {
+        dir = await fileService.createDirectory(dirName);
+      }
+      file = await fileService.createFile(dir!.path + '/$fileName');
+      if (await file.length() == 0) {
+        await file.writeAsBytes(bytes.buffer.asUint8List()).then((f) =>
+            dirName == 'face'
+                ? CacheService.saveFaceModelFilePath(f.path)
+                : DoNothingAction());
+      } else {
+        dirName == 'face'
+            ? CacheService.saveFaceModelFilePath(file.path)
+            : DoNothingAction();
+      }
+    }
+  }
 
   Widget _popupContents(BuildContext context) {
     return Selector<CoreVerifyProcessProvider, Tuple2<bool?, bool?>>(
@@ -275,12 +279,20 @@ class _HomePageState extends State<HomePage> {
                           context, 'ble', isStatusOk: isBleOk, userEvn),
                       _buildPageViewText(
                           context, 'nfc', isStatusOk: isNfcOk, userEvn),
-                      // _buildPageViewText(
-                      //     context, 'face', isStatusOk: userEvn?.isUseFace, userEvn),
+                      _buildPageViewText(
+                          context,
+                          'face',
+                          isStatusOk: userEvn?.isUseFace,
+                          userEvn),
                     ]
                   : [
                       _buildPageViewText(
                           context, 'ble', isStatusOk: isBleOk, userEvn),
+                      _buildPageViewText(
+                          context,
+                          'face',
+                          isStatusOk: userEvn?.isUseFace,
+                          userEvn),
                     ],
             );
           },
@@ -600,8 +612,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    pr(CacheService.getDeviceInfo()?.toJson());
-    Permission.camera.request();
+    Future.delayed(Duration.zero, () async {
+      await Permission.camera.request();
+    });
     return ChangeNotifierProvider(
       create: (context) => HomePageProvider(),
       builder: (context, _) {

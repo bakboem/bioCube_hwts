@@ -1,16 +1,6 @@
-# hwst
+# HWST
 
 A new Flutter project.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Camera 관련 설명.
+- 최신 Camera Plugin android 에서 최대 30까지만 지원하는 0.8버전 imagePicker를 사용함으로서 pubspec.yaml의 Camera Plugin의 버전을 별또 지정.

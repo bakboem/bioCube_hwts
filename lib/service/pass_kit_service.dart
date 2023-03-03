@@ -2,7 +2,7 @@
  * Project Name:  [koreaJob]
  * File: /Users/bakbeom/work/sm/koreajob/lib/service/pass_kit_service.dart
  * Created Date: 2023-01-22 10:14:14
- * Last Modified: 2023-03-02 22:29:12
+ * Last Modified: 2023-03-03 11:00:21
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  MOMONETWORK ALL RIGHTS RESERVED. 
@@ -36,7 +36,9 @@ class PassKitService {
     isNfcOk();
     Platform.isAndroid ? await updateToken() : await saveToken();
     Platform.isAndroid ? await activeToken() : DoNothingAction();
-    isWithStartBle ? startBle() : DoNothingAction();
+    isWithStartBle
+        ? Future.delayed(Duration(seconds: 1), () => startBle())
+        : DoNothingAction();
   }
 
   static Future<String?> getToken() async {
