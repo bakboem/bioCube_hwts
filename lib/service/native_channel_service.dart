@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/truepass/lib/service/native_channel_service.dart
  * Created Date: 2023-01-25 11:52:53
- * Last Modified: 2023-03-02 23:31:02
+ * Last Modified: 2023-03-04 11:57:43
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -19,8 +19,6 @@ import 'package:hwst/enums/verify_type.dart';
 import 'package:hwst/globalProvider/timer_provider.dart';
 import 'package:hwst/service/key_service.dart';
 import 'package:hwst/service/cache_service.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:hwst/service/pass_kit_service.dart';
 import 'package:hwst/service/thread_service.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/buildConfig/biocube_build_config.dart';
@@ -67,6 +65,7 @@ class NativeChannelService {
         //   tp.passKitProcess(PassKitService.updateToken,
         //       duration: Duration(seconds: 5));
         // }
+        pr(message);
         cp.setLastVerfyType(isBlueSuccess ? VerifyType.BLE : VerifyType.NFC);
         final tid = message.substring(message.indexOf(':') + 1).trim();
         final isAuthorized = CacheService.getTidList() == null ||

@@ -1,30 +1,57 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:hwst/globalProvider/device_status_provider.dart';
+import 'package:hwst/service/key_service.dart';
+import 'package:hwst/styles/app_size.dart';
+import 'package:hwst/view/common/function_of_print.dart';
+import 'package:provider/provider.dart';
 
 class CameraOverlayWidget extends StatelessWidget {
-  const CameraOverlayWidget({
-    Key? key,
-    required this.arucos,
-  }) : super(key: key);
+  const CameraOverlayWidget({Key? key, required this.info}) : super(key: key);
+  final List<double> info;
 
-  final List<double> arucos;
+  Offset getOffset() {
+    final dp =
+        KeyService.baseAppKey.currentContext!.read<DeviceStatusProvider>();
+    var cardWidth = AppSize.defaultContentsWidth * .8;
+    var cardHeight = dp.isOverThanIphone10
+        ? cardWidth * 1.65
+        : Platform.isAndroid
+            ? AppSize.realWidth > 600
+                ? cardWidth * 1.4
+                : cardWidth * 1.55
+            : cardWidth * 1.55;
+    var topScale = Platform.isIOS ? info[1] / 640 : info[1] / 720;
+    var leftScale = info[0] / 480;
+    var left = cardWidth * leftScale;
+    var top = cardHeight * topScale - 20;
+    return Offset(left, top);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        CustomPaint(
-          painter: ArucosPainter(arucos: arucos),
-        ),
-      ],
-    );
+    return info.isNotEmpty
+        ? Positioned(
+            left: getOffset().dx,
+            top: getOffset().dy,
+            child: Container(
+              width: info[2] / 1.75,
+              height: info[2] / 1.75,
+              decoration:
+                  BoxDecoration(border: Border.all(color: Colors.green)),
+            ))
+        : Container();
+    // CustomPaint(
+    //   painter: FaceLinePainter(faceInfo: info),
+    // )
   }
 }
 
-class ArucosPainter extends CustomPainter {
-  ArucosPainter({required this.arucos});
+class FaceLinePainter extends CustomPainter {
+  FaceLinePainter({required this.faceInfo});
 
   // list of aruco coordinates, each aruco has 4 corners with x/y, total of 8 numbers per aruco
-  final List<double> arucos;
+  final List<double> faceInfo;
 
   // paint we will use to draw to arucos
   final _paint = Paint()
@@ -34,48 +61,29 @@ class ArucosPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (arucos.isEmpty) {
+    if (faceInfo.isEmpty) {
       return;
     }
-
+    pr(faceInfo);
     // Each aruco is 8 numbers (4 corners * x,y) and corners are starting from
     // top-left going clockwise
-    final count = arucos.length ~/ 8;
-    for (int i = 0; i < count; ++i) {
-      // where current aruco coords starts
-      int arucoIdx = i * 8;
+    var x = faceInfo[0];
+    var y = faceInfo[1];
+    var fsize = faceInfo[2];
+    var point = Offset(x, y);
+    var left = Offset(x, y + fsize);
+    var bottom = Offset(left.dx + fsize, left.dy);
+    var right = Offset(bottom.dx, bottom.dy - fsize);
 
-      // Draw the 4 lines of the aruco
-      for (int j = 0; j < 4; ++j) {
-        // each corner has x and y so we jump in 2
-        final corner1Idx = arucoIdx + j * 2;
+    var top = Offset(right.dx - fsize, right.dy);
 
-        // since the corners are clockwise we can take the next corner by adding 1 to j
-        // making sure not to overflow to the next aruco, hence the modulo 8, so when
-        // j=3 corner1 will be the bottom-left corner, and corner2 will be the top-left (like j=0)
-        final corner2Idx = arucoIdx + ((j + 1) * 2) % 8;
-
-        // Draw the line between the 2 corners
-        final from = Offset(arucos[corner1Idx], arucos[corner1Idx + 1]);
-        final to = Offset(arucos[corner2Idx], arucos[corner2Idx + 1]);
-        canvas.drawLine(from, to, _paint);
-      }
-    }
+    canvas.drawLine(point, Offset(point.dx, point.dy + 50), _paint);
+    // canvas.drawLine(point, left, _paint);
+    // canvas.drawLine(left, bottom, _paint);
+    // canvas.drawLine(bottom, right, _paint);
+    // canvas.drawLine(right, top, _paint);
   }
 
   @override
-  bool shouldRepaint(ArucosPainter oldDelegate) {
-    // We check if the arucos array was changed, if so we should re-paint
-    if (arucos.length != oldDelegate.arucos.length) {
-      return true;
-    }
-
-    for (int i = 0; i < arucos.length; ++i) {
-      if (arucos[i] != oldDelegate.arucos[i]) {
-        return true;
-      }
-    }
-
-    return false;
-  }
+  bool shouldRepaint(FaceLinePainter oldDelegate) => true;
 }

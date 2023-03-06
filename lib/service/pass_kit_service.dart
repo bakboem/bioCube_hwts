@@ -2,7 +2,7 @@
  * Project Name:  [koreaJob]
  * File: /Users/bakbeom/work/sm/koreajob/lib/service/pass_kit_service.dart
  * Created Date: 2023-01-22 10:14:14
- * Last Modified: 2023-03-03 11:00:21
+ * Last Modified: 2023-03-04 17:32:21
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  MOMONETWORK ALL RIGHTS RESERVED. 
@@ -29,15 +29,21 @@ class PassKitService {
     return _instance!;
   }
 
-  static Future<void> initKit({required bool isWithStartBle}) async {
+  static Future<void> initKit({VerifyType? type}) async {
     await NativeChannelService.methodChannel.invokeMethod('initState');
-    setRssi();
-    setSessionTime();
-    isNfcOk();
-    Platform.isAndroid ? await updateToken() : await saveToken();
-    Platform.isAndroid ? await activeToken() : DoNothingAction();
-    isWithStartBle
-        ? Future.delayed(Duration(seconds: 1), () => startBle())
+    if (Platform.isAndroid) {
+      setRssi();
+      setSessionTime();
+      isNfcOk();
+      updateToken();
+      activeToken();
+    } else {
+      deleteToken();
+      saveToken();
+    }
+    type != null
+        ? Future.delayed(Duration(seconds: 1),
+            () => type == VerifyType.BLE ? startBle() : startNfc())
         : DoNothingAction();
   }
 
@@ -58,7 +64,9 @@ class PassKitService {
   }
 
   static Future<void> updateToken() async {
-    setRssi();
+    if (Platform.isAndroid) {
+      setRssi();
+    }
     if (CacheService.getUserCard() != null) {
       await NativeChannelService.methodChannel.invokeMethod(
           'updateToken', CacheService.getUserCard()!.mCardKey ?? '');
@@ -72,22 +80,13 @@ class PassKitService {
   }
 
   static Future<void> startBle() async {
-    setRssi();
-    setSessionTime();
-    Platform.isAndroid ? updateToken() : saveToken();
-    Platform.isAndroid ? activeToken() : DoNothingAction();
     final cp =
         KeyService.baseAppKey.currentContext!.read<CoreVerifyProcessProvider>();
     cp.setVerifyType(VerifyType.BLE);
-
     await NativeChannelService.methodChannel.invokeMethod('startBle');
   }
 
   static Future<void> startNfc() async {
-    setRssi();
-    setSessionTime();
-    Platform.isAndroid ? updateToken() : saveToken();
-    Platform.isAndroid ? activeToken() : DoNothingAction();
     final cp =
         KeyService.baseAppKey.currentContext!.read<CoreVerifyProcessProvider>();
     cp.setVerifyType(VerifyType.NFC);

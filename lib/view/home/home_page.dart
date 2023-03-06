@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-03 13:04:00
+ * Last Modified: 2023-03-06 19:29:09
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -12,6 +12,8 @@
  */
 
 import 'dart:io';
+import 'package:hwst/enums/verify_type.dart';
+import 'package:hwst/view/home/camera/camera_view_page.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +30,6 @@ import 'package:hwst/service/pass_kit_service.dart';
 import 'package:hwst/model/common/result_model.dart';
 import 'package:hwst/service/vibration_service.dart';
 import 'package:hwst/view/setting/setting_page.dart';
-import 'package:hwst/service/permission_service.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/view/common/base_app_toast.dart';
 import 'package:hwst/view/common/base_app_dialog.dart';
@@ -64,9 +65,11 @@ class _HomePageState extends State<HomePage> {
     _pageController = PageController(initialPage: 0);
     pr('init home');
     ConnectService.startListener();
+    Permission.camera.request();
     loadFaceDetectionAndDeepLearningFile('face', [
-      'haarcascade_frontalface_alt2.xml',
+      // 'haarcascade_frontalface_alt2.xml',
       'haarcascade_frontalface_default.xml'
+      // 'face_detection_yunet_2022mar.onnx'
     ]);
     runBleStart();
   }
@@ -74,7 +77,7 @@ class _HomePageState extends State<HomePage> {
   runBleStart() {
     var dp = context.read<DeviceStatusProvider>();
     if (dp.isBleOk && dp.isLocationOk) {
-      PassKitService.initKit(isWithStartBle: true);
+      PassKitService.initKit();
     }
   }
 
@@ -195,18 +198,17 @@ class _HomePageState extends State<HomePage> {
         elevation: 8,
         backgroundColor: AppColors.whiteText,
         onPressed: () async {
-          final isLocationOk =
-              await PermissionService.checkLocationPermission();
           final p = context.read<HomePageProvider>();
+          final dp = context.read<DeviceStatusProvider>();
           final isSelectedBlue = p.currenPage == 0;
           final isSelectedNfc = p.currenPage == 1;
           final isSelectedFace = (p.currenPage == 2);
-          if (isLocationOk) {
+          if (dp.isLocationOk) {
             if (!cp.isTimerRunning) {
               if (isSelectedBlue && isBleOk && userEvn!.isUseBle!) {
-                PassKitService.startBle();
+                PassKitService.initKit(type: VerifyType.BLE);
               } else if (isSelectedNfc && isNfcOk && userEvn!.isUseNfc!) {
-                PassKitService.startNfc();
+                PassKitService.initKit(type: VerifyType.NFC);
               } else if (isSelectedFace) {
                 if (userEvn!.isUseFace!) {
                   final p = context.read<CoreVerifyProcessProvider>();
@@ -225,6 +227,7 @@ class _HomePageState extends State<HomePage> {
                   } else {
                     final fp = context.read<FaceDetectionProvider>();
                     fp.setIsFaceFinded(false);
+                    // Navigator.pushNamed(context, CameraViewPage.routeName);
                     p.setIsShowCamera(val: true);
                   }
                 } else {
@@ -280,19 +283,13 @@ class _HomePageState extends State<HomePage> {
                       _buildPageViewText(
                           context, 'nfc', isStatusOk: isNfcOk, userEvn),
                       _buildPageViewText(
-                          context,
-                          'face',
-                          isStatusOk: userEvn?.isUseFace,
-                          userEvn),
+                          context, 'face', isStatusOk: true, userEvn)
                     ]
                   : [
                       _buildPageViewText(
                           context, 'ble', isStatusOk: isBleOk, userEvn),
                       _buildPageViewText(
-                          context,
-                          'face',
-                          isStatusOk: userEvn?.isUseFace,
-                          userEvn),
+                          context, 'face', isStatusOk: true, userEvn)
                     ],
             );
           },
@@ -304,26 +301,29 @@ class _HomePageState extends State<HomePage> {
     return Positioned(
         bottom: AppSize.appBarHeight,
         left: AppSize.realWidth / 2 - largFloatButtonWidth / 2,
-        child: Column(
-          children: [
-            SizedBox(
-                width: largFloatButtonWidth,
-                height: largFloatButtonWidth,
-                child: Selector<AuthProvider, UserEnvironmentModel?>(
-                  selector: (context, provider) =>
-                      provider.userEnvironmentModel,
-                  builder: (context, userEvn, _) {
-                    return Selector<DeviceStatusProvider, Tuple2<bool, bool>>(
-                      selector: (context, provider) =>
-                          Tuple2(provider.isBleOk, provider.isNfcOk),
-                      builder: (context, tuple, _) {
-                        return _buildButtonWidget(
-                            context, tuple.item1, tuple.item2, userEvn);
-                      },
-                    );
-                  },
-                )),
-          ],
+        child: GestureDetector(
+          onDoubleTap: () {},
+          child: Column(
+            children: [
+              SizedBox(
+                  width: largFloatButtonWidth,
+                  height: largFloatButtonWidth,
+                  child: Selector<AuthProvider, UserEnvironmentModel?>(
+                    selector: (context, provider) =>
+                        provider.userEnvironmentModel,
+                    builder: (context, userEvn, _) {
+                      return Selector<DeviceStatusProvider, Tuple2<bool, bool>>(
+                        selector: (context, provider) =>
+                            Tuple2(provider.isBleOk, provider.isNfcOk),
+                        builder: (context, tuple, _) {
+                          return _buildButtonWidget(
+                              context, tuple.item1, tuple.item2, userEvn);
+                        },
+                      );
+                    },
+                  )),
+            ],
+          ),
         ));
   }
 
@@ -353,6 +353,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buidCardWidget(BuildContext context) {
     final p = context.read<HomePageProvider>();
+    final dp = context.read<DeviceStatusProvider>();
     final userCard = CacheService.getUserCard();
     return Positioned(
       bottom: AppSize.appBarHeight +
@@ -363,7 +364,7 @@ class _HomePageState extends State<HomePage> {
           AppSize.elevation / 2,
       child: CardWidget(
         cardType: userCard!.mCardCode!,
-        isOverThanIphone10: Platform.isIOS ? p.isOverThanIphone10 : false,
+        isOverThanIphone10: Platform.isIOS ? dp.isOverThanIphone10 : false,
       ),
     );
   }
@@ -612,9 +613,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(Duration.zero, () async {
-      await Permission.camera.request();
-    });
     return ChangeNotifierProvider(
       create: (context) => HomePageProvider(),
       builder: (context, _) {

@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/auth/auth_page.dart
  * Created Date: 2023-01-22 19:10:16
- * Last Modified: 2023-03-02 20:40:24
+ * Last Modified: 2023-03-04 10:45:25
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -11,8 +11,6 @@
  * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
  */
 
-import 'package:hwst/view/common/function_of_checkBleAndLocationStatus.dart';
-import 'package:hwst/view/common/function_of_print.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +31,6 @@ import 'package:hwst/service/permission_service.dart';
 import 'package:hwst/view/common/base_app_toast.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/view/common/base_app_dialog.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:hwst/globalProvider/auth_provider.dart';
 import 'package:hwst/globalProvider/timer_provider.dart';
 import 'package:hwst/view/common/base_input_widget.dart';
@@ -56,7 +53,8 @@ class _SigninPageState extends State<SigninPage> {
   void initState() {
     final ap = context.read<AuthProvider>();
     ap.checkIsLogedIn(false);
-    checkBleAndLocationStatus();
+    PermissionService.requestLocationAndBle()
+        .then((_) => PermissionService.checkLocationAndBle());
     super.initState();
   }
 
@@ -194,6 +192,7 @@ class _SigninPageState extends State<SigninPage> {
               AppSize.radius15, () async {
             final p = context.read<SigninPageProvider>();
             final sp = context.read<SigninPageProvider>();
+            final dp = context.read<DeviceStatusProvider>();
             final ap = context.read<AuthProvider>();
             final tp = context.read<TimerProvider>();
             if (!p.isEmail) {
@@ -226,31 +225,27 @@ class _SigninPageState extends State<SigninPage> {
                 AppToast().show(context, tr('logoin_successful'));
               }
             };
-
             var permissonProccess = () async {
-              PermissionService.checkPermissionStatus(Permission.location)
-                  .then((isLocationGranted) async {
-                if (isLocationGranted) {
-                  PermissionService.checkBlePermission()
-                      .then((isBleGranted) async {
-                    if (isBleGranted) {
-                      _loginProccess();
-                    } else {
-                      var result = await AppDialog.showDangermessage(
-                          context, '${tr('not_use_ble_permission_text')}');
-                      if (result) {
-                        AppSettings.openBluetoothSettings();
-                      }
-                    }
-                  });
-                } else {
+              await PermissionService.requestLocationAndBle()
+                  .then((_) => PermissionService.checkLocationAndBle());
+              if (dp.isBleOk && dp.isLocationOk) {
+                _loginProccess();
+              } else {
+                if (!dp.isLocationOk) {
                   var result = await AppDialog.showDangermessage(
                       context, '${tr('not_use_location_permission_text')}');
                   if (result) {
                     AppSettings.openLocationSettings();
                   }
                 }
-              });
+                if (!dp.isBleOk) {
+                  var result = await AppDialog.showDangermessage(
+                      context, '${tr('not_use_ble_permission_text')}');
+                  if (result) {
+                    AppSettings.openBluetoothSettings();
+                  }
+                }
+              }
             };
 
             if (sp.isValidate && (!tp.isRunning)) {

@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/face_kit/truepass/lib/view/home/ffi/native_ffi.dart
  * Created Date: 2023-02-17 11:18:19
- * Last Modified: 2023-03-03 12:26:41
+ * Last Modified: 2023-03-05 21:28:49
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -34,7 +34,7 @@ typedef _CDetect = ffi.Pointer<ffi.Float> Function(
     ffi.Pointer<ffi.Uint8> bytes,
     ffi.Bool isYUV,
     ffi.Pointer<ffi.Int32> outCount);
-typedef _CDetectTest = ffi.Pointer<ffi.Int> Function(
+typedef _CDetectTest = ffi.Pointer<ffi.Float> Function(
     ffi.Int32 width,
     ffi.Int32 height,
     ffi.Int32 rotation,
@@ -54,7 +54,7 @@ typedef _Detect = ffi.Pointer<ffi.Float> Function(
     ffi.Pointer<ffi.Uint8> bytes,
     bool isYUV,
     ffi.Pointer<ffi.Int32> outCount);
-typedef _DetectTest = ffi.Pointer<ffi.Int> Function(
+typedef _DetectTest = ffi.Pointer<ffi.Float> Function(
     int width,
     int height,
     int rotation,
@@ -125,7 +125,7 @@ Float32List detect(int width, int height, int rotation, Uint8List yBuffer,
   return res.asTypedList(count);
 }
 
-int detectTest(int width, int height, int rotation, Uint8List yBuffer,
+Float32List detectTest(int width, int height, int rotation, Uint8List yBuffer,
     Uint8List? uBuffer, Uint8List? vBuffer) {
   var ySize = yBuffer.lengthInBytes;
   var uSize = uBuffer?.lengthInBytes ?? 0;
@@ -141,12 +141,14 @@ int detectTest(int width, int height, int rotation, Uint8List yBuffer,
     _bytes.setAll(ySize, vBuffer!);
     _bytes.setAll(ySize + vSize, uBuffer!);
   }
-
+  int size = ffi.sizeOf<ffi.Int32>();
+  print('size::${size}');
   ffi.Pointer<ffi.Int32> outCount = malloc.allocate<ffi.Int32>(1);
   var res = _detectTest(width, height, rotation, _imageBuffer!,
       Platform.isAndroid ? true : false, outCount);
+  final count = outCount.value;
   malloc.free(outCount);
-  return res.value;
+  return res.asTypedList(count);
 }
 
 // get platform dlib

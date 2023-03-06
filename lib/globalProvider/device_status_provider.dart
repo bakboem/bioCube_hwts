@@ -20,6 +20,7 @@
  */
 
 import 'package:flutter/foundation.dart';
+import 'package:hwst/service/deviceInfo_service.dart';
 
 class DeviceStatusProvider extends ChangeNotifier {
   bool isBleOk = false;
@@ -27,10 +28,15 @@ class DeviceStatusProvider extends ChangeNotifier {
   bool isSuppertNfc = true;
   bool isFaceOk = false;
   bool isLocationOk = false;
+  bool isOverThanIphone10 = false;
 
   void setBleStatus(bool val) {
     isBleOk = val;
     notifyListeners();
+  }
+
+  void setIsOverThanIphone10() async {
+    isOverThanIphone10 = await DeviceInfoService.isOverThanIphone10();
   }
 
   void setIsSuppertNfc(bool val) {

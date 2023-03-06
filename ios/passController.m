@@ -77,7 +77,7 @@
         bool isTokenConverted = [_nfcService setTokenWithToken:_mobilePassToken];
         if (isTokenConverted) {
 //            NSLog(@"NFC 통신 시작");
-            [self sendData:@"nfcStart"];
+            // [self sendData:@"nfcStart"];
             [_nfcService beginSession];
         }else{
             [self sendData:@"convertTokenError"];

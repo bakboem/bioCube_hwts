@@ -2,7 +2,7 @@
  * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/service/permission_service.dart
  * Created Date: 2021-08-13 11:38:37
- * Last Modified: 2023-03-02 22:06:25
+ * Last Modified: 2023-03-04 12:42:23
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -12,8 +12,15 @@
  */
 
 import 'dart:io';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter/material.dart';
 import 'package:hwst/service/deviceInfo_service.dart';
+import 'package:provider/provider.dart';
+import 'package:hwst/service/key_service.dart';
+import 'package:hwst/service/cache_service.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:hwst/globalProvider/device_status_provider.dart';
+
+typedef PermissionCallBack = bool Function(bool);
 
 //*  앱 권한 요청.
 class PermissionService {
@@ -30,67 +37,98 @@ class PermissionService {
     Permission.bluetooth,
   ];
   static var getAndroidBlePermission = [
-    Permission.bluetooth,
+    Permission.bluetoothAdvertise,
     Permission.bluetoothConnect,
     Permission.bluetoothScan,
   ];
-
-  // 포토 & 라이브러리 권한 부여상태 체크 및 요청.
-  static Future<bool?> checkPhotoAndLibrayPermisson() async {
-    List<bool> canUse = [];
-    await Future.forEach(getCameraAndPhotoLibrayPermisson, (permission) async {
-      // 권한 필요시 요청.
-      if (await permission.isGranted) {
-        canUse.add(true);
-      } else {
-        await requestPermission(permission).then((value) => canUse.add(true));
-      }
-    });
-    return canUse.contains(false) ? false : true;
-  }
 
   // 권한 요청.
   static Future<bool> requestPermission(Permission permission) async {
     return await permission.request().isGranted;
   }
 
-  static Future<bool> checkLocationPermission() async {
-    var isGranted = await checkPermissionStatus(Permission.location);
-    if (isGranted) return true;
-    isGranted = await checkPermissionStatus(Permission.locationAlways);
-    if (isGranted) return true;
-    isGranted = await checkPermissionStatus(Permission.locationWhenInUse);
-    if (isGranted) {
-      return true;
+  static Future<void> requestLocationAndBle() async {
+    await requestMore([
+      ...getLocationPermisson,
+      ...(Platform.isAndroid ? getAndroidBlePermission : getIosBlePermission)
+    ]);
+  }
+
+  static Future<void> checkLocationAndBle() async {
+    var context = KeyService.baseAppKey.currentContext;
+    if (context == null) return;
+    var dp = context.read<DeviceStatusProvider>();
+
+    // ble
+    var isGrantedBle = false;
+    var isGrantedBleScan = false;
+    var isGrantedBleConnect = false;
+    var isGrantedBleAdvertise = false;
+    // location
+    var isGrantedLocation = false;
+    var isGrantedLocationAlways = false;
+    var isGrantedLocationWhenInUse = false;
+    if (Platform.isAndroid) {
+      final deviceInfo = CacheService.getDeviceInfo() ??
+          await DeviceInfoService.getDeviceInfo();
+      final isLessThan30 = int.parse(deviceInfo.deviceVersion) <= 30;
+      await checkMore([
+        ...getLocationPermisson,
+        ...(isLessThan30 ? [Permission.bluetooth] : getAndroidBlePermission)
+        // [Permission.bluetooth]:...getAndroidBlePermission)
+      ], [
+        (rs) => isGrantedLocation = rs,
+        (rs) => isGrantedLocationAlways = rs,
+        (rs) => isGrantedLocationWhenInUse = rs,
+        ...(isLessThan30
+            ? [(rs) => isGrantedBle = rs]
+            : [
+                (rs) => isGrantedBleScan = rs,
+                (rs) => isGrantedBleConnect = rs,
+                (rs) => isGrantedBleAdvertise = rs,
+              ])
+      ]);
+      dp.setBleStatus(isLessThan30
+          ? isGrantedBle
+          : isGrantedBleConnect && isGrantedBleScan && isGrantedBleAdvertise);
+      dp.setLocationStatus(isGrantedLocation ||
+          isGrantedLocationAlways ||
+          isGrantedLocationWhenInUse);
     } else {
-      return await requestPermission(Permission.locationWhenInUse);
+      await checkMore([
+        ...getLocationPermisson,
+        Permission.bluetooth
+        // [Permission.bluetooth]:...getAndroidBlePermission)
+      ], [
+        (rs) => isGrantedLocation = rs,
+        (rs) => isGrantedLocationAlways = rs,
+        (rs) => isGrantedLocationWhenInUse = rs,
+        (rs) => isGrantedBle = rs
+      ]);
+      dp.setBleStatus(isGrantedBle);
+      dp.setLocationStatus(isGrantedLocation ||
+          isGrantedLocationAlways ||
+          isGrantedLocationWhenInUse);
     }
   }
 
-  // BLE 체크.
-  static Future<bool> checkBlePermission() async {
-    var isGranted = false;
-    final deviceInfo = await DeviceInfoService.getDeviceInfo();
-    if (Platform.isAndroid) {
-      if (int.parse(deviceInfo.deviceVersion) <= 30) isGranted = true;
-      if (int.parse(deviceInfo.deviceVersion) > 30) {
-        var scanGranted = await checkPermissionStatus(Permission.bluetoothScan);
-        var connectGranted =
-            await checkPermissionStatus(Permission.bluetoothConnect);
-        if (!scanGranted)
-          scanGranted = await Permission.bluetoothScan
-              .request()
-              .then((status) => status.isGranted);
-        if (!connectGranted)
-          connectGranted = await Permission.bluetoothConnect
-              .request()
-              .then((status) => status.isGranted);
-        isGranted = scanGranted && connectGranted;
-      }
-    } else {
-      isGranted = await checkPermissionStatus(Permission.bluetooth);
-    }
-    return isGranted;
+  static Future<void> checkMore(
+      List<Permission> pmsList, List<PermissionCallBack> callback) async {
+    await Future.forEach(
+        pmsList,
+        (pms) async =>
+            await callback[pmsList.indexOf(pms)].call(await pms.isGranted));
+  }
+
+  static Future<void> requestMore(List<Permission> pmsList) async {
+    var temp = <Permission>[];
+    await Future.forEach(
+        pmsList,
+        (pms) async =>
+            await pms.status.isGranted || await pms.status.isPermanentlyDenied
+                ? DoNothingAction()
+                : temp.add(pms));
+    await Future.forEach(temp, (pms) async => await pms.request());
   }
 
   //  권한 상태 체크.

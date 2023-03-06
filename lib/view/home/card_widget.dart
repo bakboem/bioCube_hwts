@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/home/card_one_widget.dart
  * Created Date: 2023-02-04 20:19:38
- * Last Modified: 2023-03-02 20:18:12
+ * Last Modified: 2023-03-06 19:28:51
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -13,6 +13,9 @@
 
 import 'dart:io';
 
+import 'package:hwst/globalProvider/device_status_provider.dart';
+import 'package:hwst/globalProvider/face_detection_provider.dart';
+import 'package:hwst/view/home/camera/camera_overlay_widget.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -198,15 +201,27 @@ class _CardWidgetState extends State<CardWidget> {
                           width: AppSize.cardBorderWidth),
                 ),
                 child: isShowCamera
-                    ? ClipRRect(
-                        clipBehavior: Clip.antiAlias,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(AppSize.radius15),
-                          topRight: Radius.circular(AppSize.radius15),
-                          bottomRight: Radius.circular(AppSize.radius15),
-                          bottomLeft: Radius.circular(AppSize.radius15),
-                        ),
-                        child: CameraViewPage(),
+                    ? Stack(
+                        children: [
+                          ClipRRect(
+                            clipBehavior: Clip.antiAlias,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(AppSize.radius15),
+                              topRight: Radius.circular(AppSize.radius15),
+                              bottomRight: Radius.circular(AppSize.radius15),
+                              bottomLeft: Radius.circular(AppSize.radius15),
+                            ),
+                            child: CameraViewPage(),
+                          ),
+                          Consumer<FaceDetectionProvider>(
+                              builder: (context, provider, _) {
+                            return provider.faceInfo != null &&
+                                    provider.faceInfo!.isNotEmpty &&
+                                    provider.isShowFaceLine
+                                ? CameraOverlayWidget(info: provider.faceInfo!)
+                                : SizedBox();
+                          })
+                        ],
                       )
                     : Stack(
                         children: [

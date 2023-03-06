@@ -20,6 +20,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:hwst/globalProvider/device_status_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/enums/request_type.dart';
 import 'package:hwst/globalProvider/auth_provider.dart';
@@ -40,10 +41,12 @@ class HomePageProvider extends ChangeNotifier {
   bool isLoadData = false;
   int currenPage = 0;
   UserDeviceInfo? userDeviceInfo;
-  bool isOverThanIphone10 = false;
+
   void initUserEnvironment() {
     Future.delayed(Duration.zero, () async {
-      isOverThanIphone10 = await DeviceInfoService.isOverThanIphone10();
+      final dp =
+          KeyService.baseAppKey.currentContext!.read<DeviceStatusProvider>();
+      dp.setIsOverThanIphone10();
       final ap = KeyService.baseAppKey.currentContext!.read<AuthProvider>();
       final userEvn = CacheService.getUserEnvironment() != null
           ? CacheService.getUserEnvironment()!

@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/truepass/lib/view/home/provider/core_process_provider.dart
  * Created Date: 2023-01-25 12:24:10
- * Last Modified: 2023-03-02 22:58:18
+ * Last Modified: 2023-03-04 12:26:53
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -10,21 +10,22 @@
  * 												Discription													
  * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
  */
-import 'dart:async';
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 import 'package:hwst/util/date_util.dart';
-import 'package:hwst/enums/request_type.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:hwst/enums/verify_type.dart';
+import 'package:hwst/enums/request_type.dart';
+import 'package:hwst/service/key_service.dart';
 import 'package:hwst/service/api_service.dart';
 import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/service/location_service.dart';
 import 'package:hwst/model/common/result_model.dart';
-import 'package:hwst/service/permission_service.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/model/home/result_authorized_model.dart';
+import 'package:hwst/globalProvider/device_status_provider.dart';
 import 'package:hwst/model/home/result_authorized_response_model.dart';
 
 class CoreVerifyProcessProvider extends ChangeNotifier {
@@ -33,6 +34,7 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
   bool hasMore = false;
   bool isLoadData = false;
   bool isShowCamera = false;
+  bool onceSwich = true;
   bool isBackgroundMode = false;
   VerifyType lastVerfyType = VerifyType.BLE;
   String? message;
@@ -55,6 +57,11 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
 
   void setLastVerfyType(VerifyType type) {
     lastVerfyType = type;
+    notifyListeners();
+  }
+
+  void setOnceSwich(bool val) {
+    onceSwich = val;
     notifyListeners();
   }
 
@@ -106,7 +113,9 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
   }
 
   Future<ResultModel> sendDataToSever() async {
-    if (await PermissionService.requestPermission(Permission.location)) {
+    final dp =
+        KeyService.baseAppKey.currentContext!.read<DeviceStatusProvider>();
+    if (dp.isLocationOk) {
       position = await LocationService.getCurrentPosition();
     } else {
       return ResultModel(false);
