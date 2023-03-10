@@ -34,8 +34,8 @@ dependencies:
   geolocator: ^9.0.2
   vibration: ^1.7.6
   soundpool: ^2.3.0
-  face_kit:
-    path: ../../face_kit
+  # face_kit:
+  #   path: ../../face_kit
   camera: ^0.10.3+2
   # if android use this camera ref.  (CamcorderProfile.get override)
   # camera:

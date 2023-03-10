@@ -21,10 +21,15 @@ class CameraOverlayWidget extends StatelessWidget {
                 ? cardWidth * 1.4
                 : cardWidth * 1.55
             : cardWidth * 1.55;
+    // low
+    // var topScale = Platform.isIOS ? info[1] / 352 : info[1] / 320;
+    // var leftScale = Platform.isIOS ? info[0] / 288 : info[0] / 240;
+    // var top = cardHeight * topScale - 40;
+    // medium
     var topScale = Platform.isIOS ? info[1] / 640 : info[1] / 720;
     var leftScale = info[0] / 480;
-    var left = cardWidth * leftScale;
     var top = cardHeight * topScale - 20;
+    var left = cardWidth * leftScale;
     return Offset(left, top);
   }
 
@@ -35,8 +40,8 @@ class CameraOverlayWidget extends StatelessWidget {
             left: getOffset().dx,
             top: getOffset().dy,
             child: Container(
-              width: info[2] / 1.75,
-              height: info[2] / 1.75,
+              width: info[2],
+              height: info[2],
               decoration:
                   BoxDecoration(border: Border.all(color: Colors.green)),
             ))

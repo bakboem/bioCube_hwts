@@ -24,9 +24,14 @@ import 'package:flutter/widgets.dart';
 class FaceDetectionProvider extends ChangeNotifier {
   bool isFaceFinded = false;
   bool isShowFaceLine = false;
+  double? cameraScale;
   List<double>? faceInfo;
   void setIsFaceFinded(bool? val) {
     isFaceFinded = val ?? !isFaceFinded;
+  }
+
+  void setCameraScale(double scale) {
+    cameraScale = scale;
   }
 
   void setFaceInfo(List<double> res) {

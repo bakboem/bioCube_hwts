@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/shwt/lib/bioCubeApp.dart
  * Created Date: 2023-01-22 19:01:08
- * Last Modified: 2023-03-06 12:55:54
+ * Last Modified: 2023-03-09 14:02:09
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -65,6 +65,7 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
     var baseContext = KeyService.baseAppKey.currentContext;
     if (baseContext == null) return;
     final cp = baseContext.read<CoreVerifyProcessProvider>();
+    final ap = baseContext.read<AuthProvider>();
     final isValidate = await isCardValidate(context);
     pr(lifeCycle);
     if (!_isForeground) {
@@ -79,7 +80,10 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
       PermissionService.requestLocationAndBle()
           .then((_) => PermissionService.checkLocationAndBle());
       PassKitService.initKit(
-          type: cp.lastVerfyType == VerifyType.BLE ? VerifyType.BLE : null);
+          type: cp.lastVerfyType == VerifyType.BLE &&
+                  (ap.userEnvironmentModel?.isUseBle ?? false)
+              ? VerifyType.BLE
+              : null);
     } else if (_isDetached) {
       pr('_isDetached ');
       SoundService.dispose();

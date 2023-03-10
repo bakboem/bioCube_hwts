@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-06 19:29:09
+ * Last Modified: 2023-03-09 16:03:54
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -12,14 +12,13 @@
  */
 
 import 'dart:io';
-import 'package:hwst/enums/verify_type.dart';
-import 'package:hwst/view/home/camera/camera_view_page.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:app_settings/app_settings.dart';
 import 'package:hwst/enums/image_type.dart';
+import 'package:hwst/enums/verify_type.dart';
+import 'package:app_settings/app_settings.dart';
 import 'package:hwst/styles/export_common.dart';
 import 'package:hwst/service/sound_service.dart';
 import 'package:hwst/view/home/card_widget.dart';
@@ -48,7 +47,7 @@ import 'package:hwst/view/home/provider/home_page_provider.dart';
 import 'package:hwst/globalProvider/face_detection_provider.dart';
 import 'package:hwst/globalProvider/core_verify_process_provider.dart';
 import 'package:hwst/view/common/function_of_check_card_is_valid.dart';
-import 'package:hwst/view/common/method_of_show_location_faild_popup.dart';
+import 'package:hwst/view/common/function_of_show_location_faild_popup.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -193,6 +192,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildButtonWidget(BuildContext context, bool isBleOk, bool isNfcOk,
       UserEnvironmentModel? userEvn) {
     final cp = context.read<CoreVerifyProcessProvider>();
+    final dp = context.read<DeviceStatusProvider>();
     return FloatingActionButton.large(
         key: Key('home'),
         elevation: 8,
@@ -201,8 +201,9 @@ class _HomePageState extends State<HomePage> {
           final p = context.read<HomePageProvider>();
           final dp = context.read<DeviceStatusProvider>();
           final isSelectedBlue = p.currenPage == 0;
-          final isSelectedNfc = p.currenPage == 1;
-          final isSelectedFace = (p.currenPage == 2);
+          final isSelectedNfc = dp.isSuppertNfc && p.currenPage == 1;
+          final isSelectedFace =
+              dp.isSuppertNfc ? p.currenPage == 2 : p.currenPage == 1;
           if (dp.isLocationOk) {
             if (!cp.isTimerRunning) {
               if (isSelectedBlue && isBleOk && userEvn!.isUseBle!) {
@@ -227,6 +228,7 @@ class _HomePageState extends State<HomePage> {
                   } else {
                     final fp = context.read<FaceDetectionProvider>();
                     fp.setIsFaceFinded(false);
+                    // fp.setIsShowFaceLine(false);
                     // Navigator.pushNamed(context, CameraViewPage.routeName);
                     p.setIsShowCamera(val: true);
                   }

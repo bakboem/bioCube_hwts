@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/face_kit/truepass/lib/view/home/ffi/native_ffi.dart
  * Created Date: 2023-02-17 11:18:19
- * Last Modified: 2023-03-05 21:28:49
+ * Last Modified: 2023-03-09 20:35:23
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -76,6 +76,62 @@ final _DestroyDetector _destroyDetector = _lib
     .lookup<ffi.NativeFunction<_CDestroyDetector>>('destroyDetector')
     .asFunction();
 
+// C function signatures
+typedef _process_image_func = ffi.Void Function(
+  ffi.Pointer<Utf8>,
+  ffi.Pointer<Utf8>,
+  ffi.Int32 width,
+  ffi.Int32 height,
+  ffi.Int32 rotation,
+  ffi.Pointer<ffi.Uint8> bytes,
+  ffi.Bool isYUV,
+);
+
+// Dart function signatures
+typedef _ProcessImageFunc = void Function(
+  ffi.Pointer<Utf8>,
+  ffi.Pointer<Utf8>,
+  int width,
+  int height,
+  int rotation,
+  ffi.Pointer<ffi.Uint8> bytes,
+  bool isYUV,
+);
+final _ProcessImageFunc _processImage = _lib
+    .lookup<ffi.NativeFunction<_process_image_func>>('process_image')
+    .asFunction();
+void processImage(
+  String inputPath,
+  String outputPath,
+  int width,
+  int height,
+  int rotation,
+  Uint8List yBuffer,
+  Uint8List? uBuffer,
+  Uint8List? vBuffer,
+) {
+  var ySize = yBuffer.lengthInBytes;
+  var uSize = uBuffer?.lengthInBytes ?? 0;
+  var vSize = vBuffer?.lengthInBytes ?? 0;
+  var totalSize = ySize + uSize + vSize;
+  print('ySize${ySize}');
+  print('uSize${uSize}');
+  print('vSize${vSize}');
+  print('totalSize${totalSize}');
+  _imageBuffer ??= malloc.allocate<ffi.Uint8>(totalSize);
+  Uint8List _bytes = _imageBuffer!.asTypedList(totalSize);
+  _bytes.setAll(0, yBuffer);
+
+  if (Platform.isAndroid) {
+    // Swap u&v buffer for opencv
+    _bytes.setAll(ySize, vBuffer!);
+    _bytes.setAll(ySize + vSize, uBuffer!);
+  }
+
+  _processImage(inputPath.toNativeUtf8(), outputPath.toNativeUtf8(), width,
+      height, rotation, _imageBuffer!, Platform.isAndroid ? true : false);
+}
+
 // Image buffer
 ffi.Pointer<ffi.Uint8>? _imageBuffer;
 
@@ -105,7 +161,10 @@ Float32List detect(int width, int height, int rotation, Uint8List yBuffer,
   var uSize = uBuffer?.lengthInBytes ?? 0;
   var vSize = vBuffer?.lengthInBytes ?? 0;
   var totalSize = ySize + uSize + vSize;
-
+  print('ySize${ySize}');
+  print('uSize${uSize}');
+  print('vSize${vSize}');
+  print('totalSize${totalSize}');
   _imageBuffer ??= malloc.allocate<ffi.Uint8>(totalSize);
   Uint8List _bytes = _imageBuffer!.asTypedList(totalSize);
   _bytes.setAll(0, yBuffer);
@@ -141,8 +200,7 @@ Float32List detectTest(int width, int height, int rotation, Uint8List yBuffer,
     _bytes.setAll(ySize, vBuffer!);
     _bytes.setAll(ySize + vSize, uBuffer!);
   }
-  int size = ffi.sizeOf<ffi.Int32>();
-  print('size::${size}');
+
   ffi.Pointer<ffi.Int32> outCount = malloc.allocate<ffi.Int32>(1);
   var res = _detectTest(width, height, rotation, _imageBuffer!,
       Platform.isAndroid ? true : false, outCount);

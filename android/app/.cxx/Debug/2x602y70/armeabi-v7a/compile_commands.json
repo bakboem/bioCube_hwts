@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/Users/bakbeom/work/bioCube/face_kit/hwst/android/app/.cxx/Debug/2x602y70/armeabi-v7a",
-  "command": "/Users/bakbeom/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=armv7-none-linux-androideabi23 --sysroot=/Users/bakbeom/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Dhwst_EXPORTS -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security -fexceptions -frtti -stdlib=libc++ -g  -fno-limit-debug-info -fPIC -o CMakeFiles/hwst.dir/hwst.cpp.o -c /Users/bakbeom/work/bioCube/face_kit/hwst/android/app/src/main/cpp/hwst.cpp",
-  "file": "/Users/bakbeom/work/bioCube/face_kit/hwst/android/app/src/main/cpp/hwst.cpp"
-}
-]

@@ -80,7 +80,6 @@ class _RequestThread {
 
     Uint8List? uBuffer;
     Uint8List? vBuffer;
-
     if (Platform.isAndroid) {
       uBuffer = planes[1].bytes;
       vBuffer = planes[2].bytes;

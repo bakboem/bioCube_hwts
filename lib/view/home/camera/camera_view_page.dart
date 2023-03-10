@@ -2,13 +2,12 @@ import 'dart:io';
 import 'dart:developer';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:hwst/globalProvider/device_status_provider.dart';
+import 'package:hwst/service/key_service.dart';
 import 'package:hwst/styles/app_size.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/globalProvider/face_detection_provider.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/view/common/widget_of_loading_view.dart';
-import 'package:hwst/view/home/camera/camera_overlay_widget.dart';
 import 'package:hwst/view/home/camera/threadController/receive_thread_process.dart';
 
 class CameraViewPage extends StatefulWidget {
@@ -26,7 +25,6 @@ class _CameraViewPageState extends State<CameraViewPage>
   double _camFrameToScreenScale = 0;
   int _lastRun = 0;
   bool _detectionInProgress = false;
-  List<double> _faceInfo = List.empty();
   @override
   void initState() {
     super.initState();
@@ -38,8 +36,8 @@ class _CameraViewPageState extends State<CameraViewPage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _requestThread.destroy();
     _camController?.dispose();
+    _requestThread.destroy();
     pr('dispose camera!');
     super.dispose();
   }
@@ -72,7 +70,8 @@ class _CameraViewPageState extends State<CameraViewPage>
     _camFrameRotation = Platform.isAndroid ? desc.sensorOrientation : 0;
     _camController = CameraController(
       desc,
-      ResolutionPreset.medium, // ios : 640 x480     android : 720x480
+      ResolutionPreset
+          .medium, // ios : 640 x480   android : 720x480   // low 352x288 on iOS, 320x240 on Android
       enableAudio: false,
       imageFormatGroup: Platform.isAndroid
           ? ImageFormatGroup.yuv420
@@ -93,6 +92,8 @@ class _CameraViewPageState extends State<CameraViewPage>
   }
 
   void _processCameraImage(CameraImage image) async {
+    final fp =
+        KeyService.baseAppKey.currentContext!.read<FaceDetectionProvider>();
     if (_detectionInProgress ||
         !mounted ||
         DateTime.now().millisecondsSinceEpoch - _lastRun < 200) {
@@ -107,19 +108,19 @@ class _CameraViewPageState extends State<CameraViewPage>
           ? image.width
           : image.height;
       _camFrameToScreenScale = AppSize.realWidth / w;
+
+      fp.setCameraScale(_camFrameToScreenScale);
     }
 
     // Call the detector
     _detectionInProgress = true;
-    final fp = context.read<FaceDetectionProvider>();
+
     List<double>? res;
     if (!fp.isFaceFinded) {
       res = await _requestThread.detect(image, _camFrameRotation);
     }
     if (res != null && res.isNotEmpty) {
-      _faceInfo = res;
       fp.setIsShowFaceLine(true);
-      // fp.setIsFaceFinded(true);
       fp.setFaceInfo(res);
       pr('find face x $res');
     } else {
@@ -150,17 +151,6 @@ class _CameraViewPageState extends State<CameraViewPage>
 
   @override
   Widget build(BuildContext context) {
-    final dp = context.read<DeviceStatusProvider>();
-    var cardWidth = AppSize.defaultContentsWidth * .8;
-    var cardHeight = dp.isOverThanIphone10
-        ? cardWidth * 1.65
-        : Platform.isAndroid
-            ? AppSize.realWidth > 600
-                ? cardWidth * 1.4
-                : cardWidth * 1.55
-            : cardWidth * 1.55;
-    var scale = AppSize.realHeight / cardHeight;
-    pr('scale!!!! ${scale}');
     if (_camController == null) {
       return Stack(
         children: [

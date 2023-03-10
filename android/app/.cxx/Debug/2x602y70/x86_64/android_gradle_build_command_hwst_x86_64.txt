@@ -1,7 +1,0 @@
-Executable : /Users/bakbeom/Library/Android/sdk/cmake/3.22.1/bin/ninja
-arguments : 
--C
-/Users/bakbeom/work/bioCube/face_kit/hwst/android/app/.cxx/Debug/2x602y70/x86_64
-hwst
-jvmArgs : 
-
