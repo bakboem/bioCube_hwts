@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-09 16:03:54
+ * Last Modified: 2023-03-12 18:26:43
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -65,11 +65,14 @@ class _HomePageState extends State<HomePage> {
     pr('init home');
     ConnectService.startListener();
     Permission.camera.request();
-    loadFaceDetectionAndDeepLearningFile('face', [
-      // 'haarcascade_frontalface_alt2.xml',
-      'haarcascade_frontalface_default.xml'
-      // 'face_detection_yunet_2022mar.onnx'
-    ]);
+    loadFaceDetectionAndDeepLearningFile(
+      'opencv',
+      ['haarcascade_frontalface_default.xml'],
+    );
+    loadFaceDetectionAndDeepLearningFile(
+      'mnn',
+      ['FaceCubePlusRecognize.mnn'],
+    );
     runBleStart();
   }
 
@@ -101,14 +104,19 @@ class _HomePageState extends State<HomePage> {
       }
       file = await fileService.createFile(dir!.path + '/$fileName');
       if (await file.length() == 0) {
-        await file.writeAsBytes(bytes.buffer.asUint8List()).then((f) =>
-            dirName == 'face'
-                ? CacheService.saveFaceModelFilePath(f.path)
-                : DoNothingAction());
+        await file
+            .writeAsBytes(bytes.buffer.asUint8List())
+            .then((f) => dirName == 'opencv'
+                ? CacheService.saveOpencvModelFilePath(f.path)
+                : dirName == 'mnn'
+                    ? CacheService.saveMnnModelFilePath(f.path)
+                    : DoNothingAction());
       } else {
-        dirName == 'face'
-            ? CacheService.saveFaceModelFilePath(file.path)
-            : DoNothingAction();
+        dirName == 'opencv'
+            ? CacheService.saveOpencvModelFilePath(file.path)
+            : dirName == 'mnn'
+                ? CacheService.saveMnnModelFilePath(file.path)
+                : DoNothingAction();
       }
     }
   }
@@ -192,7 +200,6 @@ class _HomePageState extends State<HomePage> {
   Widget _buildButtonWidget(BuildContext context, bool isBleOk, bool isNfcOk,
       UserEnvironmentModel? userEvn) {
     final cp = context.read<CoreVerifyProcessProvider>();
-    final dp = context.read<DeviceStatusProvider>();
     return FloatingActionButton.large(
         key: Key('home'),
         elevation: 8,
@@ -354,7 +361,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buidCardWidget(BuildContext context) {
-    final p = context.read<HomePageProvider>();
     final dp = context.read<DeviceStatusProvider>();
     final userCard = CacheService.getUserCard();
     return Positioned(

@@ -3,6 +3,7 @@ import 'dart:isolate';
 import 'dart:developer';
 import 'package:camera/camera.dart';
 import 'package:hwst/service/cache_service.dart';
+import 'package:hwst/service/local_file_servicer.dart';
 import 'package:hwst/view/common/fuction_of_capture_full_screen.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'request_thread_process.dart' as request_thread;
@@ -26,10 +27,16 @@ class ReceiveThread {
 // captrue full screen
 
     final bytes = await getBitmapFromContext();
+    final dir = await LocalFileService().getLocalDirectory();
+    final testOutputFile =
+        await LocalFileService().createFile('${dir!.path}/test/test.png');
+    pr(testOutputFile.path);
     final initReq = request_thread.InitRequest(
         requestThread: fromRequestThread.sendPort,
         markerPng: bytes,
-        path: CacheService.getFaceModelFilePath()!);
+        opencvModelPath: CacheService.getOpencvModelFilePath()!,
+        mnnModelPath: CacheService.getMnnModelFilePath()!,
+        testOutputPath: testOutputFile.path);
     _receiveThread = await Isolate.spawn(
       request_thread.init,
       initReq,

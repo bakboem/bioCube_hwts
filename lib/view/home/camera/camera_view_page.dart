@@ -17,8 +17,7 @@ class CameraViewPage extends StatefulWidget {
   _CameraViewPageState createState() => _CameraViewPageState();
 }
 
-class _CameraViewPageState extends State<CameraViewPage>
-    with WidgetsBindingObserver {
+class _CameraViewPageState extends State<CameraViewPage> {
   CameraController? _camController;
   late ReceiveThread _requestThread;
   int _camFrameRotation = 0;
@@ -28,66 +27,53 @@ class _CameraViewPageState extends State<CameraViewPage>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     _requestThread = ReceiveThread();
     initCamera();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     _camController?.dispose();
     _requestThread.destroy();
     pr('dispose camera!');
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    final CameraController? cameraController = _camController;
-
-    // App state changed before we got the chance to initialize.
-    if (cameraController == null || !cameraController.value.isInitialized) {
-      return;
-    }
-    if (state == AppLifecycleState.inactive) {
-      cameraController.dispose();
-    } else if (state == AppLifecycleState.resumed) {
-      initCamera();
-    }
-  }
-
   Future<void> initCamera() async {
-    final cameras = await availableCameras();
-    var idx =
-        cameras.indexWhere((c) => c.lensDirection == CameraLensDirection.front);
-    if (idx < 0) {
-      log("No Back camera found - weird");
-      return;
-    }
+    try {
+      final cameras = await availableCameras();
+      var idx = cameras
+          .indexWhere((c) => c.lensDirection == CameraLensDirection.front);
+      if (idx < 0) {
+        log("No Back camera found - weird");
+        return;
+      }
 
-    var desc = cameras[idx];
-    _camFrameRotation = Platform.isAndroid ? desc.sensorOrientation : 0;
-    _camController = CameraController(
-      desc,
-      ResolutionPreset
-          .medium, // ios : 640 x480   android : 720x480   // low 352x288 on iOS, 320x240 on Android
-      enableAudio: false,
-      imageFormatGroup: Platform.isAndroid
-          ? ImageFormatGroup.yuv420
-          : ImageFormatGroup.bgra8888,
-    );
+      var desc = cameras[idx];
+      _camFrameRotation = Platform.isAndroid ? desc.sensorOrientation : 0;
+      if (_camController != null) {
+        _camController!.dispose();
+      }
+      _camController = CameraController(
+        desc,
+        ResolutionPreset
+            .medium, // ios : 640 x480   android : 720x480   // low 352x288 on iOS, 320x240 on Android
+        enableAudio: false,
+        imageFormatGroup: Platform.isAndroid
+            ? ImageFormatGroup.yuv420
+            : ImageFormatGroup.bgra8888,
+      );
+    } catch (e) {
+      pr('@@@@@@@@@@@ Camera init Exception');
+    }
 
     try {
       await _camController!.initialize();
       await _camController!
-          .startImageStream((image) => _processCameraImage(image));
+          .startImageStream((image) => _processCameraImage(image))
+          .then((value) => mounted ? setState(() {}) : DoNothingAction());
     } catch (e) {
       log("Error initializing camera, error: ${e.toString()}");
-    }
-
-    if (mounted) {
-      setState(() {});
     }
   }
 
@@ -119,7 +105,7 @@ class _CameraViewPageState extends State<CameraViewPage>
     if (!fp.isFaceFinded) {
       res = await _requestThread.detect(image, _camFrameRotation);
     }
-    if (res != null && res.isNotEmpty) {
+    if (res != null && res.isNotEmpty && res[0] > 0) {
       fp.setIsShowFaceLine(true);
       fp.setFaceInfo(res);
       pr('find face x $res');

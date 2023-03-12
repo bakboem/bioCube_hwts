@@ -2,7 +2,7 @@
  * Project Name:  [mKolon3.0] - MedicalSalesPortal
  * File: /Users/bakbeom/work/sm/si/medsalesportal/lib/globalProvider/connect_status_provider.dart
  * Created Date: 2022-10-26 07:14:36
- * Last Modified: 2023-03-02 19:14:57
+ * Last Modified: 2023-03-12 18:04:07
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 

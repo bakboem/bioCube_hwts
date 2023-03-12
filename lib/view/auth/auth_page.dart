@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/auth/auth_page.dart
  * Created Date: 2023-02-01 10:56:03
- * Last Modified: 2023-03-02 19:00:03
+ * Last Modified: 2023-03-12 17:33:09
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -11,11 +11,11 @@
  * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
  */
 
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:provider/provider.dart';
-import 'package:hwst/globalProvider/auth_provider.dart';
 import 'package:hwst/view/home/home_page.dart';
 import 'package:hwst/view/signin/signin_page.dart';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:hwst/globalProvider/auth_provider.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});

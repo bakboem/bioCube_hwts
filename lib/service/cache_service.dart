@@ -2,7 +2,7 @@
  * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/service/cache_service.dart
  * Created Date: 2021-08-22 19:45:10
- * Last Modified: 2023-03-02 19:15:36
+ * Last Modified: 2023-03-12 11:23:48
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -20,7 +20,6 @@ import 'package:hwst/model/user/tid_model.dart';
 import 'package:hwst/model/user/user_card_model.dart';
 import 'package:hwst/model/user/user_device_info.dart';
 import 'package:hwst/model/user/user_environment_model.dart';
-import 'package:hwst/view/common/function_of_print.dart';
 
 //*  SharedPreferences Singleton
 class CacheService {
@@ -58,10 +57,10 @@ class CacheService {
   }
 
   static void deleteALL() {
-    var filePath = getFaceModelFilePath();
+    var filePath = getOpencvModelFilePath();
     sharedPreferences?.clear();
     if (filePath != null) {
-      saveFaceModelFilePath(filePath);
+      saveOpencvModelFilePath(filePath);
     }
   }
 
@@ -115,13 +114,20 @@ class CacheService {
     return getData('svUrl');
   }
 
-  static void saveFaceModelFilePath(String path) {
-    pr('?????!!!!$path');
-    saveData('faceModelPath', path);
+  static void saveOpencvModelFilePath(String path) {
+    saveData('opencvModelPath', path);
   }
 
-  static String? getFaceModelFilePath() {
-    return getData('faceModelPath');
+  static String? getOpencvModelFilePath() {
+    return getData('opencvModelPath');
+  }
+
+  static void saveMnnModelFilePath(String path) {
+    saveData('mnnModelPath', path);
+  }
+
+  static String? getMnnModelFilePath() {
+    return getData('mnnModelPath');
   }
 
   static void saveDeepLearningModelFilePath(String path) {

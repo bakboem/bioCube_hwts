@@ -8,11 +8,15 @@ import 'package:hwst/view/home/camera/ffi/native_ffi.dart' as native_ffi;
 class InitRequest {
   SendPort requestThread;
   ByteData markerPng;
-  String path;
+  String opencvModelPath;
+  String mnnModelPath;
+  String testOutputPath;
   InitRequest(
       {required this.requestThread,
       required this.markerPng,
-      required this.path});
+      required this.opencvModelPath,
+      required this.mnnModelPath,
+      required this.testOutputPath});
 }
 
 class Request {
@@ -32,7 +36,8 @@ late SendPort _requestThread;
 late _RequestThread _detector;
 
 void init(InitRequest initReq) {
-  _detector = _RequestThread(initReq.markerPng, initReq.path);
+  _detector = _RequestThread(initReq.markerPng, initReq.opencvModelPath,
+      initReq.mnnModelPath, initReq.testOutputPath);
 
   _requestThread = initReq.requestThread;
 
@@ -63,13 +68,16 @@ void _handleMessage(data) {
 }
 
 class _RequestThread {
-  _RequestThread(ByteData markerPng, String path) {
-    inits(markerPng, path);
+  _RequestThread(ByteData markerPng, String opencvModlePath,
+      String mnnModelPath, String testOutputPath) {
+    inits(markerPng, opencvModlePath, mnnModelPath, testOutputPath);
   }
 
-  void inits(ByteData markerPng, String path) {
+  void inits(ByteData markerPng, String opencvModlePath, String mnnModlePath,
+      String testOutputPath) {
     final pngBytes = markerPng.buffer.asUint8List();
-    native_ffi.initDetector(pngBytes, 36, path);
+    native_ffi.initDetector(
+        pngBytes, 36, opencvModlePath, mnnModlePath, testOutputPath);
   }
 
   List<double>? detectTest(CameraImage image, int rotation) {
@@ -84,7 +92,7 @@ class _RequestThread {
       uBuffer = planes[1].bytes;
       vBuffer = planes[2].bytes;
     }
-    var result = native_ffi.detectTest(
+    var result = native_ffi.detectFrame(
         image.width, image.height, rotation, yBuffer, uBuffer, vBuffer);
 
     return result.toList();

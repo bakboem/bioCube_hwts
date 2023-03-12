@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/home/card_one_widget.dart
  * Created Date: 2023-02-04 20:19:38
- * Last Modified: 2023-03-06 19:28:51
+ * Last Modified: 2023-03-12 17:00:07
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -12,10 +12,6 @@
  */
 
 import 'dart:io';
-
-import 'package:hwst/globalProvider/device_status_provider.dart';
-import 'package:hwst/globalProvider/face_detection_provider.dart';
-import 'package:hwst/view/home/camera/camera_overlay_widget.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +25,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/view/home/camera/camera_view_page.dart';
 import 'package:hwst/view/common/widget_of_default_spacing.dart';
+import 'package:hwst/view/home/camera/camera_overlay_widget.dart';
+import 'package:hwst/globalProvider/face_detection_provider.dart';
 import 'package:hwst/globalProvider/core_verify_process_provider.dart';
 
 class CardWidget extends StatefulWidget {
@@ -211,7 +209,9 @@ class _CardWidgetState extends State<CardWidget> {
                               bottomRight: Radius.circular(AppSize.radius15),
                               bottomLeft: Radius.circular(AppSize.radius15),
                             ),
-                            child: CameraViewPage(),
+                            child: CameraViewPage(
+                              key: Key('fromCardPage'),
+                            ),
                           ),
                           Consumer<FaceDetectionProvider>(
                               builder: (context, provider, _) {

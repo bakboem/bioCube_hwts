@@ -34,15 +34,9 @@ dependencies:
   geolocator: ^9.0.2
   vibration: ^1.7.6
   soundpool: ^2.3.0
-  # face_kit:
-  #   path: ../../face_kit
+  face_kit:
+    path: ../../face_kit
   camera: ^0.10.3+2
-  # if android use this camera ref.  (CamcorderProfile.get override)
-  # camera:
-  #   git:
-  #     url: https://github.com/flutter/plugins
-  #     path: packages/camera/camera
-  #     ref: 9e46048ad2e1f085c1e8f6c77391fa52025e681f
   cupertino_icons: ^1.0.2
   fl_mlkit_text_recognize: ^2.1.0
 
@@ -58,12 +52,12 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/
     - assets/i18n/
     - assets/images/
     - assets/sound/
     - assets/country/
-    - assets/face/
+    - assets/opencv/
+    - assets/mnn/
 
 flutter_native_splash:
   color: "#FFFFFF"

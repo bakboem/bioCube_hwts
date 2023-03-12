@@ -22,6 +22,7 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   await Hive.initFlutter();
   NativeChannelService.init();
+
   SoundService.init();
   CacheService.init();
   setSystemOverlay();

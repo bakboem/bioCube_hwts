@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/face_kit/truepass/lib/view/home/ffi/native_ffi.dart
  * Created Date: 2023-02-17 11:18:19
- * Last Modified: 2023-03-09 20:35:23
+ * Last Modified: 2023-03-12 14:47:07
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -22,19 +22,16 @@ ffi.DynamicLibrary _lib = _openDynamicLibrary();
 /// C function signatures
 typedef _CVersionFunc = ffi.Pointer<Utf8> Function();
 typedef _CInitDetector = ffi.Void Function(
-    ffi.Pointer<ffi.Uint8> markerPngBytes,
-    ffi.Int32 inSize,
-    ffi.Int32 bits,
-    ffi.Pointer<Utf8>);
+  ffi.Pointer<ffi.Uint8> markerPngBytes,
+  ffi.Int32 inSize,
+  ffi.Int32 bits,
+  ffi.Pointer<Utf8>,
+  ffi.Pointer<Utf8>,
+  ffi.Pointer<Utf8>,
+);
 typedef _CDestroyDetector = ffi.Void Function();
-typedef _CDetect = ffi.Pointer<ffi.Float> Function(
-    ffi.Int32 width,
-    ffi.Int32 height,
-    ffi.Int32 rotation,
-    ffi.Pointer<ffi.Uint8> bytes,
-    ffi.Bool isYUV,
-    ffi.Pointer<ffi.Int32> outCount);
-typedef _CDetectTest = ffi.Pointer<ffi.Float> Function(
+
+typedef _CDetectFrame = ffi.Pointer<ffi.Float> Function(
     ffi.Int32 width,
     ffi.Int32 height,
     ffi.Int32 rotation,
@@ -44,17 +41,17 @@ typedef _CDetectTest = ffi.Pointer<ffi.Float> Function(
 
 /// Dart function signatures
 typedef _VersionFunc = ffi.Pointer<Utf8> Function();
-typedef _InitDetector = void Function(ffi.Pointer<ffi.Uint8> markerPngBytes,
-    int inSize, int bits, ffi.Pointer<Utf8>);
+typedef _InitDetector = void Function(
+  ffi.Pointer<ffi.Uint8> markerPngBytes,
+  int inSize,
+  int bits,
+  ffi.Pointer<Utf8>,
+  ffi.Pointer<Utf8>,
+  ffi.Pointer<Utf8>,
+);
 typedef _DestroyDetector = void Function();
-typedef _Detect = ffi.Pointer<ffi.Float> Function(
-    int width,
-    int height,
-    int rotation,
-    ffi.Pointer<ffi.Uint8> bytes,
-    bool isYUV,
-    ffi.Pointer<ffi.Int32> outCount);
-typedef _DetectTest = ffi.Pointer<ffi.Float> Function(
+
+typedef _DetectFrame = ffi.Pointer<ffi.Float> Function(
     int width,
     int height,
     int rotation,
@@ -68,10 +65,9 @@ final _VersionFunc _version =
 final _InitDetector _initDetector = _lib
     .lookup<ffi.NativeFunction<_CInitDetector>>('initDetector')
     .asFunction();
-final _Detect _detect =
-    _lib.lookup<ffi.NativeFunction<_CDetect>>('detect').asFunction();
-final _DetectTest _detectTest =
-    _lib.lookup<ffi.NativeFunction<_CDetectTest>>('testFace').asFunction();
+
+final _DetectFrame _detectFrame =
+    _lib.lookup<ffi.NativeFunction<_CDetectFrame>>('detectFrame').asFunction();
 final _DestroyDetector _destroyDetector = _lib
     .lookup<ffi.NativeFunction<_CDestroyDetector>>('destroyDetector')
     .asFunction();
@@ -114,10 +110,6 @@ void processImage(
   var uSize = uBuffer?.lengthInBytes ?? 0;
   var vSize = vBuffer?.lengthInBytes ?? 0;
   var totalSize = ySize + uSize + vSize;
-  print('ySize${ySize}');
-  print('uSize${uSize}');
-  print('vSize${vSize}');
-  print('totalSize${totalSize}');
   _imageBuffer ??= malloc.allocate<ffi.Uint8>(totalSize);
   Uint8List _bytes = _imageBuffer!.asTypedList(totalSize);
   _bytes.setAll(0, yBuffer);
@@ -136,13 +128,20 @@ void processImage(
 ffi.Pointer<ffi.Uint8>? _imageBuffer;
 
 // Native parameter transfer
-void initDetector(Uint8List markerPngBytes, int bits, String path) {
+void initDetector(Uint8List markerPngBytes, int bits, String opencvModlePath,
+    String mnnModlePath, String testOutputPath) {
   var totalSize = markerPngBytes.lengthInBytes;
   var imgBuffer = malloc.allocate<ffi.Uint8>(totalSize);
   Uint8List bytes = imgBuffer.asTypedList(totalSize);
   bytes.setAll(0, markerPngBytes);
-  _initDetector(imgBuffer, totalSize, bits, path.toNativeUtf8());
-
+  _initDetector(
+    imgBuffer,
+    totalSize,
+    bits,
+    opencvModlePath.toNativeUtf8(),
+    mnnModlePath.toNativeUtf8(),
+    testOutputPath.toNativeUtf8(),
+  );
   malloc.free(imgBuffer);
 }
 
@@ -155,36 +154,7 @@ void destroy() {
 }
 
 // Native parameter transfer
-Float32List detect(int width, int height, int rotation, Uint8List yBuffer,
-    Uint8List? uBuffer, Uint8List? vBuffer) {
-  var ySize = yBuffer.lengthInBytes;
-  var uSize = uBuffer?.lengthInBytes ?? 0;
-  var vSize = vBuffer?.lengthInBytes ?? 0;
-  var totalSize = ySize + uSize + vSize;
-  print('ySize${ySize}');
-  print('uSize${uSize}');
-  print('vSize${vSize}');
-  print('totalSize${totalSize}');
-  _imageBuffer ??= malloc.allocate<ffi.Uint8>(totalSize);
-  Uint8List _bytes = _imageBuffer!.asTypedList(totalSize);
-  _bytes.setAll(0, yBuffer);
-
-  if (Platform.isAndroid) {
-    // Swap u&v buffer for opencv
-    _bytes.setAll(ySize, vBuffer!);
-    _bytes.setAll(ySize + vSize, uBuffer!);
-  }
-
-  ffi.Pointer<ffi.Int32> outCount = malloc.allocate<ffi.Int32>(1);
-  var res = _detect(width, height, rotation, _imageBuffer!,
-      Platform.isAndroid ? true : false, outCount);
-  final count = outCount.value;
-
-  malloc.free(outCount);
-  return res.asTypedList(count);
-}
-
-Float32List detectTest(int width, int height, int rotation, Uint8List yBuffer,
+Float32List detectFrame(int width, int height, int rotation, Uint8List yBuffer,
     Uint8List? uBuffer, Uint8List? vBuffer) {
   var ySize = yBuffer.lengthInBytes;
   var uSize = uBuffer?.lengthInBytes ?? 0;
@@ -202,11 +172,14 @@ Float32List detectTest(int width, int height, int rotation, Uint8List yBuffer,
   }
 
   ffi.Pointer<ffi.Int32> outCount = malloc.allocate<ffi.Int32>(1);
-  var res = _detectTest(width, height, rotation, _imageBuffer!,
+  var res = _detectFrame(width, height, rotation, _imageBuffer!,
       Platform.isAndroid ? true : false, outCount);
+
   final count = outCount.value;
+  final result = res.asTypedList(count);
   malloc.free(outCount);
-  return res.asTypedList(count);
+  malloc.free(res);
+  return result;
 }
 
 // get platform dlib
