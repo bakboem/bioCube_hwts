@@ -324,7 +324,7 @@ packages:
   face_kit:
     dependency: "direct main"
     description:
-      path: "../../face_kit"
+      path: ".."
       relative: true
     source: path
     version: "0.0.1"

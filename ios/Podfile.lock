@@ -222,7 +222,7 @@ SPEC CHECKSUMS:
   camera_avfoundation: 3125e8cd1a4387f6f31c6c63abb8a55892a9eeeb
   connectivity_plus: 413a8857dd5d9f1c399a39130850d02fe0feaf7e
   device_info_plus: e5c5da33f982a436e103237c0c85f9031142abed
-  face_kit: dc5ba539a3485f79389ae05ca6194fcb5677e6c3
+  face_kit: df14bb2e867500525cde16990e5e2fe32af1f797
   fl_camera: fae9c06295706dae18fdf6a489b9d2dadaddd712
   fl_mlkit_text_recognize: 5a453f93ee029baa6fb188e3dbe620fa76c61c25
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
