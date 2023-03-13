@@ -2,12 +2,12 @@ import 'dart:io';
 import 'dart:developer';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:hwst/service/key_service.dart';
-import 'package:hwst/styles/app_size.dart';
 import 'package:provider/provider.dart';
-import 'package:hwst/globalProvider/face_detection_provider.dart';
+import 'package:hwst/styles/app_size.dart';
+import 'package:hwst/service/key_service.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/view/common/widget_of_loading_view.dart';
+import 'package:hwst/globalProvider/face_detection_provider.dart';
 import 'package:hwst/view/home/camera/threadController/receive_thread_process.dart';
 
 class CameraViewPage extends StatefulWidget {
@@ -70,8 +70,10 @@ class _CameraViewPageState extends State<CameraViewPage> {
     try {
       await _camController!.initialize();
       await _camController!
-          .startImageStream((image) => _processCameraImage(image))
-          .then((value) => mounted ? setState(() {}) : DoNothingAction());
+          .startImageStream((image) => _processCameraImage(image));
+      if (mounted) {
+        setState(() {});
+      }
     } catch (e) {
       log("Error initializing camera, error: ${e.toString()}");
     }
@@ -82,7 +84,7 @@ class _CameraViewPageState extends State<CameraViewPage> {
         KeyService.baseAppKey.currentContext!.read<FaceDetectionProvider>();
     if (_detectionInProgress ||
         !mounted ||
-        DateTime.now().millisecondsSinceEpoch - _lastRun < 200) {
+        DateTime.now().millisecondsSinceEpoch - _lastRun < 500) {
       return;
     }
     // calc the scale factor to convert from camera frame coords to screen coords.
@@ -93,14 +95,13 @@ class _CameraViewPageState extends State<CameraViewPage> {
       var w = (_camFrameRotation == 0 || _camFrameRotation == 180)
           ? image.width
           : image.height;
-      _camFrameToScreenScale = AppSize.realWidth / w;
+      _camFrameToScreenScale = 360 / w;
 
       fp.setCameraScale(_camFrameToScreenScale);
     }
 
     // Call the detector
     _detectionInProgress = true;
-
     List<double>? res;
     if (!fp.isFaceFinded) {
       res = await _requestThread.detect(image, _camFrameRotation);
@@ -108,6 +109,7 @@ class _CameraViewPageState extends State<CameraViewPage> {
     if (res != null && res.isNotEmpty && res[0] > 0) {
       fp.setIsShowFaceLine(true);
       fp.setFaceInfo(res);
+      fp.setIsFaceFinded(true);
       pr('find face x $res');
     } else {
       fp.setIsShowFaceLine(false);

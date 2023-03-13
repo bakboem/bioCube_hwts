@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/face_kit/truepass/lib/view/home/ffi/native_ffi.dart
  * Created Date: 2023-02-17 11:18:19
- * Last Modified: 2023-03-12 14:47:07
+ * Last Modified: 2023-03-13 21:34:41
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -15,6 +15,10 @@ import 'dart:ffi' as ffi;
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
+import 'package:hwst/globalProvider/face_detection_provider.dart';
+import 'package:hwst/service/key_service.dart';
+import 'package:hwst/view/common/function_of_print.dart';
+import 'package:provider/provider.dart';
 
 // Getting a library that holds needed symbols
 ffi.DynamicLibrary _lib = _openDynamicLibrary();
@@ -32,12 +36,14 @@ typedef _CInitDetector = ffi.Void Function(
 typedef _CDestroyDetector = ffi.Void Function();
 
 typedef _CDetectFrame = ffi.Pointer<ffi.Float> Function(
-    ffi.Int32 width,
-    ffi.Int32 height,
-    ffi.Int32 rotation,
-    ffi.Pointer<ffi.Uint8> bytes,
-    ffi.Bool isYUV,
-    ffi.Pointer<ffi.Int32> outCount);
+  ffi.Int32 width,
+  ffi.Int32 height,
+  ffi.Int32 rotation,
+  ffi.Pointer<ffi.Uint8> bytes,
+  ffi.Bool isYUV,
+  ffi.Pointer<ffi.Int32> outCount,
+  ffi.Pointer<ffi.Float> feat,
+);
 
 /// Dart function signatures
 typedef _VersionFunc = ffi.Pointer<Utf8> Function();
@@ -57,7 +63,8 @@ typedef _DetectFrame = ffi.Pointer<ffi.Float> Function(
     int rotation,
     ffi.Pointer<ffi.Uint8> bytes,
     bool isYUV,
-    ffi.Pointer<ffi.Int32> outCount);
+    ffi.Pointer<ffi.Int32> outCount,
+    ffi.Pointer<ffi.Float> feat);
 // Functions mapping.
 final _VersionFunc _version =
     _lib.lookup<ffi.NativeFunction<_CVersionFunc>>('version').asFunction();
@@ -172,13 +179,18 @@ Float32List detectFrame(int width, int height, int rotation, Uint8List yBuffer,
   }
 
   ffi.Pointer<ffi.Int32> outCount = malloc.allocate<ffi.Int32>(1);
+  var featCount = ffi.sizeOf<ffi.Float>();
+  ffi.Pointer<ffi.Float> feat = malloc.allocate<ffi.Float>(featCount * 512);
   var res = _detectFrame(width, height, rotation, _imageBuffer!,
-      Platform.isAndroid ? true : false, outCount);
-
+      Platform.isAndroid ? true : false, outCount, feat);
   final count = outCount.value;
-  final result = res.asTypedList(count);
+  var result = res.asTypedList(count);
+
+  var featResul = feat.asTypedList(featCount * 512).toList();
+  pr(featResul);
   malloc.free(outCount);
   malloc.free(res);
+  malloc.free(feat);
   return result;
 }
 

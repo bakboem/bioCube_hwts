@@ -1,6 +1,6 @@
-import 'dart:developer';
 import 'dart:io';
 import 'dart:isolate';
+import 'dart:developer';
 import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:hwst/view/home/camera/ffi/native_ffi.dart' as native_ffi;
@@ -62,7 +62,6 @@ void _handleMessage(data) {
       default:
         log('Unknown method: ${data.method}');
     }
-
     _requestThread.send(Response(reqId: data.reqId, data: res));
   }
 }

@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-12 18:26:43
+ * Last Modified: 2023-03-13 20:28:59
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -71,7 +71,10 @@ class _HomePageState extends State<HomePage> {
     );
     loadFaceDetectionAndDeepLearningFile(
       'mnn',
-      ['FaceCubePlusRecognize.mnn'],
+      [
+        'FaceCubePlusRecognize.mnn',
+        // 'FaceCubePlusDetect.mnn',
+      ],
     );
     runBleStart();
   }
@@ -109,13 +112,17 @@ class _HomePageState extends State<HomePage> {
             .then((f) => dirName == 'opencv'
                 ? CacheService.saveOpencvModelFilePath(f.path)
                 : dirName == 'mnn'
-                    ? CacheService.saveMnnModelFilePath(f.path)
+                    ? fileName == 'FaceCubePlusDetect.mnn'
+                        ? CacheService.saveOpencvModelFilePath(f.path)
+                        : CacheService.saveMnnModelFilePath(f.path)
                     : DoNothingAction());
       } else {
         dirName == 'opencv'
             ? CacheService.saveOpencvModelFilePath(file.path)
             : dirName == 'mnn'
-                ? CacheService.saveMnnModelFilePath(file.path)
+                ? fileName == 'FaceCubePlusDetect.mnn'
+                    ? CacheService.saveOpencvModelFilePath(file.path)
+                    : CacheService.saveMnnModelFilePath(file.path)
                 : DoNothingAction();
       }
     }
