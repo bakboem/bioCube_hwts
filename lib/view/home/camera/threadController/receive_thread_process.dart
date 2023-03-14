@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:camera/camera.dart';
 import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/service/local_file_servicer.dart';
-import 'request_thread_process.dart' as request_thread;
+import 'main_thread_process.dart' as request_thread;
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/view/common/fuction_of_capture_full_screen.dart';
 

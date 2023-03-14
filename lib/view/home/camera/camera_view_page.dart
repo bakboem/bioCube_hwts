@@ -2,13 +2,12 @@ import 'dart:io';
 import 'dart:developer';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:hwst/view/home/camera/threadController/receive_thread_process.dart';
 import 'package:provider/provider.dart';
-import 'package:hwst/styles/app_size.dart';
 import 'package:hwst/service/key_service.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/view/common/widget_of_loading_view.dart';
 import 'package:hwst/globalProvider/face_detection_provider.dart';
-import 'package:hwst/view/home/camera/threadController/receive_thread_process.dart';
 
 class CameraViewPage extends StatefulWidget {
   const CameraViewPage({Key? key}) : super(key: key);
@@ -24,6 +23,7 @@ class _CameraViewPageState extends State<CameraViewPage> {
   double _camFrameToScreenScale = 0;
   int _lastRun = 0;
   bool _detectionInProgress = false;
+  bool _isCameraReady = false;
   @override
   void initState() {
     super.initState();
@@ -72,6 +72,7 @@ class _CameraViewPageState extends State<CameraViewPage> {
       await _camController!
           .startImageStream((image) => _processCameraImage(image));
       if (mounted) {
+        _isCameraReady = true;
         setState(() {});
       }
     } catch (e) {
@@ -139,17 +140,16 @@ class _CameraViewPageState extends State<CameraViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_camController == null) {
+    if (_camController == null || !_isCameraReady) {
       return Stack(
         children: [
           BaseLoadingViewOnStackWidget.build(context, true),
         ],
       );
+    } else {
+      return Stack(
+        children: [CameraPreview(_camController!)],
+      );
     }
-    return Stack(
-      children: [
-        CameraPreview(_camController!),
-      ],
-    );
   }
 }
