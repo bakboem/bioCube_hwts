@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/HWST/lib/view/home/camera/threadController/main_thread_process copy.dart
  * Created Date: 2023-03-14 13:29:53
- * Last Modified: 2023-03-14 13:36:33
+ * Last Modified: 2023-03-14 13:44:18
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -19,22 +19,22 @@ import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/service/local_file_servicer.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/view/common/fuction_of_capture_full_screen.dart';
-import 'package:hwst/view/home/camera/threadController/receive_for_mainThread.dart';
+import 'package:hwst/view/home/camera/threadController/receive_for_firstThread.dart';
 
-class MainThread {
+class FirstThread {
   bool isMainThreadReady = false;
   late Isolate _mainThreadIsolate;
   late SendPort _mainThreadSendPort;
   int _mainReqId = 0;
   final Map<int, Completer> _cbs = {};
 
-  MainThread() {
-    _initMainThread();
+  FirstThread() {
+    _initFirstThread();
   }
 
-  void _initMainThread() async {
+  void _initFirstThread() async {
     ReceivePort mainThreadReceiver = ReceivePort();
-    mainThreadReceiver.listen(_handleMainThreadMessage, onDone: () {
+    mainThreadReceiver.listen(_handleMessage, onDone: () {
       isMainThreadReady = false;
     });
 // captrue full screen
@@ -56,7 +56,7 @@ class MainThread {
     );
   }
 
-  Future<List<double>?> detectByMainThread(CameraImage image, int rotation) {
+  Future<List<double>?> detect(CameraImage image, int rotation) {
     if (!isMainThreadReady) {
       return Future.value(null);
     }
@@ -89,7 +89,7 @@ class MainThread {
     _mainThreadIsolate.kill();
   }
 
-  void _handleMainThreadMessage(data) {
+  void _handleMessage(data) {
     if (data is SendPort) {
       _mainThreadSendPort = data;
       isMainThreadReady = true;

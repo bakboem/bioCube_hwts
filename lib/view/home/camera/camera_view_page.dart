@@ -7,7 +7,7 @@ import 'package:hwst/service/key_service.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/view/common/widget_of_loading_view.dart';
 import 'package:hwst/globalProvider/face_detection_provider.dart';
-import 'package:hwst/view/home/camera/threadController/main_thread_process.dart';
+import 'package:hwst/view/home/camera/threadController/first_thread_process.dart';
 
 class CameraViewPage extends StatefulWidget {
   const CameraViewPage({Key? key}) : super(key: key);
@@ -18,7 +18,7 @@ class CameraViewPage extends StatefulWidget {
 
 class _CameraViewPageState extends State<CameraViewPage> {
   CameraController? _camController;
-  late MainThread _mainThread;
+  late FirstThread _firstThread;
   int _camFrameRotation = 0;
   double _camFrameToScreenScale = 0;
   int _lastRun = 0;
@@ -27,14 +27,14 @@ class _CameraViewPageState extends State<CameraViewPage> {
   @override
   void initState() {
     super.initState();
-    _mainThread = MainThread();
+    _firstThread = FirstThread();
     initCamera();
   }
 
   @override
   void dispose() {
     _camController?.dispose();
-    _mainThread.destroy();
+    _firstThread.destroy();
     pr('dispose camera!');
     super.dispose();
   }
@@ -105,7 +105,7 @@ class _CameraViewPageState extends State<CameraViewPage> {
     _detectionInProgress = true;
     List<double>? res;
     if (!fp.isFaceFinded) {
-      res = await _mainThread.detectByMainThread(image, _camFrameRotation);
+      res = await _firstThread.detect(image, _camFrameRotation);
     }
     if (res != null && res.isNotEmpty && res[0] > 0) {
       fp.setIsShowFaceLine(true);

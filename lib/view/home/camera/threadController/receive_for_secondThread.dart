@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/HWST/lib/view/home/camera/threadController/receive_thread_one_process copy.dart
  * Created Date: 2023-03-14 12:36:47
- * Last Modified: 2023-03-14 13:11:52
+ * Last Modified: 2023-03-14 13:50:43
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -14,8 +14,6 @@
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:developer';
-import 'dart:typed_data';
-import 'package:camera/camera.dart';
 import 'package:hwst/view/home/camera/ffi/native_ffi.dart' as native_ffi;
 
 class InitRequestTwo {
@@ -40,10 +38,10 @@ class ResponseTwo {
 }
 
 late SendPort _mainReceiveSendPort;
-late _ReceiveThreadTwo _receiveThreadOne;
+late _ReceiveThreadTwo _receiveThreadTwo;
 
 void initTwo(InitRequestTwo initReq) {
-  _receiveThreadOne = _ReceiveThreadTwo();
+  _receiveThreadTwo = _ReceiveThreadTwo();
 
   _mainReceiveSendPort = initReq.mainSendPortOne;
 
@@ -57,13 +55,12 @@ void _handleMessage(data) {
   if (data is RequestTwo) {
     dynamic res;
     switch (data.method) {
-      case 'detect':
-        var image = data.params['image'] as CameraImage;
-        var rotation = data.params['rotation'];
-        res = _receiveThreadOne.detect(image, rotation);
+      case 'match':
+        var list = data.params['data'] as List;
+        // request match
         break;
       case 'destroy':
-        _receiveThreadOne.destroy();
+        _receiveThreadTwo.destroy();
         break;
       default:
         log('Unknown method: ${data.method}');
@@ -81,24 +78,6 @@ class _ReceiveThreadTwo {
     // final pngBytes = markerPng.buffer.asUint8List();
     // native_ffi.initDetector(
     //     pngBytes, 36, opencvModlePath, mnnModlePath, testOutputPath);
-  }
-
-  List<double>? detect(CameraImage image, int rotation) {
-    // in iOS the format is BGRA and we get a single buffer for all channels.
-    // So the yBuffer variable on Android will be just the Y channel but on iOS it will be
-    var planes = image.planes;
-    var yBuffer = planes[0].bytes;
-
-    Uint8List? uBuffer;
-    Uint8List? vBuffer;
-    if (Platform.isAndroid) {
-      uBuffer = planes[1].bytes;
-      vBuffer = planes[2].bytes;
-    }
-    var result = native_ffi.detectFrame(
-        image.width, image.height, rotation, yBuffer, uBuffer, vBuffer);
-
-    return result.toList();
   }
 
   destroy() {

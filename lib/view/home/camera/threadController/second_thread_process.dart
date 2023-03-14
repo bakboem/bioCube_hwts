@@ -31,6 +31,23 @@ class SecondThread {
     );
   }
 
+  Future<List<double>?> match(data) {
+    if (!isSecondThreadReady) {
+      return Future.value(null);
+    }
+
+    var reqId = ++_secondReqId;
+    var res = Completer<List<double>?>();
+    _cbs[reqId] = res;
+    var msg = RequestTwo(
+      reqId: reqId,
+      method: 'match',
+      params: {'data': data},
+    );
+    _secondThreadSendPort.send(msg);
+    return res.future;
+  }
+
   void secondThreadDestroy() async {
     if (!isSecondThreadReady) {
       return;
