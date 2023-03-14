@@ -1,103 +1,107 @@
-import 'dart:io';
+/*
+ * Project Name:  [TruePass]
+ * File: /Users/bakbeom/work/HWST/lib/view/home/camera/threadController/main_thread_process copy.dart
+ * Created Date: 2023-03-14 13:29:53
+ * Last Modified: 2023-03-14 13:36:33
+ * Author: bakbeom
+ * Modified By: bakbeom
+ * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
+ * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
+ * 												Discription													
+ * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
+ */
+
+import 'dart:async';
 import 'dart:isolate';
 import 'dart:developer';
-import 'dart:typed_data';
 import 'package:camera/camera.dart';
-import 'package:hwst/view/home/camera/ffi/native_ffi.dart' as native_ffi;
+import 'package:hwst/service/cache_service.dart';
+import 'package:hwst/service/local_file_servicer.dart';
+import 'package:hwst/view/common/function_of_print.dart';
+import 'package:hwst/view/common/fuction_of_capture_full_screen.dart';
+import 'package:hwst/view/home/camera/threadController/receive_for_mainThread.dart';
 
-class InitRequestOne {
-  SendPort mainSendPortOne;
-  ByteData markerPng;
-  String opencvModelPath;
-  String mnnModelPath;
-  String testOutputPath;
-  InitRequestOne(
-      {required this.mainSendPortOne,
-      required this.markerPng,
-      required this.opencvModelPath,
-      required this.mnnModelPath,
-      required this.testOutputPath});
-}
+class MainThread {
+  bool isMainThreadReady = false;
+  late Isolate _mainThreadIsolate;
+  late SendPort _mainThreadSendPort;
+  int _mainReqId = 0;
+  final Map<int, Completer> _cbs = {};
 
-class Request {
-  int reqId;
-  String method;
-  dynamic params;
-  Request({required this.reqId, required this.method, this.params});
-}
+  MainThread() {
+    _initMainThread();
+  }
 
-class Response {
-  int reqId;
-  dynamic data;
-  Response({required this.reqId, this.data});
-}
+  void _initMainThread() async {
+    ReceivePort mainThreadReceiver = ReceivePort();
+    mainThreadReceiver.listen(_handleMainThreadMessage, onDone: () {
+      isMainThreadReady = false;
+    });
+// captrue full screen
 
-late SendPort _requestThread;
-late _RequestThreadOne _requestThreadOne;
+    final bytes = await getBitmapFromContext();
+    final dir = await LocalFileService().getLocalDirectory();
+    final testOutputFile =
+        await LocalFileService().createFile('${dir!.path}/test/test.png');
+    pr(testOutputFile.path);
+    final initReq = InitRequestOne(
+        mainSendPortOne: mainThreadReceiver.sendPort,
+        markerPng: bytes,
+        opencvModelPath: CacheService.getOpencvModelFilePath()!,
+        mnnModelPath: CacheService.getMnnModelFilePath()!,
+        testOutputPath: testOutputFile.path);
+    _mainThreadIsolate = await Isolate.spawn(
+      initOne,
+      initReq,
+    );
+  }
 
-void initOne(InitRequestOne initReq) {
-  _requestThreadOne = _RequestThreadOne(initReq.markerPng,
-      initReq.opencvModelPath, initReq.mnnModelPath, initReq.testOutputPath);
-
-  _requestThread = initReq.mainSendPortOne;
-
-  ReceivePort fromMainThread = ReceivePort();
-  fromMainThread.listen(_handleMessage);
-
-  _requestThread.send(fromMainThread.sendPort);
-}
-
-void _handleMessage(data) {
-  if (data is Request) {
-    dynamic res;
-    switch (data.method) {
-      case 'detect':
-        var image = data.params['image'] as CameraImage;
-        var rotation = data.params['rotation'];
-        res = _requestThreadOne.detectTest(image, rotation);
-        break;
-      case 'destroy':
-        _requestThreadOne.destroy();
-        break;
-      default:
-        log('Unknown method: ${data.method}');
+  Future<List<double>?> detectByMainThread(CameraImage image, int rotation) {
+    if (!isMainThreadReady) {
+      return Future.value(null);
     }
-    _requestThread.send(Response(reqId: data.reqId, data: res));
-  }
-}
 
-class _RequestThreadOne {
-  _RequestThreadOne(ByteData markerPng, String opencvModlePath,
-      String mnnModelPath, String testOutputPath) {
-    inits(markerPng, opencvModlePath, mnnModelPath, testOutputPath);
-  }
+    var reqId = ++_mainReqId;
+    var res = Completer<List<double>?>();
+    _cbs[reqId] = res;
+    var msg = RequestOne(
+      reqId: reqId,
+      method: 'detect',
+      params: {'image': image, 'rotation': rotation},
+    );
 
-  void inits(ByteData markerPng, String opencvModlePath, String mnnModlePath,
-      String testOutputPath) {
-    final pngBytes = markerPng.buffer.asUint8List();
-    native_ffi.initDetector(
-        pngBytes, 36, opencvModlePath, mnnModlePath, testOutputPath);
+    _mainThreadSendPort.send(msg);
+    return res.future;
   }
 
-  List<double>? detectTest(CameraImage image, int rotation) {
-    // in iOS the format is BGRA and we get a single buffer for all channels.
-    // So the yBuffer variable on Android will be just the Y channel but on iOS it will be
-    var planes = image.planes;
-    var yBuffer = planes[0].bytes;
-
-    Uint8List? uBuffer;
-    Uint8List? vBuffer;
-    if (Platform.isAndroid) {
-      uBuffer = planes[1].bytes;
-      vBuffer = planes[2].bytes;
+  void destroy() async {
+    if (!isMainThreadReady) {
+      return;
     }
-    var result = native_ffi.detectFrame(
-        image.width, image.height, rotation, yBuffer, uBuffer, vBuffer);
+    isMainThreadReady = false;
+    var reqId = ++_mainReqId;
+    var res = Completer();
+    _cbs[reqId] = res;
+    var msg = RequestOne(reqId: reqId, method: 'destroy');
+    _mainThreadSendPort.send(msg);
 
-    return result.toList();
+    await res.future;
+    _mainThreadIsolate.kill();
   }
 
-  destroy() {
-    native_ffi.destroy();
+  void _handleMainThreadMessage(data) {
+    if (data is SendPort) {
+      _mainThreadSendPort = data;
+      isMainThreadReady = true;
+      return;
+    }
+
+    if (data is ResponseOne) {
+      var reqId = data.reqId;
+      _cbs[reqId]?.complete(data.data);
+      _cbs.remove(reqId);
+      return;
+    }
+    log('Unknown message from , got: $data');
   }
 }
