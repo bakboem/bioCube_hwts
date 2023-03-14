@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:camera/camera.dart';
 import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/service/local_file_servicer.dart';
-import 'main_thread_process.dart' as request_thread;
+import 'main_thread_process.dart' as main_thread;
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/view/common/fuction_of_capture_full_screen.dart';
 
@@ -20,8 +20,8 @@ class ReceiveThread {
   }
 
   void _initDetectionThread() async {
-    ReceivePort fromRequestThread = ReceivePort();
-    fromRequestThread.listen(_handleMessage, onDone: () {
+    ReceivePort mainThreadOneReceiver = ReceivePort();
+    mainThreadOneReceiver.listen(_handleMessage, onDone: () {
       arThreadReady = false;
     });
 // captrue full screen
@@ -31,14 +31,14 @@ class ReceiveThread {
     final testOutputFile =
         await LocalFileService().createFile('${dir!.path}/test/test.png');
     pr(testOutputFile.path);
-    final initReq = request_thread.InitRequest(
-        requestThread: fromRequestThread.sendPort,
+    final initReq = main_thread.InitRequestOne(
+        mainSendPortOne: mainThreadOneReceiver.sendPort,
         markerPng: bytes,
         opencvModelPath: CacheService.getOpencvModelFilePath()!,
         mnnModelPath: CacheService.getMnnModelFilePath()!,
         testOutputPath: testOutputFile.path);
     _receiveThread = await Isolate.spawn(
-      request_thread.init,
+      main_thread.initOne,
       initReq,
     );
   }
@@ -51,7 +51,7 @@ class ReceiveThread {
     var reqId = ++_reqId;
     var res = Completer<List<double>?>();
     _cbs[reqId] = res;
-    var msg = request_thread.Request(
+    var msg = main_thread.Request(
       reqId: reqId,
       method: 'detect',
       params: {'image': image, 'rotation': rotation},
@@ -69,7 +69,7 @@ class ReceiveThread {
     var reqId = ++_reqId;
     var res = Completer();
     _cbs[reqId] = res;
-    var msg = request_thread.Request(reqId: reqId, method: 'destroy');
+    var msg = main_thread.Request(reqId: reqId, method: 'destroy');
     _receiveThreadSendPort.send(msg);
 
     await res.future;
@@ -83,9 +83,8 @@ class ReceiveThread {
       return;
     }
 
-    if (data is request_thread.Response) {
+    if (data is main_thread.Response) {
       var reqId = data.reqId;
-
       _cbs[reqId]?.complete(data.data);
       _cbs.remove(reqId);
       return;

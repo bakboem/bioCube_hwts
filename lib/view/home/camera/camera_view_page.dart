@@ -2,12 +2,12 @@ import 'dart:io';
 import 'dart:developer';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:hwst/view/home/camera/threadController/receive_thread_process.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/service/key_service.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/view/common/widget_of_loading_view.dart';
 import 'package:hwst/globalProvider/face_detection_provider.dart';
+import 'package:hwst/view/home/camera/threadController/receive_thread_one_process.dart';
 
 class CameraViewPage extends StatefulWidget {
   const CameraViewPage({Key? key}) : super(key: key);

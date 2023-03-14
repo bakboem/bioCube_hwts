@@ -5,14 +5,14 @@ import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:hwst/view/home/camera/ffi/native_ffi.dart' as native_ffi;
 
-class InitRequest {
-  SendPort requestThread;
+class InitRequestOne {
+  SendPort mainSendPortOne;
   ByteData markerPng;
   String opencvModelPath;
   String mnnModelPath;
   String testOutputPath;
-  InitRequest(
-      {required this.requestThread,
+  InitRequestOne(
+      {required this.mainSendPortOne,
       required this.markerPng,
       required this.opencvModelPath,
       required this.mnnModelPath,
@@ -33,13 +33,13 @@ class Response {
 }
 
 late SendPort _requestThread;
-late _RequestThread _detector;
+late _RequestThreadOne _requestThreadOne;
 
-void init(InitRequest initReq) {
-  _detector = _RequestThread(initReq.markerPng, initReq.opencvModelPath,
-      initReq.mnnModelPath, initReq.testOutputPath);
+void initOne(InitRequestOne initReq) {
+  _requestThreadOne = _RequestThreadOne(initReq.markerPng,
+      initReq.opencvModelPath, initReq.mnnModelPath, initReq.testOutputPath);
 
-  _requestThread = initReq.requestThread;
+  _requestThread = initReq.mainSendPortOne;
 
   ReceivePort fromMainThread = ReceivePort();
   fromMainThread.listen(_handleMessage);
@@ -54,10 +54,10 @@ void _handleMessage(data) {
       case 'detect':
         var image = data.params['image'] as CameraImage;
         var rotation = data.params['rotation'];
-        res = _detector.detectTest(image, rotation);
+        res = _requestThreadOne.detectTest(image, rotation);
         break;
       case 'destroy':
-        _detector.destroy();
+        _requestThreadOne.destroy();
         break;
       default:
         log('Unknown method: ${data.method}');
@@ -66,8 +66,8 @@ void _handleMessage(data) {
   }
 }
 
-class _RequestThread {
-  _RequestThread(ByteData markerPng, String opencvModlePath,
+class _RequestThreadOne {
+  _RequestThreadOne(ByteData markerPng, String opencvModlePath,
       String mnnModelPath, String testOutputPath) {
     inits(markerPng, opencvModlePath, mnnModelPath, testOutputPath);
   }
