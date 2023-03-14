@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-13 20:28:59
+ * Last Modified: 2023-03-14 16:51:09
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -166,8 +166,10 @@ class _HomePageState extends State<HomePage> {
       {bool? isStatusOk}) {
     final isBlueStatusOk =
         type == 'ble' && isStatusOk != null && isStatusOk && userEvn!.isUseBle!;
-    final isNfcStatusOk =
-        type == 'nfc' && isStatusOk != null && isStatusOk && userEvn!.isUseNfc!;
+    final isNfcStatusOk = type == 'nfc' &&
+        isStatusOk != null &&
+        isStatusOk &&
+        (userEvn!.isUseNfc ?? false);
     final isFaceOk = type == 'face' &&
         isStatusOk != null &&
         isStatusOk &&

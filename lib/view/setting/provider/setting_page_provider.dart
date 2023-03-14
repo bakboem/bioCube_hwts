@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/provider/setting_page_provider.dart
  * Created Date: 2023-01-27 12:15:53
- * Last Modified: 2023-03-02 23:25:58
+ * Last Modified: 2023-03-14 16:48:33
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -25,6 +25,7 @@ class SettinPageProivder extends ChangeNotifier {
   bool bleSwichVal = false;
   bool nfcSwichVal = false;
   bool faceSwichVal = false;
+  bool faceMoreSwichVal = false;
 
   String? currenGuideMethod;
   String? currenVeirfyRadioStr;
@@ -42,6 +43,7 @@ class SettinPageProivder extends ChangeNotifier {
         bleSwichVal,
         guideMethodRadioList.indexOf(currenGuideMethod!),
         faceSwichVal,
+        faceMoreSwichVal,
         nfcSwichVal,
         combinationVeifyRadioStr == null
             ? veifyRadioList.indexOf(currenVeirfyRadioStr!)
@@ -94,8 +96,14 @@ class SettinPageProivder extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setFaceMoreSwich() {
+    faceMoreSwichVal = !faceMoreSwichVal;
+    notifyListeners();
+  }
+
   Future<ResultModel> init() async {
     final userEvn = CacheService.getUserEnvironment();
+    print(userEvn?.toJson());
     veifyRadioList = [tr('fixed_type'), tr('personal')];
     guideMethodRadioList = [tr('vibration'), tr('system_voice'), tr('sound')];
     combinationVeifyRadioList = [tr('face_and_ble'), tr('face_and_nfc')];
@@ -104,12 +112,15 @@ class SettinPageProivder extends ChangeNotifier {
       currenVeirfyRadioStr = tr('personal');
       bleSwichVal = true;
       nfcSwichVal = true;
+      faceMoreSwichVal = false;
+      faceSwichVal = false;
       sessionSettingTime = 20;
       rssi = '-80';
     } else {
       nfcSwichVal = userEvn.isUseNfc!;
       bleSwichVal = userEvn.isUseBle!;
       faceSwichVal = userEvn.isUseFace!;
+      faceMoreSwichVal = userEvn.isUseFaceMore ?? false;
       currenGuideMethod = guideMethodRadioList[userEvn.alarmType!];
       currenVeirfyRadioStr = userEvn.useType! > 1
           ? veifyRadioList[1]

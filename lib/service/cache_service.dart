@@ -2,7 +2,7 @@
  * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/service/cache_service.dart
  * Created Date: 2021-08-22 19:45:10
- * Last Modified: 2023-03-13 20:46:34
+ * Last Modified: 2023-03-14 16:34:24
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -57,11 +57,7 @@ class CacheService {
   }
 
   static void deleteALL() {
-    var filePath = getOpencvModelFilePath();
     sharedPreferences?.clear();
-    if (filePath != null) {
-      saveOpencvModelFilePath(filePath);
-    }
   }
 
   static getData(String key) {

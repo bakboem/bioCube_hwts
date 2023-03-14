@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/HWST/lib/view/home/camera/threadController/receive_thread_one_process copy.dart
  * Created Date: 2023-03-14 12:36:47
- * Last Modified: 2023-03-14 13:50:43
+ * Last Modified: 2023-03-14 14:29:36
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -11,7 +11,6 @@
  * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
  */
 
-import 'dart:io';
 import 'dart:isolate';
 import 'dart:developer';
 import 'package:hwst/view/home/camera/ffi/native_ffi.dart' as native_ffi;
@@ -37,6 +36,7 @@ class ResponseTwo {
   ResponseTwo({required this.reqId, this.data});
 }
 
+//
 late SendPort _mainReceiveSendPort;
 late _ReceiveThreadTwo _receiveThreadTwo;
 

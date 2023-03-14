@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/enums/string_fomate_type.dart
  * Created Date: 2021-09-17 09:25:12
- * Last Modified: 2023-02-22 22:42:47
+ * Last Modified: 2023-03-14 15:54:44
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -13,7 +13,6 @@
 
 import 'package:hwst/util/format_util.dart';
 
-// 포맷 유형
 enum StringFormateType {
   PHONE,
   DATE_MD,

@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/face_kit/truepass/lib/view/home/ffi/native_ffi.dart
  * Created Date: 2023-02-17 11:18:19
- * Last Modified: 2023-03-13 23:26:01
+ * Last Modified: 2023-03-14 14:29:31
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -15,10 +15,7 @@ import 'dart:ffi' as ffi;
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
-import 'package:hwst/globalProvider/face_detection_provider.dart';
-import 'package:hwst/service/key_service.dart';
 import 'package:hwst/view/common/function_of_print.dart';
-import 'package:provider/provider.dart';
 
 // Getting a library that holds needed symbols
 ffi.DynamicLibrary _lib = _openDynamicLibrary();

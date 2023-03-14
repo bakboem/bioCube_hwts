@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-03-02 23:27:25
+ * Last Modified: 2023-03-14 16:23:12
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -49,6 +49,7 @@ class _SettingPageState extends State<SettingPage> {
   var nfcSwich = ValueNotifier(false);
   var bleSwich = ValueNotifier(false);
   var faceSwich = ValueNotifier(false);
+  var faceMoreSwich = ValueNotifier(false);
   List<String> veifyRadioList = [];
   List<String> combinationVeifyRadioList = [];
   List<String> guideMethodRadioList = [];
@@ -80,13 +81,16 @@ class _SettingPageState extends State<SettingPage> {
     nfcSwich.value = p.nfcSwichVal;
     bleSwich.value = p.bleSwichVal;
     faceSwich.value = p.faceSwichVal;
+    faceMoreSwich.value = p.faceMoreSwichVal;
     return Container(
       child: ValueListenableBuilder<bool?>(
         valueListenable: type == SwichType.NFC
             ? nfcSwich
             : type == SwichType.BLE
                 ? bleSwich
-                : faceSwich,
+                : type == SwichType.FACE
+                    ? faceSwich
+                    : faceMoreSwich,
         builder: (context, value, child) {
           return Padding(
             padding: EdgeInsets.zero,
@@ -112,6 +116,10 @@ class _SettingPageState extends State<SettingPage> {
                             faceSwich.value = value;
                             p.setFaceSwich();
                           }();
+                    break;
+                  case SwichType.FACE_MORE:
+                    faceMoreSwich.value = value;
+                    p.setFaceMoreSwich();
                     break;
                 }
                 p.setUserEnvrionment();
@@ -202,6 +210,11 @@ class _SettingPageState extends State<SettingPage> {
   Widget _buildIsUseFaceButton(BuildContext context) {
     return _buildButtonItem(
         context, SwichType.FACE, tr('is_use_face_recognition'));
+  }
+
+  Widget _buildIsUseFaceByMatchMroeButton(BuildContext context) {
+    return _buildButtonItem(
+        context, SwichType.FACE_MORE, tr('is_use_faceMore_recognition'));
   }
 
   Widget _buildTitleText(BuildContext context, String title, bool isTitle) {
@@ -573,6 +586,7 @@ class _SettingPageState extends State<SettingPage> {
                             _buildIsUseNfcButton(context),
                             _buildIsUseBleButton(context),
                             _buildIsUseFaceButton(context),
+                            _buildIsUseFaceByMatchMroeButton(context),
                             defaultSpacing(multiple: 2),
                             Divider(height: 1, color: AppColors.subText),
 

@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/shwt/lib/bioCubeApp.dart
  * Created Date: 2023-01-22 19:01:08
- * Last Modified: 2023-03-09 14:02:09
+ * Last Modified: 2023-03-14 17:50:57
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -74,6 +74,7 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
     if (!_isBackground) {
       cp.setIsBackgroundMode(false);
     }
+
     if (_isForeground && isValidate && cp.onceSwich) {
       hideKeyboard(context);
       cp.setOnceSwich(false); // ios nfc 태킹창 대비

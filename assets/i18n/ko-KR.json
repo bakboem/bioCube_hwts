@@ -111,5 +111,7 @@
     "session_setting":"BLE세션 설정",
     "second":"sec",
     "session_description":"세션이 끝나면 다시 앱을 열거나 인증버튼을 눌러 인증해야 합니다.",
-    "slider_description":"신호가 약할수록 장비에 더 가까이 있어야 합니다."
+    "slider_description":"신호가 약할수록 장비에 더 가까이 있어야 합니다.",
+    "is_use_faceMore_recognition":"얼굴전체인식 활성화 여부"
+
 }

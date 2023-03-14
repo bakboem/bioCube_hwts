@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/info/info_page.dart
  * Created Date: 2023-02-02 14:44:43
- * Last Modified: 2023-03-02 19:00:03
+ * Last Modified: 2023-03-14 14:29:55
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -11,20 +11,16 @@
  * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
  */
 
-import 'dart:io';
-
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:hwst/buildConfig/biocube_build_config.dart';
 import 'package:hwst/enums/image_type.dart';
-import 'package:hwst/model/user/user_device_info.dart';
-import 'package:hwst/service/cache_service.dart';
-import 'package:hwst/service/deviceInfo_service.dart';
 import 'package:hwst/styles/export_common.dart';
+import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/view/common/base_layout.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:hwst/buildConfig/biocube_build_config.dart';
+import 'package:hwst/view/common/widget_of_divider_line.dart';
 import 'package:hwst/view/common/widget_of_appbar_contents.dart';
 import 'package:hwst/view/common/widget_of_default_spacing.dart';
-import 'package:hwst/view/common/widget_of_divider_line.dart';
 
 class InfoPage extends StatelessWidget {
   const InfoPage({super.key});

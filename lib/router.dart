@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/sm/si/medsalesportal/lib/route.dart
  * Created Date: 2022-07-02 14:47:58
- * Last Modified: 2023-02-22 22:40:52
+ * Last Modified: 2023-03-14 15:57:16
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2022  KOLON GROUP. ALL RIGHTS RESERVED. 
@@ -13,7 +13,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:hwst/view/card/card_page.dart';
 import 'package:hwst/view/home/home_page.dart';
-import 'package:hwst/view/face/face_page.dart';
 import 'package:hwst/view/info/info_page.dart';
 import 'package:hwst/view/signin/signin_page.dart';
 import 'package:hwst/view/setting/setting_page.dart';
@@ -25,7 +24,6 @@ import 'package:hwst/view/terms/terms_of_privacy_policy.dart';
 Map<String, WidgetBuilder> routes = {
   HomePage.routeName: (context) => const HomePage(),
   CardPage.routeName: (context) => const CardPage(),
-  FacePage.routeName: (context) => const FacePage(),
   InfoPage.routeName: (context) => const InfoPage(),
   SigninPage.routeName: (context) => const SigninPage(),
   SettingPage.routeName: (context) => const SettingPage(),
