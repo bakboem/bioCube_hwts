@@ -6,13 +6,12 @@
  * @FilePath: /hwst/lib/main.dart
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hwst/bioCubeApp.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hwst/model/db/user_info_table.dart';
 import 'package:hwst/service/cache_service.dart';
-import 'package:hwst/service/pass_kit_service.dart';
 import 'package:hwst/service/sound_service.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/view/common/function_of_print.dart';
@@ -23,6 +22,7 @@ void main() async {
   await WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await Hive.initFlutter();
+  Hive.registerAdapter(UserInfoTableAdapter());
   NativeChannelService.init();
   SoundService.init();
   CacheService.init();

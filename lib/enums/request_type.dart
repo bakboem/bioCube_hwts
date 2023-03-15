@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/enums/request_type.dart
  * Created Date: 2021-08-27 10:22:15
- * Last Modified: 2023-03-14 15:54:28
+ * Last Modified: 2023-03-14 21:44:27
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -18,7 +18,8 @@ enum RequestType {
   REGIST_ACCESS_KEY,
   SEND_MATCH_RESULT,
   ACCESS_HISTORY,
-  GET_USER_CARD
+  GET_USER_CARD,
+  GET_ALL_USER_INFO
 }
 
 extension RequestTypeExtension on RequestType {
@@ -33,6 +34,8 @@ extension RequestTypeExtension on RequestType {
         return '$baseURL/auth_list.php';
       case RequestType.GET_USER_CARD:
         return '$baseURL/get_mobile_user.php';
+      case RequestType.GET_ALL_USER_INFO:
+        return '$baseURL/get_mobile_user_all.php';
     }
   }
 

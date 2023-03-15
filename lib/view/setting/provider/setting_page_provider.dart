@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/provider/setting_page_provider.dart
  * Created Date: 2023-01-27 12:15:53
- * Last Modified: 2023-03-14 16:48:33
+ * Last Modified: 2023-03-15 00:14:21
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -11,7 +11,15 @@
  * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
  */
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:hwst/enums/hive_box_type.dart';
+import 'package:hwst/enums/request_type.dart';
+import 'package:hwst/model/user/get_user_all_response_model.dart';
+import 'package:hwst/service/api_service.dart';
+import 'package:hwst/service/hive_service.dart';
+import 'package:hwst/util/date_util.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/service/key_service.dart';
 import 'package:hwst/service/cache_service.dart';
@@ -30,12 +38,14 @@ class SettinPageProivder extends ChangeNotifier {
   String? currenGuideMethod;
   String? currenVeirfyRadioStr;
   String? combinationVeifyRadioStr;
+  String? cameraRadioStr;
   String? rssi;
   int? sessionSettingTime;
 
   var veifyRadioList = [];
   var combinationVeifyRadioList = [];
   var guideMethodRadioList = [];
+  var cameraRadioList = [];
 
   void setUserEnvrionment() {
     final ap = KeyService.baseAppKey.currentContext!.read<AuthProvider>();
@@ -63,6 +73,11 @@ class SettinPageProivder extends ChangeNotifier {
 
   void setCurrenGuideMethodStr(List<String> list, int index) {
     currenGuideMethod = list[index];
+    notifyListeners();
+  }
+
+  void setCameraRadioStr(List<String> list, int index) {
+    cameraRadioStr = list[index];
     notifyListeners();
   }
 
@@ -107,6 +122,7 @@ class SettinPageProivder extends ChangeNotifier {
     veifyRadioList = [tr('fixed_type'), tr('personal')];
     guideMethodRadioList = [tr('vibration'), tr('system_voice'), tr('sound')];
     combinationVeifyRadioList = [tr('face_and_ble'), tr('face_and_nfc')];
+    cameraRadioList = [tr('one_to_one'), tr('one_to_more')];
     if (userEvn == null) {
       currenGuideMethod = tr('system_voice');
       currenVeirfyRadioStr = tr('personal');

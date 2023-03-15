@@ -112,6 +112,9 @@
     "second":"sec",
     "session_description":"세션이 끝나면 다시 앱을 열거나 인증버튼을 눌러 인증해야 합니다.",
     "slider_description":"신호가 약할수록 장비에 더 가까이 있어야 합니다.",
-    "is_use_faceMore_recognition":"얼굴전체인식 활성화 여부"
+    "is_use_faceMore_recognition":"얼굴전체인식 활성화 여부",
+    "is_start_down_load_user_all_proccess":"1:N 인식 하기 위해 필요한 데이터가 다운로드 됩니다.\n지금 다운로드 하시겠습니까?",
+    "one_to_one":"1:1",
+    "one_to_more":"1:N"
 
 }

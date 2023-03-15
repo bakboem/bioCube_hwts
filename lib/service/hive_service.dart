@@ -2,7 +2,7 @@
  * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/service/hive_service.dart
  * Created Date: 2021-08-17 13:17:07
- * Last Modified: 2023-03-02 19:15:36
+ * Last Modified: 2023-03-15 00:35:27
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -13,8 +13,9 @@
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hwst/enums/hive_box_type.dart';
+import 'package:hwst/model/db/user_info_table.dart';
 
-// typedef SearchEtDd07vCustomerConditional = bool Function(TCustomerCustomsModel);
+typedef SearchUserinfoConditional = bool Function(UserInfoTable);
 
 class HiveService {
   factory HiveService() => _sharedInstance();
@@ -38,19 +39,26 @@ class HiveService {
 
   static Future<Box> getBox() async {
     switch (cureenBoxType!) {
-      // case HiveBoxType.ET_CUSTOMER_CUSTOMS_INFO:
-      // return await Hive.boxExists(cureenBoxType!.boxName)
-      //     ? Hive.isBoxOpen(cureenBoxType!.boxName)
-      //         ? Hive.box<TValuesModel>(cureenBoxType!.boxName)
-      //         : await Hive.openBox<TValuesModel>(cureenBoxType!.boxName)
-      //     : await Hive.openBox<TValuesModel>(cureenBoxType!.boxName);
+      case HiveBoxType.USER_INFO:
+        return await Hive.boxExists(cureenBoxType!.boxName)
+            ? Hive.isBoxOpen(cureenBoxType!.boxName)
+                ? Hive.box<UserInfoTable>(cureenBoxType!.boxName)
+                : await Hive.openBox<UserInfoTable>(cureenBoxType!.boxName)
+            : await Hive.openBox<UserInfoTable>(cureenBoxType!.boxName);
       default:
-        return await Hive.box('cureenBoxType!.boxName');
+        return await Hive.box('${cureenBoxType!.boxName}');
     }
   }
 
   static Future<void> save(dynamic data) async {
     switch (cureenBoxType) {
+      case HiveBoxType.USER_INFO:
+        await getBox().then((box) {
+          box as Box<UserInfoTable>;
+          data as List<UserInfoTable>;
+          box.addAll(data);
+        });
+        break;
       default:
         await getBox().then((box) {
           box as Box<String>;
@@ -60,8 +68,44 @@ class HiveService {
     }
   }
 
-  static Future<List<dynamic>?> getData() async {
-    return null;
+  static Future<void> updateAll(List<UserInfoTable>? data) async {
+    var tempNull = UserInfoTable(null, null, null, null);
+    switch (cureenBoxType) {
+      case HiveBoxType.USER_INFO:
+        await getBox().then((box) {
+          box as Box<UserInfoTable>;
+          if (box.isEmpty && data != null) {
+            box.addAll(data);
+          } else {
+            for (var table in data!) {
+              var item = box.values.firstWhere(
+                (element) => element.mPerson == table.mPerson,
+                orElse: () => tempNull,
+              );
+              if (item != tempNull) {
+                box.delete(item);
+                box.add(table);
+              }
+            }
+          }
+        });
+        break;
+      default:
+    }
+  }
+
+  static Future<List<UserInfoTable>?> getData(
+      SearchUserinfoConditional conditional) async {
+    if (!Hive.isBoxOpen(cureenBoxType!.boxName)) return null;
+    switch (cureenBoxType) {
+      case HiveBoxType.USER_INFO:
+        return Hive.box<UserInfoTable>(cureenBoxType!.boxName)
+            .values
+            .where(conditional)
+            .toList();
+      default:
+        return null;
+    }
   }
 
   static Future<void> closeBox() async {

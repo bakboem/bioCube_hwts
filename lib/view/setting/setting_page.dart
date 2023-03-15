@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-03-14 16:23:12
+ * Last Modified: 2023-03-15 02:39:09
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -14,6 +14,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:hwst/globalProvider/face_detection_provider.dart';
+import 'package:hwst/view/common/widget_of_download_progress.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/service/pass_kit_service.dart';
 import 'package:hwst/styles/app_text.dart';
@@ -51,6 +53,7 @@ class _SettingPageState extends State<SettingPage> {
   var faceSwich = ValueNotifier(false);
   var faceMoreSwich = ValueNotifier(false);
   List<String> veifyRadioList = [];
+  List<String> cameraRadioList = [];
   List<String> combinationVeifyRadioList = [];
   List<String> guideMethodRadioList = [];
 
@@ -109,17 +112,9 @@ class _SettingPageState extends State<SettingPage> {
 
                     break;
                   case SwichType.FACE:
-                    p.veifyRadioList.indexOf(p.currenVeirfyRadioStr) == 0
-                        ? AppDialog.showDangermessage(context,
-                            tr('fixed_type_can_not_use_face_detection'))
-                        : () {
-                            faceSwich.value = value;
-                            p.setFaceSwich();
-                          }();
-                    break;
-                  case SwichType.FACE_MORE:
-                    faceMoreSwich.value = value;
-                    p.setFaceMoreSwich();
+                    faceSwich.value = value;
+                    p.setFaceSwich();
+
                     break;
                 }
                 p.setUserEnvrionment();
@@ -212,11 +207,6 @@ class _SettingPageState extends State<SettingPage> {
         context, SwichType.FACE, tr('is_use_face_recognition'));
   }
 
-  Widget _buildIsUseFaceByMatchMroeButton(BuildContext context) {
-    return _buildButtonItem(
-        context, SwichType.FACE_MORE, tr('is_use_faceMore_recognition'));
-  }
-
   Widget _buildTitleText(BuildContext context, String title, bool isTitle) {
     return AppText.text(title,
         style: isTitle ? AppTextStyle.w500_16 : AppTextStyle.default_12,
@@ -224,7 +214,7 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Widget _buildRadioIcon(BuildContext context, String? currenStr,
-      bool? isCombinationVeify, int index) {
+      bool? isCombinationVeify, int index, bool? isUseFace) {
     final p = context.read<SettinPageProivder>();
     return SizedBox(
       width: 10,
@@ -237,7 +227,9 @@ class _SettingPageState extends State<SettingPage> {
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         value: isCombinationVeify != null
             ? combinationVeifyRadioList[index]
-            : veifyRadioList[index],
+            : isUseFace == null
+                ? veifyRadioList[index]
+                : cameraRadioList[index],
         groupValue: currenStr,
         onChanged: (_) {
           isCombinationVeify != null
@@ -250,14 +242,18 @@ class _SettingPageState extends State<SettingPage> {
                   p.setCombinationVeifyRadioStr(
                       combinationVeifyRadioList, index);
                 }()
-              : () {
-                  if (faceSwich.value) {
-                    faceSwich.value = false;
-                    p.setFaceSwich();
-                    p.setUserEnvrionment();
-                  }
-                  p.setCurrenVeirfyRadioStr(veifyRadioList, index);
-                }();
+              : isUseFace == null
+                  ? () {
+                      if (faceSwich.value) {
+                        faceSwich.value = false;
+                        p.setFaceSwich();
+                        p.setUserEnvrionment();
+                      }
+                      p.setCurrenVeirfyRadioStr(veifyRadioList, index);
+                    }()
+                  : () {
+                      p.setCameraRadioStr(cameraRadioList, index);
+                    }();
           p.setUserEnvrionment();
         },
       ),
@@ -265,44 +261,79 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Widget _buildRadioText(BuildContext context, String? currenStr,
-      bool? isCombinationVeify, int index) {
+      bool? isCombinationVeify, int index, bool? isUseFace) {
     return Expanded(
         child: AppText.text(
             isCombinationVeify != null
                 ? combinationVeifyRadioList[index]
-                : veifyRadioList[index],
+                : isUseFace == null
+                    ? veifyRadioList[index]
+                    : cameraRadioList[index],
             style: currenStr == veifyRadioList[index] ||
                     (isCombinationVeify != null &&
-                        currenStr == combinationVeifyRadioList[index])
+                        currenStr == combinationVeifyRadioList[index]) ||
+                    (currenStr == cameraRadioList[index])
                 ? AppTextStyle.default_14.copyWith(fontWeight: FontWeight.w600)
                 : AppTextStyle.sub_14));
   }
 
   Widget _buildRadioItem(BuildContext context, int index, String? currenStr,
-      bool? isCombinationVeify) {
+      bool? isCombinationVeify, bool? isUseFace) {
     final p = context.read<SettinPageProivder>();
     return GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
           Future.delayed(Duration.zero, () {
-            isCombinationVeify != null
+            isCombinationVeify != null && isUseFace == null
                 ? () {
                     if (p.faceSwichVal == false) {
                       faceSwich.value = true;
                       p.setFaceSwich();
-                      p.setUserEnvrionment();
                     }
                     p.setCombinationVeifyRadioStr(
                         combinationVeifyRadioList, index);
                   }()
-                : () {
-                    if (faceSwich.value) {
-                      faceSwich.value = false;
-                      p.setFaceSwich();
-                      p.setUserEnvrionment();
-                    }
-                    p.setCurrenVeirfyRadioStr(veifyRadioList, index);
-                  }();
+                : isUseFace == null
+                    ? () {
+                        if (faceSwich.value) {
+                          faceSwich.value = false;
+                          p.setFaceSwich();
+                        }
+                        p.setCurrenVeirfyRadioStr(veifyRadioList, index);
+                      }()
+                    : () async {
+                        p.setCameraRadioStr(cameraRadioList, index);
+                        if (p.cameraRadioList.indexOf(p.cameraRadioStr) == 1) {
+                          final result = await AppDialog.showPopup(
+                              context,
+                              buildTowButtonDialogContents(
+                                  context,
+                                  AppSize.appBarHeight * 3,
+                                  Padding(
+                                      padding: AppSize.defaultSidePadding,
+                                      child: AppText.text(
+                                          tr('is_start_down_load_user_all_proccess'),
+                                          textAlign: TextAlign.start,
+                                          maxLines: 4)),
+                                  callback: () => 'success'));
+                          if (result == 'success') {
+                            final fp = context.read<FaceDetectionProvider>();
+                            fp.requestAllUserInfoData();
+                            var updateResult = await AppDialog.showPopup(
+                                context,
+                                buildTowButtonDialogContents(
+                                    context,
+                                    AppSize.smallPopupHeight,
+                                    updateContents(context),
+                                    callback: () => 'success'));
+                            if (updateResult == 'success') {
+                              fp.resetData();
+                            }
+                          } else {
+                            p.setCameraRadioStr(cameraRadioList, 0);
+                          }
+                        }
+                      }();
           }).whenComplete(() => p.setUserEnvrionment());
         },
         child: Container(
@@ -310,9 +341,11 @@ class _SettingPageState extends State<SettingPage> {
           padding: AppSize.defaultSidePadding,
           child: Row(
             children: [
-              _buildRadioIcon(context, currenStr, isCombinationVeify, index),
+              _buildRadioIcon(
+                  context, currenStr, isCombinationVeify, index, isUseFace),
               Padding(padding: EdgeInsets.only(right: AppSize.padding)),
-              _buildRadioText(context, currenStr, isCombinationVeify, index)
+              _buildRadioText(
+                  context, currenStr, isCombinationVeify, index, isUseFace)
             ],
           ),
         ));
@@ -371,8 +404,23 @@ class _SettingPageState extends State<SettingPage> {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            ...veifyRadioList.asMap().entries.map(
-                (map) => _buildRadioItem(context, map.key, str ?? '', null))
+            ...veifyRadioList.asMap().entries.map((map) =>
+                _buildRadioItem(context, map.key, str ?? '', null, null))
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildCameraTypeWidget(BuildContext context) {
+    return Selector<SettinPageProivder, String?>(
+      selector: (context, provider) => provider.cameraRadioStr,
+      builder: (context, str, _) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ...cameraRadioList.asMap().entries.map((map) =>
+                _buildRadioItem(context, map.key, str ?? '', null, true))
           ],
         );
       },
@@ -562,6 +610,7 @@ class _SettingPageState extends State<SettingPage> {
     veifyRadioList = [tr('fixed_type'), tr('personal')];
     combinationVeifyRadioList = [tr('face_and_ble'), tr('face_and_nfc')];
     guideMethodRadioList = [tr('vibration'), tr('system_voice'), tr('sound')];
+    cameraRadioList = [tr('one_to_one'), tr('one_to_more')];
     return BaseLayout(
         hasForm: false,
         appBar: appBarContents(context,
@@ -586,7 +635,8 @@ class _SettingPageState extends State<SettingPage> {
                             _buildIsUseNfcButton(context),
                             _buildIsUseBleButton(context),
                             _buildIsUseFaceButton(context),
-                            _buildIsUseFaceByMatchMroeButton(context),
+                            defaultSpacing(multiple: 2),
+                            _buildCameraTypeWidget(context),
                             defaultSpacing(multiple: 2),
                             Divider(height: 1, color: AppColors.subText),
 
