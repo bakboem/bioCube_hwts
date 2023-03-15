@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/bioCube/face_kit/truepass/lib/globalProvider/face_detection_provider.dart
  * Created Date: 2023-02-19 15:22:53
- * Last Modified: 2023-03-15 20:56:39
+ * Last Modified: 2023-03-15 22:17:53
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -14,6 +14,7 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hwst/util/date_util.dart';
 import 'package:hwst/enums/request_type.dart';
 import 'package:hwst/service/api_service.dart';
@@ -34,11 +35,9 @@ class FaceDetectionProvider extends ChangeNotifier {
   int? totalCount;
   bool hasMore = true;
   bool isLoadData = false;
-  String? downloadTime;
-  String? saveTime;
-  String? getDbDataTime;
-  String? totalTime;
-  String? dataLength;
+  Duration downloadTime = Duration();
+  Duration saveTime = Duration();
+  Duration totalTime = Duration();
 
   GetUserAllResponseModel? responseModel;
   void setIsFaceFinded(bool? val) {
@@ -65,42 +64,36 @@ class FaceDetectionProvider extends ChangeNotifier {
     pos = 1;
     totalCount = null;
     responseModel = null;
-    downloadTime = null;
-    saveTime = null;
-    getDbDataTime = null;
+    downloadTime = Duration();
+    saveTime = Duration();
+    totalTime = Duration();
     notifyListeners();
   }
 
   Future<ResultModel> requestAllUserInfoData() async {
-    // var complate = Completer();
-    var time = DateTime.now();
-    print('Http start at ::  ${time.toIso8601String()}');
-    // complate.complete([await Future.doWhile(getUserDataForPageing)]);
-    // await complate.future;
-    await Future.doWhile(getUserDataForPageing);
-    downloadTime = '${DateTime.now().difference(time).inMilliseconds}';
-    print('Http stop at ::  $downloadTime');
-
-    if (responseModel != null && responseModel!.data!.isNotEmpty) {
-      pr(responseModel?.data?.length);
-      time = DateTime.now();
-      print('Hive Save start at ::  ${time.toIso8601String()}');
-      HiveService.init(HiveBoxType.USER_INFO);
-      await HiveService.updateAll(responseModel?.data);
-      saveTime = '${DateTime.now().difference(time).inMilliseconds}';
-      print('Hive Save stop at :: $saveTime');
-      time = DateTime.now();
-      print('Hive Get start at ::  ${time.toIso8601String()}');
-      var result = await HiveService.getData((e) => e.imageData!.isNotEmpty);
-      getDbDataTime = '${DateTime.now().difference(time).inMilliseconds}';
-      print('Hive Get stop at ::  $getDbDataTime');
-    }
-    notifyListeners();
+    Future.doWhile(getUserDataForPageing);
     return ResultModel(true);
   }
 
+  void startSaveData() async {
+    if (responseModel != null && responseModel!.data!.isNotEmpty) {
+      var start = DateTime.now();
+      HiveService.init(HiveBoxType.USER_INFO);
+      HiveService.updateAll(responseModel?.data).whenComplete(() {
+        saveTime += DateTime.now().difference(start);
+        totalTime = downloadTime + saveTime;
+        notifyListeners();
+      });
+    }
+  }
+
   Future<bool> getUserDataForPageing() async {
-    if (!hasMore) return false;
+    if (!hasMore) {
+      startSaveData();
+      return false;
+    }
+
+    var start = DateTime.now();
     final _api = ApiService();
     final accessInfo = CacheService.getAccessInfo()!;
     HiveService.init(HiveBoxType.USER_INFO);
@@ -126,6 +119,8 @@ class FaceDetectionProvider extends ChangeNotifier {
     if (result.statusCode == 200 && result.body['result'] == 'success') {
       var temp = GetUserAllResponseModel.fromJson(result.body);
       totalCount ??= int.parse(temp.totalCount!);
+
+      notifyListeners();
       notifyListeners();
       print('totalCount  ${totalCount}');
       print('response Lenght :${responseModel?.data?.length}');
@@ -140,13 +135,13 @@ class FaceDetectionProvider extends ChangeNotifier {
           responseModel = temp;
         } else {
           var copy = responseModel;
-          copy!.data!.addAll(temp.data!);
-          responseModel = GetUserAllResponseModel.fromJson(copy.toJson());
-          dataLength = '${responseModel!.data!.length}';
+          copy?.data?.addAll(temp.data!);
+          responseModel = GetUserAllResponseModel.fromJson(copy!.toJson());
         }
         pos++;
       }
     }
+    downloadTime += DateTime.now().difference(start);
     notifyListeners();
     return true;
   }
