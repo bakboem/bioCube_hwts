@@ -45,6 +45,7 @@ class AppSize {
       MediaQuery.of(context).size.width * multiple;
   static double get updatePopupWidth => 328.w;
   static double get smallPopupHeight => 300;
+  static double get downloadPopupHeight => 250;
   static double get singlePopupHeight => 150.w;
   static double get menuPopupHeight =>
       buttonHeight * 3 + AppSize.dividerHeight * 2;

@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/HWST/lib/view/common/widget_of_download_progress.dart
  * Created Date: 2023-03-15 01:40:21
- * Last Modified: 2023-03-15 22:26:14
+ * Last Modified: 2023-03-15 22:50:38
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -30,6 +30,7 @@ Widget updateContents(BuildContext context) {
         child: provider.responseModel != null
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   AppText.text(
                       'DownloadTime: ${provider.downloadTime.inMilliseconds} milliseconds',
