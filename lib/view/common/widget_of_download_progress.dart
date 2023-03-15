@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/HWST/lib/view/common/widget_of_download_progress.dart
  * Created Date: 2023-03-15 01:40:21
- * Last Modified: 2023-03-15 22:50:38
+ * Last Modified: 2023-03-15 23:09:40
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -54,9 +54,8 @@ Widget updateContents(BuildContext context) {
                   LinearProgressIndicator(
                     backgroundColor: AppColors.textGrey,
                     valueColor: AlwaysStoppedAnimation(AppColors.primary),
-                    value: (provider.responseModel!.data!.length ~/
-                            (provider.totalCount ?? 0)) *
-                        100,
+                    value: provider.responseModel!.data!.length /
+                        (provider.totalCount ?? 0),
                   ),
                 ],
               )

@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-03-15 23:04:40
+ * Last Modified: 2023-03-15 23:12:14
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
