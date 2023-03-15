@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/provider/setting_page_provider.dart
  * Created Date: 2023-01-27 12:15:53
- * Last Modified: 2023-03-15 00:14:21
+ * Last Modified: 2023-03-15 21:32:55
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -111,8 +111,8 @@ class SettinPageProivder extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setFaceMoreSwich() {
-    faceMoreSwichVal = !faceMoreSwichVal;
+  void setFaceMoreSwich(bool? val) {
+    faceMoreSwichVal = val ?? !faceMoreSwichVal;
     notifyListeners();
   }
 
@@ -126,6 +126,7 @@ class SettinPageProivder extends ChangeNotifier {
     if (userEvn == null) {
       currenGuideMethod = tr('system_voice');
       currenVeirfyRadioStr = tr('personal');
+      cameraRadioStr = tr('one_to_one');
       bleSwichVal = true;
       nfcSwichVal = true;
       faceMoreSwichVal = false;
@@ -144,6 +145,7 @@ class SettinPageProivder extends ChangeNotifier {
       combinationVeifyRadioStr = userEvn.useType! > 1
           ? combinationVeifyRadioList[userEvn.useType! - veifyRadioList.length]
           : null;
+      cameraRadioStr = cameraRadioList[userEvn.isUseFaceMore! ? 1 : 0];
       sessionSettingTime = userEvn.sessionTime;
       rssi = userEvn.rssi;
     }

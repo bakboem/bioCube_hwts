@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-03-15 02:39:09
+ * Last Modified: 2023-03-15 21:35:53
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -14,7 +14,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:hwst/enums/hive_box_type.dart';
 import 'package:hwst/globalProvider/face_detection_provider.dart';
+import 'package:hwst/model/db/user_info_table.dart';
+import 'package:hwst/service/hive_service.dart';
 import 'package:hwst/view/common/widget_of_download_progress.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/service/pass_kit_service.dart';
@@ -39,6 +42,7 @@ import 'package:hwst/view/common/widget_of_dialog_contents.dart';
 import 'package:hwst/view/common/widget_of_appbar_contents.dart';
 import 'package:hwst/view/common/widget_of_default_spacing.dart';
 import 'package:hwst/view/setting/provider/setting_page_provider.dart';
+import 'package:tuple/tuple.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -51,7 +55,6 @@ class _SettingPageState extends State<SettingPage> {
   var nfcSwich = ValueNotifier(false);
   var bleSwich = ValueNotifier(false);
   var faceSwich = ValueNotifier(false);
-  var faceMoreSwich = ValueNotifier(false);
   List<String> veifyRadioList = [];
   List<String> cameraRadioList = [];
   List<String> combinationVeifyRadioList = [];
@@ -84,16 +87,13 @@ class _SettingPageState extends State<SettingPage> {
     nfcSwich.value = p.nfcSwichVal;
     bleSwich.value = p.bleSwichVal;
     faceSwich.value = p.faceSwichVal;
-    faceMoreSwich.value = p.faceMoreSwichVal;
     return Container(
       child: ValueListenableBuilder<bool?>(
         valueListenable: type == SwichType.NFC
             ? nfcSwich
             : type == SwichType.BLE
                 ? bleSwich
-                : type == SwichType.FACE
-                    ? faceSwich
-                    : faceMoreSwich,
+                : faceSwich,
         builder: (context, value, child) {
           return Padding(
             padding: EdgeInsets.zero,
@@ -109,12 +109,10 @@ class _SettingPageState extends State<SettingPage> {
                   case SwichType.BLE:
                     bleSwich.value = value;
                     p.setBleSwich();
-
                     break;
                   case SwichType.FACE:
                     faceSwich.value = value;
                     p.setFaceSwich();
-
                     break;
                 }
                 p.setUserEnvrionment();
@@ -225,19 +223,18 @@ class _SettingPageState extends State<SettingPage> {
             horizontal: VisualDensity.minimumDensity,
             vertical: VisualDensity.minimumDensity),
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        value: isCombinationVeify != null
+        value: isCombinationVeify != null && isUseFace == null
             ? combinationVeifyRadioList[index]
             : isUseFace == null
                 ? veifyRadioList[index]
                 : cameraRadioList[index],
         groupValue: currenStr,
         onChanged: (_) {
-          isCombinationVeify != null
+          isCombinationVeify != null && isUseFace == null
               ? () {
                   if (p.faceSwichVal == false) {
                     faceSwich.value = true;
                     p.setFaceSwich();
-                    p.setUserEnvrionment();
                   }
                   p.setCombinationVeifyRadioStr(
                       combinationVeifyRadioList, index);
@@ -247,7 +244,6 @@ class _SettingPageState extends State<SettingPage> {
                       if (faceSwich.value) {
                         faceSwich.value = false;
                         p.setFaceSwich();
-                        p.setUserEnvrionment();
                       }
                       p.setCurrenVeirfyRadioStr(veifyRadioList, index);
                     }()
@@ -303,30 +299,41 @@ class _SettingPageState extends State<SettingPage> {
                       }()
                     : () async {
                         p.setCameraRadioStr(cameraRadioList, index);
-                        if (p.cameraRadioList.indexOf(p.cameraRadioStr) == 1) {
-                          final result = await AppDialog.showPopup(
-                              context,
-                              buildTowButtonDialogContents(
+                        p.setFaceMoreSwich(true);
+                        var isSelectedOneToOne =
+                            p.cameraRadioList.indexOf(p.cameraRadioStr) == 0;
+                        if (isSelectedOneToOne) {
+                          p.setFaceMoreSwich(false);
+                        }
+                        var isSelectedOneToMore =
+                            p.cameraRadioList.indexOf(p.cameraRadioStr) == 1;
+                        var isNeedUpdate = await HiveService.isNeedUpdate();
+                        // 1:N 선택했으면
+                        if (isSelectedOneToMore && isNeedUpdate) {
+                          final showIsStartDownloadPopupResult =
+                              await AppDialog.showPopup(
                                   context,
-                                  AppSize.appBarHeight * 3,
-                                  Padding(
-                                      padding: AppSize.defaultSidePadding,
-                                      child: AppText.text(
-                                          tr('is_start_down_load_user_all_proccess'),
-                                          textAlign: TextAlign.start,
-                                          maxLines: 4)),
-                                  callback: () => 'success'));
-                          if (result == 'success') {
+                                  buildTowButtonDialogContents(
+                                      context,
+                                      AppSize.appBarHeight * 3,
+                                      Padding(
+                                          padding: AppSize.defaultSidePadding,
+                                          child: AppText.text(
+                                              tr('is_start_down_load_user_all_proccess'),
+                                              textAlign: TextAlign.start,
+                                              maxLines: 4)),
+                                      callback: () => 'success'));
+                          if (showIsStartDownloadPopupResult == 'success') {
                             final fp = context.read<FaceDetectionProvider>();
                             fp.requestAllUserInfoData();
-                            var updateResult = await AppDialog.showPopup(
+                            var downLoadPopupResult = await AppDialog.showPopup(
                                 context,
                                 buildTowButtonDialogContents(
                                     context,
                                     AppSize.smallPopupHeight,
                                     updateContents(context),
                                     callback: () => 'success'));
-                            if (updateResult == 'success') {
+                            if (downLoadPopupResult == 'success') {
                               fp.resetData();
                             }
                           } else {
@@ -413,34 +420,28 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Widget _buildCameraTypeWidget(BuildContext context) {
-    return Selector<SettinPageProivder, String?>(
-      selector: (context, provider) => provider.cameraRadioStr,
-      builder: (context, str, _) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            ...cameraRadioList.asMap().entries.map((map) =>
-                _buildRadioItem(context, map.key, str ?? '', null, true))
-          ],
-        );
+    return Selector<SettinPageProivder, Tuple2<String?, bool>>(
+      selector: (context, provider) =>
+          Tuple2(provider.cameraRadioStr, provider.faceSwichVal),
+      builder: (context, tuple, _) {
+        return !tuple.item2
+            ? SizedBox()
+            : Column(
+                children: [
+                  defaultSpacing(multiple: 2),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ...cameraRadioList.asMap().entries.map((map) =>
+                          _buildRadioItem(
+                              context, map.key, tuple.item1 ?? '', null, true))
+                    ],
+                  )
+                ],
+              );
       },
     );
   }
-
-  // Widget _buildCombinationVrirfyWidget(BuildContext context) {
-  //   return Selector<SettinPageProivder, String?>(
-  //     selector: (context, provider) => provider.combinationVeifyRadioStr,
-  //     builder: (context, str, _) {
-  //       return Row(
-  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //         children: [
-  //           ...combinationVeifyRadioList.asMap().entries.map(
-  //               (map) => _buildRadioItem(context, map.key, str ?? '', true))
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
 
   Widget _buildGuideMethodWidget(BuildContext context) {
     return Selector<SettinPageProivder, String?>(
@@ -464,24 +465,6 @@ class _SettingPageState extends State<SettingPage> {
       child: _buildTitleText(context, title, true),
     );
   }
-
-  // Widget _buildVerifyTypeByChoic(BuildContext context) {
-  //   return Selector<SettinPageProivder, String?>(
-  //     selector: (context, provider) => provider.currenVeirfyRadioStr,
-  //     builder: (context, verifyType, _) {
-  //       return verifyType != null && verifyType == tr('personal')
-  //           ? Column(
-  //               children: [
-  //                 _buildTitle(context, tr('combination_type_choic')),
-  //                 defaultSpacing(),
-  //                 _buildCombinationVrirfyWidget(context),
-  //                 defaultSpacing(),
-  //               ],
-  //             )
-  //           : Container();
-  //     },
-  //   );
-  // }
 
   Widget _buidStopUsingRequestWidget(BuildContext context) {
     return Padding(
@@ -635,7 +618,6 @@ class _SettingPageState extends State<SettingPage> {
                             _buildIsUseNfcButton(context),
                             _buildIsUseBleButton(context),
                             _buildIsUseFaceButton(context),
-                            defaultSpacing(multiple: 2),
                             _buildCameraTypeWidget(context),
                             defaultSpacing(multiple: 2),
                             Divider(height: 1, color: AppColors.subText),
