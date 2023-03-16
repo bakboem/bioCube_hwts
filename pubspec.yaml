@@ -34,11 +34,12 @@ dependencies:
   geolocator: ^9.0.2
   vibration: ^1.7.6
   soundpool: ^2.3.0
-  # face_kit:
-  #   path: ../../face_match_kit
+  face_kit:
+    path: ../../face_match_kit
   camera: ^0.10.3+2
   cupertino_icons: ^1.0.2
   fl_mlkit_text_recognize: ^2.1.0
+  lottie: ^2.3.0
 
 dev_dependencies:
   flutter_launcher_icons: ^0.11.0
@@ -57,6 +58,7 @@ flutter:
     - assets/country/
     - assets/opencv/
     - assets/mnn/
+    - assets/lottie/
 
 flutter_native_splash:
   color: "#FFFFFF"

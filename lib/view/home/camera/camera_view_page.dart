@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:developer';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:hwst/view/home/camera/camera_overlay_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/service/key_service.dart';
 import 'package:hwst/view/common/function_of_print.dart';
@@ -148,7 +149,16 @@ class _CameraViewPageState extends State<CameraViewPage> {
       );
     } else {
       return Stack(
-        children: [CameraPreview(_camController!)],
+        children: [
+          CameraPreview(_camController!),
+          Consumer<FaceDetectionProvider>(builder: (context, provider, _) {
+            return provider.faceInfo != null &&
+                    provider.faceInfo!.isNotEmpty &&
+                    provider.isShowFaceLine
+                ? CameraOverlayWidget(info: provider.faceInfo!)
+                : SizedBox();
+          }),
+        ],
       );
     }
   }

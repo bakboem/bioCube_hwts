@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-03-15 23:12:14
+ * Last Modified: 2023-03-16 11:20:51
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -12,16 +12,9 @@
  */
 
 import 'dart:io';
-
+import 'package:tuple/tuple.dart';
 import 'package:flutter/material.dart';
-import 'package:hwst/enums/hive_box_type.dart';
-import 'package:hwst/globalProvider/face_detection_provider.dart';
-import 'package:hwst/model/db/user_info_table.dart';
-import 'package:hwst/service/hive_service.dart';
-import 'package:hwst/view/common/function_of_print.dart';
-import 'package:hwst/view/common/widget_of_download_progress.dart';
 import 'package:provider/provider.dart';
-import 'package:hwst/service/pass_kit_service.dart';
 import 'package:hwst/styles/app_text.dart';
 import 'package:hwst/styles/app_size.dart';
 import 'package:hwst/enums/swich_type.dart';
@@ -29,21 +22,25 @@ import 'package:hwst/styles/app_style.dart';
 import 'package:hwst/styles/app_colors.dart';
 import 'package:hwst/enums/language_type.dart';
 import 'package:hwst/service/key_service.dart';
+import 'package:hwst/service/hive_service.dart';
 import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/styles/app_text_style.dart';
 import 'package:hwst/view/common/base_layout.dart';
+import 'package:hwst/service/pass_kit_service.dart';
 import 'package:hwst/model/common/result_model.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/view/common/base_app_dialog.dart';
 import 'package:hwst/globalProvider/auth_provider.dart';
+import 'package:hwst/view/common/function_of_print.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/globalProvider/app_theme_provider.dart';
 import 'package:hwst/view/common/widget_of_divider_line.dart';
 import 'package:hwst/view/common/function_of_pop_to_first.dart';
-import 'package:hwst/view/common/widget_of_dialog_contents.dart';
-import 'package:hwst/view/common/widget_of_appbar_contents.dart';
 import 'package:hwst/view/common/widget_of_default_spacing.dart';
+import 'package:hwst/view/common/widget_of_appbar_contents.dart';
+import 'package:hwst/view/common/widget_of_dialog_contents.dart';
+import 'package:hwst/globalProvider/face_detection_provider.dart';
+import 'package:hwst/view/common/widget_of_download_progress.dart';
 import 'package:hwst/view/setting/provider/setting_page_provider.dart';
-import 'package:tuple/tuple.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});

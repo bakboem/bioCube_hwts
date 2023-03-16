@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/truepass/lib/service/native_channel_service.dart
  * Created Date: 2023-01-25 11:52:53
- * Last Modified: 2023-03-04 11:57:43
+ * Last Modified: 2023-03-16 12:04:11
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -14,6 +14,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hwst/service/pass_kit_service.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/enums/verify_type.dart';
 import 'package:hwst/globalProvider/timer_provider.dart';
@@ -61,10 +62,10 @@ class NativeChannelService {
       final isBlueSuccess = message.startsWith('bleSuccess:');
       final isNfcSuccess = message.startsWith('nfcSuccess:');
       if (isBlueSuccess || isNfcSuccess) {
-        // if (!tp.isPassKitTimerRunning) {
-        //   tp.passKitProcess(PassKitService.updateToken,
-        //       duration: Duration(seconds: 5));
-        // }
+        if (!tp.isPassKitTimerRunning && isNfcSuccess) {
+          tp.passKitProcess(PassKitService.updateToken,
+              duration: Duration(seconds: 3));
+        }
         pr(message);
         cp.setLastVerfyType(isBlueSuccess ? VerifyType.BLE : VerifyType.NFC);
         final tid = message.substring(message.indexOf(':') + 1).trim();

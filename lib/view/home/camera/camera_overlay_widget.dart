@@ -30,8 +30,11 @@ class CameraOverlayWidget extends StatelessWidget {
     var leftScale = info[0] / 480;
     var top = cardHeight * topScale;
     var left = cardWidth * leftScale;
-    var border = cardWidth * (info[2] / 480);
-    return [Offset(left, top), Offset(border, border)];
+    var width = info[2] * (cardWidth / 480) * (AppSize.realWidth / 480);
+    var height = info[2] *
+        (cardHeight / (Platform.isIOS ? 640 : 720)) *
+        (AppSize.realHeight / (Platform.isIOS ? 640 : 720));
+    return [Offset(left, top), Offset(width, height)];
   }
 
   @override

@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/home/card_one_widget.dart
  * Created Date: 2023-02-04 20:19:38
- * Last Modified: 2023-03-13 23:17:15
+ * Last Modified: 2023-03-17 00:59:46
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -12,6 +12,7 @@
  */
 
 import 'dart:io';
+import 'package:lottie/lottie.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -38,7 +39,21 @@ class CardWidget extends StatefulWidget {
   State<CardWidget> createState() => _CardWidgetState();
 }
 
-class _CardWidgetState extends State<CardWidget> {
+class _CardWidgetState extends State<CardWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   Widget _buildCard1TopColorBox(double colorBoxHeight, double cardWidth) {
     var cardType = widget.cardType;
     return Container(
@@ -213,14 +228,29 @@ class _CardWidgetState extends State<CardWidget> {
                               key: Key('fromCardPage'),
                             ),
                           ),
-                          Consumer<FaceDetectionProvider>(
-                              builder: (context, provider, _) {
-                            return provider.faceInfo != null &&
-                                    provider.faceInfo!.isNotEmpty &&
-                                    provider.isShowFaceLine
-                                ? CameraOverlayWidget(info: provider.faceInfo!)
-                                : SizedBox();
-                          })
+                          // Consumer<FaceDetectionProvider>(
+                          //     builder: (context, provider, _) {
+                          //   return provider.faceInfo != null &&
+                          //           provider.faceInfo!.isNotEmpty &&
+                          //           provider.isShowFaceLine
+                          //       ? CameraOverlayWidget(info: provider.faceInfo!)
+                          //       : SizedBox();
+                          // }),
+                          Lottie.asset(
+                            'assets/lottie/face.json',
+                            controller: _controller
+                              ..addListener(() {
+                                if (_controller.isCompleted) {
+                                  _controller.repeat();
+                                }
+                              }),
+                            onLoaded: (comp) {
+                              _controller
+                                ..duration = Duration(seconds: 5)
+                                ..forward();
+                            },
+                            options: LottieOptions(),
+                          ),
                         ],
                       )
                     : Stack(
