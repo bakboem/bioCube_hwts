@@ -21,13 +21,15 @@ class UserInfoTableAdapter extends TypeAdapter<UserInfoTable> {
       fields[2] as String?,
       fields[3] as DateTime?,
       fields[4] as String?,
+      (fields[5] as List?)?.cast<double>(),
+      fields[6] as bool?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserInfoTable obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(6)
       ..writeByte(1)
       ..write(obj.mPerson)
       ..writeByte(2)
@@ -35,7 +37,11 @@ class UserInfoTableAdapter extends TypeAdapter<UserInfoTable> {
       ..writeByte(3)
       ..write(obj.updateDate)
       ..writeByte(4)
-      ..write(obj.imageData);
+      ..write(obj.imageData)
+      ..writeByte(5)
+      ..write(obj.feature)
+      ..writeByte(6)
+      ..write(obj.isExtracted);
   }
 
   @override
@@ -59,6 +65,10 @@ UserInfoTable _$UserInfoTableFromJson(Map<String, dynamic> json) =>
       json['M_photo'] as String?,
       json['Adate'] == null ? null : DateTime.parse(json['Adate'] as String),
       json['M_photo_base64'] as String?,
+      (json['feature'] as List<dynamic>?)
+          ?.map((e) => (e as num).toDouble())
+          .toList(),
+      json['isExtracted'] as bool?,
     );
 
 Map<String, dynamic> _$UserInfoTableToJson(UserInfoTable instance) =>
@@ -67,4 +77,6 @@ Map<String, dynamic> _$UserInfoTableToJson(UserInfoTable instance) =>
       'M_photo': instance.mPhoto,
       'Adate': instance.updateDate?.toIso8601String(),
       'M_photo_base64': instance.imageData,
+      'feature': instance.feature,
+      'isExtracted': instance.isExtracted,
     };

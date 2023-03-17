@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/HWST/lib/model/db/user_info_table.dart
  * Created Date: 2023-03-14 20:10:24
- * Last Modified: 2023-03-14 21:54:17
+ * Last Modified: 2023-03-17 14:40:25
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -29,8 +29,12 @@ class UserInfoTable {
   @HiveField(4)
   @JsonKey(name: 'M_photo_base64')
   String? imageData;
-
-  UserInfoTable(this.mPerson, this.mPhoto, this.updateDate, this.imageData);
+  @HiveField(5)
+  List<double>? feature;
+  @HiveField(6)
+  bool? isExtracted;
+  UserInfoTable(this.mPerson, this.mPhoto, this.updateDate, this.imageData,
+      this.feature, this.isExtracted);
   factory UserInfoTable.fromJson(Object? json) =>
       _$UserInfoTableFromJson(json as Map<String, dynamic>);
   Map<String, dynamic> toJson() => _$UserInfoTableToJson(this);
