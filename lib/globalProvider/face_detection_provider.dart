@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/bioCube/face_kit/truepass/lib/globalProvider/face_detection_provider.dart
  * Created Date: 2023-02-19 15:22:53
- * Last Modified: 2023-03-18 14:18:00
+ * Last Modified: 2023-03-18 17:11:01
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -37,7 +37,6 @@ class FaceDetectionProvider extends ChangeNotifier {
   Duration downloadTime = Duration();
   Duration saveTime = Duration();
   Duration totalTime = Duration();
-
   GetUserAllResponseModel? responseModel;
   void setIsFaceFinded(bool? val) {
     isFaceFinded = val ?? !isFaceFinded;
@@ -64,6 +63,7 @@ class FaceDetectionProvider extends ChangeNotifier {
     pos = 1;
     totalCount = null;
     responseModel = null;
+    hasMore = true;
     downloadTime = Duration();
     saveTime = Duration();
     totalTime = Duration();
@@ -119,8 +119,6 @@ class FaceDetectionProvider extends ChangeNotifier {
     if (result.statusCode == 200 && result.body['result'] == 'success') {
       var temp = GetUserAllResponseModel.fromJson(result.body);
       totalCount ??= int.parse(temp.totalCount!);
-
-      notifyListeners();
       notifyListeners();
       print('totalCount  ${totalCount}');
       print('response Lenght :${responseModel?.data?.length}');

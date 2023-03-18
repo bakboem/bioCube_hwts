@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/HWST/lib/view/common/widget_of_download_progress.dart
  * Created Date: 2023-03-15 01:40:21
- * Last Modified: 2023-03-15 23:09:40
+ * Last Modified: 2023-03-18 15:18:52
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -11,11 +11,23 @@
  * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
  */
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/styles/export_common.dart';
 import 'package:hwst/globalProvider/face_detection_provider.dart';
 import 'package:hwst/view/common/widget_of_default_spacing.dart';
+
+Widget textRow(String start, String end, isUseTime) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      AppText.text('$start:', style: AppTextStyle.default_14),
+      AppText.text('$end ${isUseTime ? 'milliseconds' : ''}',
+          style: AppTextStyle.default_14),
+    ],
+  );
+}
 
 Widget updateContents(BuildContext context) {
   return Consumer<FaceDetectionProvider>(builder: (context, provider, _) {
@@ -32,24 +44,20 @@ Widget updateContents(BuildContext context) {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  AppText.text(
-                      'DownloadTime: ${provider.downloadTime.inMilliseconds} milliseconds',
-                      style: AppTextStyle.default_14),
+                  defaultSpacing(multiple: 2),
+                  textRow(tr('downloadTime'),
+                      '${provider.downloadTime.inMilliseconds}', true),
                   defaultSpacing(),
-                  AppText.text(
-                      'SaveDataTime: ${provider.saveTime.inMilliseconds} milliseconds',
-                      style: AppTextStyle.default_14),
+                  textRow(tr('saveDataTime'),
+                      '${provider.saveTime.inMilliseconds}', true),
                   defaultSpacing(),
-                  AppText.text(
-                      'TotalTime: ${provider.totalTime.inMilliseconds} milliseconds',
-                      style: AppTextStyle.default_14),
+                  textRow(tr('totalTime'),
+                      '${provider.totalTime.inMilliseconds}', true),
                   defaultSpacing(),
-                  AppText.text(
-                      'TotalComplete: ${provider.responseModel?.data?.length}/${provider.totalCount}',
-                      style: AppTextStyle.default_14),
-                  // AppText.text(
-                  //     '${(provider.responseModel!.data!.length ~/ (provider.totalCount ?? 0)) * 100}%',
-                  //     style: AppTextStyle.default_14),
+                  textRow(
+                      tr('totalComplete'),
+                      '${provider.responseModel?.data?.length}/${provider.totalCount}',
+                      false),
                   defaultSpacing(),
                   LinearProgressIndicator(
                     backgroundColor: AppColors.textGrey,
@@ -57,6 +65,10 @@ Widget updateContents(BuildContext context) {
                     value: provider.responseModel!.data!.length /
                         (provider.totalCount ?? 0),
                   ),
+                  defaultSpacing(multiple: 2),
+                  AppText.text(!provider.hasMore ? tr('done') : '',
+                      style: AppTextStyle.default_14,
+                      textAlign: TextAlign.center),
                 ],
               )
             : SizedBox(),

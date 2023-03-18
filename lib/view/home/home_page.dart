@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-18 14:25:05
+ * Last Modified: 2023-03-18 17:25:32
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -223,7 +223,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _doUpdateProccess() async {
+  Future<void> _doUpdateProccess() async {
     final showIsStartDownloadPopupResult = await AppDialog.showPopup(
         context,
         buildTowButtonDialogContents(
@@ -262,6 +262,7 @@ class _HomePageState extends State<HomePage> {
                   cp.setIsShowCamera(val: true);
                 } else {}
                 fp.resetData();
+
                 return true;
               }
               return false;
@@ -291,9 +292,15 @@ class _HomePageState extends State<HomePage> {
           return;
         }
       } else {
-        if (await HiveService.isNeedUpdate() &&
-            (CacheService.getUserEnvironment()?.isUseFaceMore ?? false)) {
-          _doUpdateProccess();
+        if ((CacheService.getUserEnvironment()?.isUseFaceMore ?? false) &&
+            await HiveService.isNeedUpdate()) {
+          final dp = context.read<FaceDetectionProvider>();
+          await _doUpdateProccess();
+          if (!await HiveService.isNeedUpdate()) {
+            final fp = context.read<FaceDetectionProvider>();
+            fp.setIsFaceFinded(false);
+            cp.setIsShowCamera(val: true);
+          }
         } else {
           final fp = context.read<FaceDetectionProvider>();
           fp.setIsFaceFinded(false);
@@ -306,7 +313,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void routeToSettinsPage(UserEnvironmentModel userEvn) async {
-    if (!userEvn.isUseBle! || !userEvn.isUseNfc!) {
+    if (!userEvn.isUseBle! || !userEvn.isUseNfc! || !userEvn.isUseFace!) {
       Navigator.pushNamed(context, SettingPage.routeName);
     } else {
       final result = await AppDialog.showPopup(
@@ -409,10 +416,13 @@ class _HomePageState extends State<HomePage> {
               SizedBox(
                   width: largFloatButtonWidth,
                   height: largFloatButtonWidth,
-                  child:
-                      Selector<DeviceStatusProvider, Tuple3<bool, bool, bool>>(
-                    selector: (context, provider) => Tuple3(
-                        provider.isBleOk, provider.isNfcOk, provider.isFaceOk),
+                  child: Selector<DeviceStatusProvider,
+                      Tuple4<bool, bool, bool, bool>>(
+                    selector: (context, provider) => Tuple4(
+                        provider.isBleOk,
+                        provider.isNfcOk,
+                        provider.isFaceOk,
+                        provider.updateSwich),
                     builder: (context, tuple, _) {
                       return _buildButtonWidget(
                           context,

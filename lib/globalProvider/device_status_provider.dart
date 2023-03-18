@@ -29,9 +29,14 @@ class DeviceStatusProvider extends ChangeNotifier {
   bool isFaceOk = false;
   bool isLocationOk = false;
   bool isOverThanIphone10 = false;
-
+  bool updateSwich = true;
   void setBleStatus(bool val) {
     isBleOk = val;
+    notifyListeners();
+  }
+
+  void doUpdateStatus() {
+    updateSwich = !updateSwich;
     notifyListeners();
   }
 

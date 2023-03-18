@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-03-18 14:10:51
+ * Last Modified: 2023-03-18 17:27:06
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -12,6 +12,8 @@
  */
 
 import 'dart:io';
+import 'package:hwst/enums/hive_box_type.dart';
+import 'package:hwst/globalProvider/device_status_provider.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -275,7 +277,10 @@ class _SettingPageState extends State<SettingPage> {
               callback: () => 'success'));
       if (showIsStartDownloadPopupResult == 'success') {
         final fp = context.read<FaceDetectionProvider>();
+        pr('1>');
         fp.requestAllUserInfoData();
+        pr('2>');
+
         var downLoadPopupResult = await AppDialog.showPopup(
             context,
             buildDialogContents(context, updateContents(context), true,
@@ -293,6 +298,12 @@ class _SettingPageState extends State<SettingPage> {
                         callback: () => 'success'));
                 if (popupResult == 'success') {
                   fp.resetData();
+                  HiveService.deleteAll();
+
+                  p.setCameraRadioStr(cameraRadioList, 0);
+                  p.setFaceMoreSwich(false);
+                  final dp = context.read<DeviceStatusProvider>();
+                  dp.doUpdateStatus();
                   return true;
                 }
                 return false;
@@ -301,11 +312,13 @@ class _SettingPageState extends State<SettingPage> {
               }
             }));
         if (downLoadPopupResult != null && downLoadPopupResult) {
-          pr('??');
           fp.resetData();
         }
       } else {
         p.setCameraRadioStr(cameraRadioList, 0);
+        p.setFaceMoreSwich(false);
+        final dp = context.read<DeviceStatusProvider>();
+        dp.doUpdateStatus();
       }
     }
   }
@@ -361,7 +374,11 @@ class _SettingPageState extends State<SettingPage> {
                         }
                         await _doUpdateProccess(context);
                       }();
-          }).whenComplete(() => p.setUserEnvrionment(context));
+          }).whenComplete(() {
+            final dp = context.read<DeviceStatusProvider>();
+            dp.doUpdateStatus();
+            p.setUserEnvrionment(context);
+          });
         },
         child: Container(
           width: AppSize.defaultContentsWidth / 2,
@@ -486,7 +503,7 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
-  Widget _buidStopUsingRequestWidget(BuildContext context) {
+  Widget _buidSignOutWidget(BuildContext context) {
     return Padding(
       padding: AppSize.defaultSidePadding * .8,
       child: Row(
@@ -513,6 +530,7 @@ class _SettingPageState extends State<SettingPage> {
                 }));
             if (result != null && result == 'ok') {
               CacheService.deleteALL();
+              await HiveService.deleteAll();
               final ap = context.read<AuthProvider>();
               ap.setIsLogedIn(false);
               popToFirst(context);
@@ -678,7 +696,7 @@ class _SettingPageState extends State<SettingPage> {
                             defaultSpacing(multiple: 2),
                             _buildTitle(context, tr('stop_using_request')),
                             defaultSpacing(),
-                            _buidStopUsingRequestWidget(context),
+                            _buidSignOutWidget(context),
                             defaultSpacing(height: AppSize.appBarHeight)
                           ],
                         ))
