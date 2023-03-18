@@ -2,7 +2,7 @@
  * Project Name:  [koreaJob]
  * File: /Users/bakbeom/work/sm/koreajob/lib/service/pass_kit_service.dart
  * Created Date: 2023-01-22 10:14:14
- * Last Modified: 2023-03-04 17:32:21
+ * Last Modified: 2023-03-18 09:36:38
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  MOMONETWORK ALL RIGHTS RESERVED. 
@@ -13,6 +13,7 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:hwst/globalProvider/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/enums/verify_type.dart';
 import 'package:hwst/service/key_service.dart';
@@ -23,7 +24,9 @@ import 'package:hwst/globalProvider/core_verify_process_provider.dart';
 class PassKitService {
   factory PassKitService() => _sharedInstance();
   static PassKitService? _instance;
+
   PassKitService._();
+
   static PassKitService _sharedInstance() {
     _instance ??= PassKitService._();
     return _instance!;
@@ -31,6 +34,7 @@ class PassKitService {
 
   static Future<void> initKit({VerifyType? type}) async {
     await NativeChannelService.methodChannel.invokeMethod('initState');
+    final ap = KeyService.baseAppKey.currentContext!.read<AuthProvider>();
     if (Platform.isAndroid) {
       setRssi();
       setSessionTime();
@@ -41,9 +45,20 @@ class PassKitService {
       deleteToken();
       saveToken();
     }
-    type != null
-        ? Future.delayed(Duration(seconds: 1),
-            () => type == VerifyType.BLE ? startBle() : startNfc())
+
+    print('타입은 ?');
+    print(type);
+
+    type != null && Platform.isAndroid
+        ? Future.delayed(
+            Duration.zero,
+            () => (type == VerifyType.BLE &&
+                    (ap.userEnvironmentModel?.isUseBle ?? false))
+                ? startBle()
+                : (type == VerifyType.BLE &&
+                        (ap.userEnvironmentModel?.isUseBle ?? false))
+                    ? startNfc()
+                    : DoNothingAction())
         : DoNothingAction();
   }
 
@@ -80,6 +95,7 @@ class PassKitService {
   }
 
   static Future<void> startBle() async {
+    print("BLE");
     final cp =
         KeyService.baseAppKey.currentContext!.read<CoreVerifyProcessProvider>();
     cp.setVerifyType(VerifyType.BLE);
@@ -87,6 +103,7 @@ class PassKitService {
   }
 
   static Future<void> startNfc() async {
+    print("NFC");
     final cp =
         KeyService.baseAppKey.currentContext!.read<CoreVerifyProcessProvider>();
     cp.setVerifyType(VerifyType.NFC);
@@ -106,10 +123,7 @@ class PassKitService {
   static Future<void> setRssi() async {
     if (Platform.isAndroid) {
       await NativeChannelService.methodChannel.invokeMethod(
-          'setRssi',
-          CacheService.getUserEnvironment() != null
-              ? CacheService.getUserEnvironment()!.rssi ?? '-80'
-              : '-80');
+          'setRssi', CacheService.getUserEnvironment()?.rssi ?? '-80');
     }
   }
 
@@ -117,9 +131,9 @@ class PassKitService {
     if (Platform.isAndroid) {
       await NativeChannelService.methodChannel.invokeMethod(
           'setSessionTime',
-          CacheService.getUserEnvironment() != null
-              ? CacheService.getUserEnvironment()!.sessionTime ?? 60
-              : 60);
+          Platform.isAndroid
+              ? CacheService.getUserEnvironment()?.sessionTime ?? 60
+              : '${CacheService.getUserEnvironment()?.sessionTime ?? 60}');
     }
   }
 

@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/enums/verify_type.dart
  * Created Date: 2023-01-24 13:16:21
- * Last Modified: 2023-02-22 22:44:49
+ * Last Modified: 2023-03-18 10:41:57
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -54,6 +54,19 @@ extension VerifyTypeExtension on VerifyType {
         return tr('face_and_ble');
       case VerifyType.QR_CODE:
         return tr('qr_code');
+    }
+  }
+
+  int get getIndex {
+    switch (this) {
+      case VerifyType.NFC:
+        return 1;
+      case VerifyType.BLE:
+        return 0;
+      case VerifyType.FACE:
+        return 3;
+      default:
+        return 0;
     }
   }
 }

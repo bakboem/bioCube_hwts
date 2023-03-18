@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/truepass/lib/view/home/provider/core_process_provider.dart
  * Created Date: 2023-01-25 12:24:10
- * Last Modified: 2023-03-04 12:26:53
+ * Last Modified: 2023-03-18 10:57:23
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -36,7 +36,6 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
   bool isShowCamera = false;
   bool onceSwich = true;
   bool isBackgroundMode = false;
-  VerifyType lastVerfyType = VerifyType.BLE;
   String? message;
   String tid = '';
 
@@ -44,6 +43,8 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
   bool? isNfcSuccess; // toast
   Timer? timer;
   Timer? sessionTimer;
+
+  DateTime? lastVerfyTime;
   var verifyType = VerifyType.BLE;
   final _api = ApiService();
   bool get isTimerRunning => timer != null ? timer!.isActive : false;
@@ -55,14 +56,23 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
     timer = Timer(duration ?? Duration(seconds: 3), () => reset());
   }
 
-  void setLastVerfyType(VerifyType type) {
-    lastVerfyType = type;
-    notifyListeners();
-  }
-
   void setOnceSwich(bool val) {
     onceSwich = val;
     notifyListeners();
+  }
+
+  void resetLastVerfyTime() {
+    lastVerfyTime = null;
+  }
+
+  bool isLastVerfyTimeLessThan3Sec() {
+    if (lastVerfyTime == null) {
+      lastVerfyTime = DateTime.now();
+      return false;
+    } else {
+      print('less than 3');
+      return DateTime.now().difference(lastVerfyTime!).inSeconds > 3;
+    }
   }
 
   void startSettionTimer() {

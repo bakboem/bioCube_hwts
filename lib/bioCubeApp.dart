@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/shwt/lib/bioCubeApp.dart
  * Created Date: 2023-01-22 19:01:08
- * Last Modified: 2023-03-14 17:50:57
+ * Last Modified: 2023-03-18 10:04:16
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -13,6 +13,7 @@
 
 import 'package:hwst/router.dart';
 import 'package:flutter/material.dart';
+import 'package:hwst/service/cache_service.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/enums/verify_type.dart';
 import 'package:hwst/view/auth/auth_page.dart';
@@ -32,6 +33,7 @@ import 'package:hwst/globalProvider/device_status_provider.dart';
 import 'package:hwst/globalProvider/face_detection_provider.dart';
 import 'package:hwst/globalProvider/connect_status_provider.dart';
 import 'package:hwst/globalProvider/next_page_loading_provider.dart';
+import 'package:hwst/globalProvider/home_start_button_provider.dart';
 import 'package:hwst/view/common/function_of_check_card_is_valid.dart';
 import 'package:hwst/globalProvider/core_verify_process_provider.dart';
 
@@ -61,27 +63,30 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
     final _isForeground = (lifeCycle == AppLifecycleState.resumed);
     final _isBackground = (lifeCycle == AppLifecycleState.paused);
     final _isDetached = (lifeCycle == AppLifecycleState.detached);
-
+    pr(lifeCycle);
     var baseContext = KeyService.baseAppKey.currentContext;
     if (baseContext == null) return;
     final cp = baseContext.read<CoreVerifyProcessProvider>();
     final ap = baseContext.read<AuthProvider>();
+    final hp = baseContext.read<HomeStartButtonPorvider>();
     final isValidate = await isCardValidate(context);
-    pr(lifeCycle);
+    var isLastVerfyTypeWasBle =
+        CacheService.getLastVerfyType() == VerifyType.BLE;
     if (!_isForeground) {
-      cp.setIsShowCamera(val: false);
+      hp.setCurrenPage(isLastVerfyTypeWasBle ? 0 : 1);
     }
     if (!_isBackground) {
       cp.setIsBackgroundMode(false);
     }
-
     if (_isForeground && isValidate && cp.onceSwich) {
       hideKeyboard(context);
+
       cp.setOnceSwich(false); // ios nfc 태킹창 대비
+
       PermissionService.requestLocationAndBle()
           .then((_) => PermissionService.checkLocationAndBle());
       PassKitService.initKit(
-          type: cp.lastVerfyType == VerifyType.BLE &&
+          type: isLastVerfyTypeWasBle &&
                   (ap.userEnvironmentModel?.isUseBle ?? false)
               ? VerifyType.BLE
               : null);
@@ -122,7 +127,8 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
         ChangeNotifierProvider<DeviceStatusProvider>(
           create: (_) => DeviceStatusProvider(),
         ),
-        ChangeNotifierProvider(create: (_) => FaceDetectionProvider())
+        ChangeNotifierProvider(create: (_) => FaceDetectionProvider()),
+        ChangeNotifierProvider(create: (_) => HomeStartButtonPorvider())
       ],
       child: ScreenUtilInit(
           designSize: const Size(360, 690),

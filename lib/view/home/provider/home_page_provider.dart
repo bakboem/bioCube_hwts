@@ -39,7 +39,6 @@ class HomePageProvider extends ChangeNotifier {
   int partial = 100;
   bool hasMore = false;
   bool isLoadData = false;
-  int currenPage = 0;
   UserDeviceInfo? userDeviceInfo;
 
   void initUserEnvironment() {
@@ -54,11 +53,6 @@ class HomePageProvider extends ChangeNotifier {
       print('@@@@@${CacheService.getUserEnvironment()?.toJson()}');
       ap.setUserEnvironment(userEvn);
     });
-  }
-
-  void setCurrenPage(int index) {
-    currenPage = index;
-    notifyListeners();
   }
 
   Future<ResultModel> getUserCard() async {

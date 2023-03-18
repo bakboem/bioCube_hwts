@@ -1,3 +1,16 @@
+/*
+ * Project Name:  [TruePass]
+ * File: /Users/bakbeom/work/HWST/lib/model/db/user_info_table.g.dart
+ * Created Date: 2023-03-17 14:40:55
+ * Last Modified: 2023-03-17 18:23:03
+ * Author: bakbeom
+ * Modified By: bakbeom
+ * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
+ * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
+ * 												Discription													
+ * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
+ */
+
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'user_info_table.dart';

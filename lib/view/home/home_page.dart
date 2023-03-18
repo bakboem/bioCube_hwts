@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-14 16:51:09
+ * Last Modified: 2023-03-18 11:37:56
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -12,6 +12,8 @@
  */
 
 import 'dart:io';
+import 'package:hwst/globalProvider/home_start_button_provider.dart';
+import 'package:hwst/service/permission_service.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +63,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
     _pageController = PageController(initialPage: 0);
     pr('init home');
     ConnectService.startListener();
@@ -76,14 +79,28 @@ class _HomePageState extends State<HomePage> {
         // 'FaceCubePlusDetect.mnn',
       ],
     );
+
     runBleStart();
   }
 
-  runBleStart() {
-    var dp = context.read<DeviceStatusProvider>();
-    if (dp.isBleOk && dp.isLocationOk) {
-      PassKitService.initKit();
-    }
+  void indexingPageController() {
+    var lastVerfyType = CacheService.getLastVerfyType();
+    _pageController.jumpToPage(lastVerfyType == VerifyType.BLE ? 0 : 1);
+  }
+
+  void runBleStart() {
+    PermissionService.requestLocationAndBle()
+        .then((_) => PermissionService.checkLocationAndBle());
+    PassKitService.isNfcOk().then((_) => PassKitService.initKit(
+        type: CacheService.getLastVerfyType() == VerifyType.BLE &&
+                CacheService.getUserEnvironment()!.isUseBle!
+            ? VerifyType.BLE
+            : null));
+
+    var lastVerfyType = CacheService.getLastVerfyType();
+    Future.delayed(Duration(seconds: 2), () {
+      _pageController.jumpToPage(lastVerfyType.getIndex);
+    });
   }
 
   @override
@@ -206,15 +223,64 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void doFacePreccess(UserEnvironmentModel userEvn) async {
+    if (userEvn.isUseFace!) {
+      final p = context.read<CoreVerifyProcessProvider>();
+      var status = await Permission.camera.status;
+      if (!status.isGranted) {
+        pr('notgranted');
+        try {
+          await Permission.camera.request().then((status) => status.isGranted
+              ? p.setIsShowCamera(val: true)
+              : AppSettings.openDeviceSettings());
+        } catch (e) {
+          pr('nothing');
+          return;
+        }
+      } else {
+        final fp = context.read<FaceDetectionProvider>();
+        fp.setIsFaceFinded(false);
+        // fp.setIsShowFaceLine(false);
+        // Navigator.pushNamed(context, CameraViewPage.routeName);
+        p.setIsShowCamera(val: true);
+      }
+    } else {
+      await Navigator.pushNamed(context, SettingPage.routeName);
+    }
+  }
+
+  void routeToSettinsPage(UserEnvironmentModel userEvn) async {
+    if (!userEvn.isUseBle! || !userEvn.isUseNfc!) {
+      Navigator.pushNamed(context, SettingPage.routeName);
+    } else {
+      final result = await AppDialog.showPopup(
+          context,
+          buildTowButtonDialogContents(
+              context,
+              AppSize.singlePopupHeight,
+              Center(
+                child: AppText.text(tr('ble_is_not_avalible_is_set_now')),
+              ),
+              callback: () => 'success'));
+      if (result == 'success') {
+        AppSettings.openBluetoothSettings();
+      }
+    }
+  }
+
   Widget _buildButtonWidget(BuildContext context, bool isBleOk, bool isNfcOk,
       UserEnvironmentModel? userEvn) {
     final cp = context.read<CoreVerifyProcessProvider>();
+    Future.delayed(Duration.zero, () {
+      _pageController.jumpToPage(
+          CacheService.getLastVerfyType() == VerifyType.BLE ? 0 : 1);
+    });
     return FloatingActionButton.large(
         key: Key('home'),
         elevation: 8,
         backgroundColor: AppColors.whiteText,
         onPressed: () async {
-          final p = context.read<HomePageProvider>();
+          final p = context.read<HomeStartButtonPorvider>();
           final dp = context.read<DeviceStatusProvider>();
           final isSelectedBlue = p.currenPage == 0;
           final isSelectedNfc = dp.isSuppertNfc && p.currenPage == 1;
@@ -227,48 +293,9 @@ class _HomePageState extends State<HomePage> {
               } else if (isSelectedNfc && isNfcOk && userEvn!.isUseNfc!) {
                 PassKitService.initKit(type: VerifyType.NFC);
               } else if (isSelectedFace) {
-                if (userEvn!.isUseFace!) {
-                  final p = context.read<CoreVerifyProcessProvider>();
-                  var status = await Permission.camera.status;
-                  if (!status.isGranted) {
-                    pr('notgranted');
-                    try {
-                      await Permission.camera.request().then((status) =>
-                          status.isGranted
-                              ? p.setIsShowCamera(val: true)
-                              : AppSettings.openDeviceSettings());
-                    } catch (e) {
-                      pr('nothing');
-                      return;
-                    }
-                  } else {
-                    final fp = context.read<FaceDetectionProvider>();
-                    fp.setIsFaceFinded(false);
-                    // fp.setIsShowFaceLine(false);
-                    // Navigator.pushNamed(context, CameraViewPage.routeName);
-                    p.setIsShowCamera(val: true);
-                  }
-                } else {
-                  await Navigator.pushNamed(context, SettingPage.routeName);
-                }
+                doFacePreccess(userEvn!);
               } else {
-                if (!userEvn!.isUseBle! || !userEvn.isUseNfc!) {
-                  Navigator.pushNamed(context, SettingPage.routeName);
-                } else {
-                  final result = await AppDialog.showPopup(
-                      context,
-                      buildTowButtonDialogContents(
-                          context,
-                          AppSize.singlePopupHeight,
-                          Center(
-                            child: AppText.text(
-                                tr('ble_is_not_avalible_is_set_now')),
-                          ),
-                          callback: () => 'success'));
-                  if (result == 'success') {
-                    AppSettings.openBluetoothSettings();
-                  }
-                }
+                routeToSettinsPage(userEvn!);
               }
             } else {
               return;
@@ -291,7 +318,7 @@ class _HomePageState extends State<HomePage> {
                   }
                 }),
               onPageChanged: (index) {
-                final p = context.read<HomePageProvider>();
+                final p = context.read<HomeStartButtonPorvider>();
                 p.setCurrenPage(index);
               },
               children: isSupportNfc
@@ -386,6 +413,18 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildStartMatchButtonJumpToWidget(BuildContext context) {
+    return Selector<HomeStartButtonPorvider, int>(
+      selector: (context, provider) => provider.currenPage,
+      builder: (context, currenPage, _) {
+        Future.delayed(Duration.zero, () {
+          _pageController.jumpToPage(currenPage);
+        });
+        return SizedBox();
+      },
+    );
+  }
+
   Widget _buildContents(BuildContext context) {
     final userCard = CacheService.getUserCard()!;
     var isCard1 = userCard.mCardCode == '1';
@@ -409,6 +448,7 @@ class _HomePageState extends State<HomePage> {
             _buildLogoImage(context),
             _buidCardWidget(context),
             _buildStartMatchButton(context),
+            _buildStartMatchButtonJumpToWidget(context),
             _buildTip(),
           ],
         ));

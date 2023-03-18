@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/truepass/lib/service/native_channel_service.dart
  * Created Date: 2023-01-25 11:52:53
- * Last Modified: 2023-03-17 17:17:13
+ * Last Modified: 2023-03-18 10:03:51
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -14,6 +14,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hwst/globalProvider/home_start_button_provider.dart';
 import 'package:hwst/service/pass_kit_service.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/enums/verify_type.dart';
@@ -29,7 +30,9 @@ import 'package:hwst/globalProvider/core_verify_process_provider.dart';
 class NativeChannelService {
   factory NativeChannelService() => _sharedInstance();
   static NativeChannelService? _instance;
+
   NativeChannelService._();
+
   static NativeChannelService _sharedInstance() {
     _instance ??= NativeChannelService._();
     return _instance!;
@@ -59,15 +62,26 @@ class NativeChannelService {
       final cp = context.read<CoreVerifyProcessProvider>();
       final dp = context.read<DeviceStatusProvider>();
       final tp = context.read<TimerProvider>();
+      final hp = context.read<HomeStartButtonPorvider>();
       final isBlueSuccess = message.startsWith('bleSuccess:');
       final isNfcSuccess = message.startsWith('nfcSuccess:');
       if (isBlueSuccess || isNfcSuccess) {
-        // if (!tp.isPassKitTimerRunning && isNfcSuccess) {
-        //   tp.passKitProcess(PassKitService.updateToken,
-        //       duration: Duration(seconds: 3));
-        // }
-        pr(message);
-        cp.setLastVerfyType(isBlueSuccess ? VerifyType.BLE : VerifyType.NFC);
+        Platform.isAndroid && isBlueSuccess
+            ? Future.delayed(Duration(seconds: 1), () {
+                PassKitService.initKit();
+              })
+            : Platform.isAndroid && isNfcSuccess
+                ? cp.resetLastVerfyTime()
+                : DoNothingAction();
+
+        if (Platform.isAndroid &&
+            isNfcSuccess &&
+            cp.isLastVerfyTimeLessThan3Sec()) return;
+        pr('????');
+        CacheService.saveLastVerfyType(
+            isBlueSuccess ? VerifyType.BLE : VerifyType.NFC);
+        cp.setVerifyType(isBlueSuccess ? VerifyType.BLE : VerifyType.NFC);
+        hp.setCurrenPage(isBlueSuccess ? 0 : 1);
         final tid = message.substring(message.indexOf(':') + 1).trim();
         final isAuthorized = CacheService.getTidList() == null ||
             CacheService.getTidList()!
@@ -76,16 +90,7 @@ class NativeChannelService {
         if (isAuthorized) {
           cp.setTid(tid);
           pr(tid);
-          var setType = () {
-            if (isBlueSuccess) {
-              cp.setVerifyType(VerifyType.BLE);
-            } else if (isNfcSuccess) {
-              cp.setVerifyType(VerifyType.NFC);
-            }
-          };
           final thread = ThreadService.one();
-          Platform.isAndroid ? setType.call() : DoNothingAction();
-
           if (cp.isBackgroundMode && Platform.isAndroid && !tp.isRunning) {
             thread.reuqest(Future.delayed(
                 Duration.zero, () => cp.sendDataToSeverFromBackground()));
@@ -95,7 +100,7 @@ class NativeChannelService {
                 if (result.isSuccessful) {
                   cp.startTimer(
                       duration: message.startsWith('nfcSuccess:')
-                          ? Duration(seconds: Platform.isAndroid ? 2 : 5)
+                          ? Duration(seconds: 2)
                           : null);
                 }
               }));

@@ -82,8 +82,7 @@ class PassKitService :  UtilsCallBack{
     public  fun saveToken (t:String){
         val resMap =  tokenProcess!!.putToken(
            t,
-           setSessionTimeVlue*1000 // 최대치.,
-
+           0 // 최대치.,
         )
         val isSaved = resMap["data"] as Boolean
        if (isSaved){

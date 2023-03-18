@@ -2,7 +2,7 @@
  * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/service/cache_service.dart
  * Created Date: 2021-08-22 19:45:10
- * Last Modified: 2023-03-14 16:34:24
+ * Last Modified: 2023-03-18 10:03:04
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -13,6 +13,7 @@
 
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
+import 'package:hwst/enums/verify_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hwst/enums/language_type.dart';
 import 'package:hwst/model/access/access_info.dart';
@@ -108,6 +109,19 @@ class CacheService {
 
   static String? getSvUrl() {
     return getData('svUrl');
+  }
+
+  static void saveLastVerfyType(VerifyType type) {
+    saveData('lastVerfyType', type == VerifyType.BLE ? 0 : 1);
+  }
+
+  static VerifyType getLastVerfyType() {
+    var result = getData('lastVerfyType');
+    if (result == null) {
+      return VerifyType.BLE;
+    } else {
+      return result == 0 ? VerifyType.BLE : VerifyType.NFC;
+    }
   }
 
   static void saveOpencvModelFilePath(String path) {
