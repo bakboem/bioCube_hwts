@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/bioCube/face_kit/truepass/lib/globalProvider/face_detection_provider.dart
  * Created Date: 2023-02-19 15:22:53
- * Last Modified: 2023-03-15 22:48:57
+ * Last Modified: 2023-03-18 14:18:00
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -14,7 +14,6 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hwst/util/date_util.dart';
 import 'package:hwst/enums/request_type.dart';
 import 'package:hwst/service/api_service.dart';

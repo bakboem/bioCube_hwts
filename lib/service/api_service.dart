@@ -2,7 +2,7 @@
  * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/service/api_service.dart
  * Created Date: 2021-08-22 21:53:15
- * Last Modified: 2023-03-14 15:53:05
+ * Last Modified: 2023-03-18 14:18:10
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -201,6 +201,7 @@ class ApiService {
               response.statusCode!, response.data, response.statusMessage!);
         } on DioError catch (e, s) {
           cancel(tag);
+          pr(s);
           return RequestResult(-1, null, 'serverError',
               errorMessage: 'serverError');
         }

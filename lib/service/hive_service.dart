@@ -2,7 +2,7 @@
  * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/service/hive_service.dart
  * Created Date: 2021-08-17 13:17:07
- * Last Modified: 2023-03-17 17:02:23
+ * Last Modified: 2023-03-18 13:22:53
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -102,6 +102,11 @@ class HiveService {
     }
   }
 
+  static Future<void> deleteAll() async {
+    var box = await getBox();
+    box.deleteAll(box.keys);
+  }
+
   static Future<List<UserInfoTable>?> getData(
       SearchUserinfoConditional conditional) async {
     if (!Hive.isBoxOpen(cureenBoxType!.boxName)) return null;
@@ -125,10 +130,5 @@ class HiveService {
     if (await Hive.boxExists(cureenBoxType!.boxName)) {
       await Hive.deleteBoxFromDisk(cureenBoxType!.boxName);
     }
-  }
-
-  static Future<void> clearBox() async {
-    if (Hive.isBoxOpen(cureenBoxType!.boxName))
-      await Hive.box(cureenBoxType!.boxName).clear();
   }
 }

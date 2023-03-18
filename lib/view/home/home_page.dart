@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-18 11:37:56
+ * Last Modified: 2023-03-18 14:25:05
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -12,8 +12,6 @@
  */
 
 import 'dart:io';
-import 'package:hwst/globalProvider/home_start_button_provider.dart';
-import 'package:hwst/service/permission_service.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +19,7 @@ import 'package:provider/provider.dart';
 import 'package:hwst/enums/image_type.dart';
 import 'package:hwst/enums/verify_type.dart';
 import 'package:app_settings/app_settings.dart';
+import 'package:hwst/service/hive_service.dart';
 import 'package:hwst/styles/export_common.dart';
 import 'package:hwst/service/sound_service.dart';
 import 'package:hwst/view/home/card_widget.dart';
@@ -31,22 +30,24 @@ import 'package:hwst/service/pass_kit_service.dart';
 import 'package:hwst/model/common/result_model.dart';
 import 'package:hwst/service/vibration_service.dart';
 import 'package:hwst/view/setting/setting_page.dart';
+import 'package:hwst/service/permission_service.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/view/common/base_app_toast.dart';
 import 'package:hwst/view/common/base_app_dialog.dart';
 import 'package:hwst/service/local_file_servicer.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:hwst/globalProvider/auth_provider.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/buildConfig/biocube_build_config.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:hwst/model/user/user_environment_model.dart';
 import 'package:hwst/view/common/widget_of_divider_line.dart';
 import 'package:hwst/view/common/widget_of_loading_view.dart';
-import 'package:hwst/view/common/widget_of_dialog_contents.dart';
 import 'package:hwst/view/common/widget_of_default_spacing.dart';
 import 'package:hwst/globalProvider/device_status_provider.dart';
 import 'package:hwst/view/home/provider/home_page_provider.dart';
+import 'package:hwst/view/common/widget_of_dialog_contents.dart';
 import 'package:hwst/globalProvider/face_detection_provider.dart';
+import 'package:hwst/view/common/widget_of_download_progress.dart';
+import 'package:hwst/globalProvider/home_start_button_provider.dart';
 import 'package:hwst/globalProvider/core_verify_process_provider.dart';
 import 'package:hwst/view/common/function_of_check_card_is_valid.dart';
 import 'package:hwst/view/common/function_of_show_location_faild_popup.dart';
@@ -150,8 +151,7 @@ class _HomePageState extends State<HomePage> {
       selector: (context, provider) =>
           Tuple2(provider.isBleSuccess, provider.isNfcSuccess),
       builder: (context, tuple, _) {
-        final ap = context.read<AuthProvider>();
-        var userEvn = ap.userEnvironmentModel!;
+        var userEvn = CacheService.getUserEnvironment()!;
         var bleSuccess = tuple.item1 != null && tuple.item1!;
         var nfcSuccess = tuple.item2 != null && tuple.item2!;
         if (bleSuccess || nfcSuccess) {
@@ -223,26 +223,82 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _doUpdateProccess() async {
+    final showIsStartDownloadPopupResult = await AppDialog.showPopup(
+        context,
+        buildTowButtonDialogContents(
+            context,
+            AppSize.appBarHeight * 3,
+            Padding(
+                padding: AppSize.defaultSidePadding,
+                child: AppText.text(tr('is_start_down_load_user_all_proccess'),
+                    textAlign: TextAlign.start, maxLines: 4)),
+            callback: () => 'success'));
+    if (showIsStartDownloadPopupResult == 'success') {
+      final fp = context.read<FaceDetectionProvider>();
+      fp.requestAllUserInfoData();
+      var downLoadPopupResult = await AppDialog.showPopup(
+          context,
+          buildDialogContents(context, updateContents(context), true,
+              AppSize.downloadPopupHeight, signgleButtonText: tr('cancel'),
+              canPopCallBackk: () async {
+            final fp = context.read<FaceDetectionProvider>();
+            if (fp.totalCount != fp.responseModel?.data?.length) {
+              var popupResult = await AppDialog.showPopup(
+                  context,
+                  buildTowButtonDialogContents(
+                      context,
+                      AppSize.appBarHeight * 3,
+                      AppText.text(tr('realy_exit_download_process'),
+                          textAlign: TextAlign.start, maxLines: 4),
+                      callback: () => 'success'));
+              if (popupResult == 'success') {
+                var isModelNotNull = fp.responseModel != null &&
+                    fp.responseModel!.data!.isNotEmpty;
+                if (isModelNotNull &&
+                    fp.totalCount! - 1 == fp.responseModel!.data!.length + 1) {
+                  final cp = context.read<CoreVerifyProcessProvider>();
+                  fp.setIsFaceFinded(false);
+                  cp.setIsShowCamera(val: true);
+                } else {}
+                fp.resetData();
+                return true;
+              }
+              return false;
+            } else {
+              return true;
+            }
+          }));
+      if (downLoadPopupResult != null && downLoadPopupResult) {
+        pr('??');
+        fp.resetData();
+      }
+    }
+  }
+
   void doFacePreccess(UserEnvironmentModel userEvn) async {
     if (userEvn.isUseFace!) {
-      final p = context.read<CoreVerifyProcessProvider>();
+      final cp = context.read<CoreVerifyProcessProvider>();
       var status = await Permission.camera.status;
       if (!status.isGranted) {
         pr('notgranted');
         try {
           await Permission.camera.request().then((status) => status.isGranted
-              ? p.setIsShowCamera(val: true)
+              ? cp.setIsShowCamera(val: true)
               : AppSettings.openDeviceSettings());
         } catch (e) {
           pr('nothing');
           return;
         }
       } else {
-        final fp = context.read<FaceDetectionProvider>();
-        fp.setIsFaceFinded(false);
-        // fp.setIsShowFaceLine(false);
-        // Navigator.pushNamed(context, CameraViewPage.routeName);
-        p.setIsShowCamera(val: true);
+        if (await HiveService.isNeedUpdate() &&
+            (CacheService.getUserEnvironment()?.isUseFaceMore ?? false)) {
+          _doUpdateProccess();
+        } else {
+          final fp = context.read<FaceDetectionProvider>();
+          fp.setIsFaceFinded(false);
+          cp.setIsShowCamera(val: true);
+        }
       }
     } else {
       await Navigator.pushNamed(context, SettingPage.routeName);
@@ -269,7 +325,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildButtonWidget(BuildContext context, bool isBleOk, bool isNfcOk,
-      UserEnvironmentModel? userEvn) {
+      bool isFaceOk, UserEnvironmentModel? userEvn) {
     final cp = context.read<CoreVerifyProcessProvider>();
     Future.delayed(Duration.zero, () {
       _pageController.jumpToPage(
@@ -292,7 +348,7 @@ class _HomePageState extends State<HomePage> {
                 PassKitService.initKit(type: VerifyType.BLE);
               } else if (isSelectedNfc && isNfcOk && userEvn!.isUseNfc!) {
                 PassKitService.initKit(type: VerifyType.NFC);
-              } else if (isSelectedFace) {
+              } else if (isSelectedFace && isFaceOk) {
                 doFacePreccess(userEvn!);
               } else {
                 routeToSettinsPage(userEvn!);
@@ -328,13 +384,13 @@ class _HomePageState extends State<HomePage> {
                       _buildPageViewText(
                           context, 'nfc', isStatusOk: isNfcOk, userEvn),
                       _buildPageViewText(
-                          context, 'face', isStatusOk: true, userEvn)
+                          context, 'face', isStatusOk: isFaceOk, userEvn)
                     ]
                   : [
                       _buildPageViewText(
                           context, 'ble', isStatusOk: isBleOk, userEvn),
                       _buildPageViewText(
-                          context, 'face', isStatusOk: true, userEvn)
+                          context, 'face', isStatusOk: isFaceOk, userEvn)
                     ],
             );
           },
@@ -353,20 +409,19 @@ class _HomePageState extends State<HomePage> {
               SizedBox(
                   width: largFloatButtonWidth,
                   height: largFloatButtonWidth,
-                  child: Selector<AuthProvider, UserEnvironmentModel?>(
-                    selector: (context, provider) =>
-                        provider.userEnvironmentModel,
-                    builder: (context, userEvn, _) {
-                      return Selector<DeviceStatusProvider, Tuple2<bool, bool>>(
-                        selector: (context, provider) =>
-                            Tuple2(provider.isBleOk, provider.isNfcOk),
-                        builder: (context, tuple, _) {
-                          return _buildButtonWidget(
-                              context, tuple.item1, tuple.item2, userEvn);
-                        },
-                      );
+                  child:
+                      Selector<DeviceStatusProvider, Tuple3<bool, bool, bool>>(
+                    selector: (context, provider) => Tuple3(
+                        provider.isBleOk, provider.isNfcOk, provider.isFaceOk),
+                    builder: (context, tuple, _) {
+                      return _buildButtonWidget(
+                          context,
+                          tuple.item1,
+                          tuple.item2,
+                          tuple.item3,
+                          CacheService.getUserEnvironment());
                     },
-                  )),
+                  ))
             ],
           ),
         ));

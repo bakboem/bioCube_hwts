@@ -2,7 +2,7 @@
  * Project Name:  [koreaJob]
  * File: /Users/bakbeom/work/sm/koreajob/lib/service/pass_kit_service.dart
  * Created Date: 2023-01-22 10:14:14
- * Last Modified: 2023-03-18 09:36:38
+ * Last Modified: 2023-03-18 14:18:16
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  MOMONETWORK ALL RIGHTS RESERVED. 
@@ -13,7 +13,6 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:hwst/globalProvider/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/enums/verify_type.dart';
 import 'package:hwst/service/key_service.dart';
@@ -34,7 +33,6 @@ class PassKitService {
 
   static Future<void> initKit({VerifyType? type}) async {
     await NativeChannelService.methodChannel.invokeMethod('initState');
-    final ap = KeyService.baseAppKey.currentContext!.read<AuthProvider>();
     if (Platform.isAndroid) {
       setRssi();
       setSessionTime();
@@ -53,10 +51,10 @@ class PassKitService {
         ? Future.delayed(
             Duration.zero,
             () => (type == VerifyType.BLE &&
-                    (ap.userEnvironmentModel?.isUseBle ?? false))
+                    (CacheService.getUserEnvironment()?.isUseBle ?? false))
                 ? startBle()
                 : (type == VerifyType.BLE &&
-                        (ap.userEnvironmentModel?.isUseBle ?? false))
+                        (CacheService.getUserEnvironment()?.isUseBle ?? false))
                     ? startNfc()
                     : DoNothingAction())
         : DoNothingAction();

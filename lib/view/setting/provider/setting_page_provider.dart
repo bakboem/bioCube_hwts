@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/provider/setting_page_provider.dart
  * Created Date: 2023-01-27 12:15:53
- * Last Modified: 2023-03-15 21:32:55
+ * Last Modified: 2023-03-18 14:24:13
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -12,22 +12,14 @@
  */
 
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:hwst/enums/hive_box_type.dart';
-import 'package:hwst/enums/request_type.dart';
-import 'package:hwst/model/user/get_user_all_response_model.dart';
-import 'package:hwst/service/api_service.dart';
-import 'package:hwst/service/hive_service.dart';
-import 'package:hwst/util/date_util.dart';
 import 'package:provider/provider.dart';
-import 'package:hwst/service/key_service.dart';
 import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/model/common/result_model.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:hwst/globalProvider/auth_provider.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/model/user/user_environment_model.dart';
+import 'package:hwst/globalProvider/device_status_provider.dart';
 
 class SettinPageProivder extends ChangeNotifier {
   bool bleSwichVal = false;
@@ -47,8 +39,7 @@ class SettinPageProivder extends ChangeNotifier {
   var guideMethodRadioList = [];
   var cameraRadioList = [];
 
-  void setUserEnvrionment() {
-    final ap = KeyService.baseAppKey.currentContext!.read<AuthProvider>();
+  void setUserEnvrionment(BuildContext context) {
     var temp = UserEnvironmentModel(
         bleSwichVal,
         guideMethodRadioList.indexOf(currenGuideMethod!),
@@ -62,7 +53,8 @@ class SettinPageProivder extends ChangeNotifier {
         sessionSettingTime);
     pr(temp.toJson());
     CacheService.saveUserEnvironment(temp.toJson());
-    ap.setUserEnvironment(temp);
+    final dp = context.read<DeviceStatusProvider>();
+    dp.setFaceStatus(temp.isUseFace!);
   }
 
   void setCurrenVeirfyRadioStr(List<String> list, int index) {

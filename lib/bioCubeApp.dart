@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/shwt/lib/bioCubeApp.dart
  * Created Date: 2023-01-22 19:01:08
- * Last Modified: 2023-03-18 10:04:16
+ * Last Modified: 2023-03-18 14:17:55
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -67,7 +67,6 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
     var baseContext = KeyService.baseAppKey.currentContext;
     if (baseContext == null) return;
     final cp = baseContext.read<CoreVerifyProcessProvider>();
-    final ap = baseContext.read<AuthProvider>();
     final hp = baseContext.read<HomeStartButtonPorvider>();
     final isValidate = await isCardValidate(context);
     var isLastVerfyTypeWasBle =
@@ -87,7 +86,7 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
           .then((_) => PermissionService.checkLocationAndBle());
       PassKitService.initKit(
           type: isLastVerfyTypeWasBle &&
-                  (ap.userEnvironmentModel?.isUseBle ?? false)
+                  (CacheService.getUserEnvironment()?.isUseBle ?? false)
               ? VerifyType.BLE
               : null);
     } else if (_isDetached) {

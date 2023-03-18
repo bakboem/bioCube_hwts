@@ -20,17 +20,12 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:hwst/globalProvider/device_status_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:hwst/enums/request_type.dart';
-import 'package:hwst/globalProvider/auth_provider.dart';
-import 'package:hwst/model/user/user_environment_model.dart';
 import 'package:hwst/service/api_service.dart';
 import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/model/common/result_model.dart';
 import 'package:hwst/model/user/user_device_info.dart';
 import 'package:hwst/service/deviceInfo_service.dart';
-import 'package:hwst/service/key_service.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/model/access/access_response_model.dart';
 
@@ -41,22 +36,7 @@ class HomePageProvider extends ChangeNotifier {
   bool isLoadData = false;
   UserDeviceInfo? userDeviceInfo;
 
-  void initUserEnvironment() {
-    Future.delayed(Duration.zero, () async {
-      final dp =
-          KeyService.baseAppKey.currentContext!.read<DeviceStatusProvider>();
-      dp.setIsOverThanIphone10();
-      final ap = KeyService.baseAppKey.currentContext!.read<AuthProvider>();
-      final userEvn = CacheService.getUserEnvironment() != null
-          ? CacheService.getUserEnvironment()!
-          : UserEnvironmentModel(true, 1, false, true, false, 1, '-80', 20);
-      print('@@@@@${CacheService.getUserEnvironment()?.toJson()}');
-      ap.setUserEnvironment(userEvn);
-    });
-  }
-
   Future<ResultModel> getUserCard() async {
-    initUserEnvironment();
     userDeviceInfo = await DeviceInfoService.getDeviceInfo();
     try {
       isLoadData = true;

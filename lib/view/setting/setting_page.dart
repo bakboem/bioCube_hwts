@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-03-16 11:20:51
+ * Last Modified: 2023-03-18 14:10:51
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -113,7 +113,7 @@ class _SettingPageState extends State<SettingPage> {
                     p.setFaceSwich();
                     break;
                 }
-                p.setUserEnvrionment();
+                p.setUserEnvrionment(context);
               },
               activeTrackColor: AppColors.primary,
               activeColor: AppColors.whiteText,
@@ -249,7 +249,7 @@ class _SettingPageState extends State<SettingPage> {
                       p.setCameraRadioStr(cameraRadioList, index);
                       await _doUpdateProccess(context);
                     }();
-          p.setUserEnvrionment();
+          p.setUserEnvrionment(context);
         },
       ),
     );
@@ -361,7 +361,7 @@ class _SettingPageState extends State<SettingPage> {
                         }
                         await _doUpdateProccess(context);
                       }();
-          }).whenComplete(() => p.setUserEnvrionment());
+          }).whenComplete(() => p.setUserEnvrionment(context));
         },
         child: Container(
           width: AppSize.defaultContentsWidth / 2,
@@ -385,7 +385,7 @@ class _SettingPageState extends State<SettingPage> {
         behavior: HitTestBehavior.opaque,
         onTap: () {
           p.setCurrenGuideMethodStr(guideMethodRadioList, index);
-          p.setUserEnvrionment();
+          p.setUserEnvrionment(context);
         },
         child: Container(
           padding: AppSize.defaultSidePadding,
@@ -405,7 +405,7 @@ class _SettingPageState extends State<SettingPage> {
                   groupValue: currenStr,
                   onChanged: (_) {
                     p.setCurrenGuideMethodStr(guideMethodRadioList, index);
-                    p.setUserEnvrionment();
+                    p.setUserEnvrionment(context);
                   },
                 ),
               ),
@@ -539,7 +539,7 @@ class _SettingPageState extends State<SettingPage> {
                 divisions: 100,
                 onChangeEnd: (t) {
                   final p = context.read<SettinPageProivder>();
-                  p.setUserEnvrionment();
+                  p.setUserEnvrionment(context);
                   PassKitService.setRssi();
                 },
                 onChanged: (t) {
@@ -571,7 +571,7 @@ class _SettingPageState extends State<SettingPage> {
             value: session != null ? session.toDouble() : 20,
             onChangeEnd: (s) {
               final p = context.read<SettinPageProivder>();
-              p.setUserEnvrionment();
+              p.setUserEnvrionment(context);
               PassKitService.setSessionTime();
             },
             onChanged: (s) {
