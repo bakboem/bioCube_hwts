@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-03-18 17:27:06
+ * Last Modified: 2023-03-18 18:23:36
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -12,8 +12,6 @@
  */
 
 import 'dart:io';
-import 'package:hwst/enums/hive_box_type.dart';
-import 'package:hwst/globalProvider/device_status_provider.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -37,6 +35,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/globalProvider/app_theme_provider.dart';
 import 'package:hwst/view/common/widget_of_divider_line.dart';
 import 'package:hwst/view/common/function_of_pop_to_first.dart';
+import 'package:hwst/globalProvider/device_status_provider.dart';
 import 'package:hwst/view/common/widget_of_default_spacing.dart';
 import 'package:hwst/view/common/widget_of_appbar_contents.dart';
 import 'package:hwst/view/common/widget_of_dialog_contents.dart';
@@ -252,6 +251,8 @@ class _SettingPageState extends State<SettingPage> {
                       await _doUpdateProccess(context);
                     }();
           p.setUserEnvrionment(context);
+          final dp = context.read<DeviceStatusProvider>();
+          dp.doUpdateStatus();
         },
       ),
     );
@@ -302,8 +303,7 @@ class _SettingPageState extends State<SettingPage> {
 
                   p.setCameraRadioStr(cameraRadioList, 0);
                   p.setFaceMoreSwich(false);
-                  final dp = context.read<DeviceStatusProvider>();
-                  dp.doUpdateStatus();
+
                   return true;
                 }
                 return false;
@@ -317,8 +317,6 @@ class _SettingPageState extends State<SettingPage> {
       } else {
         p.setCameraRadioStr(cameraRadioList, 0);
         p.setFaceMoreSwich(false);
-        final dp = context.read<DeviceStatusProvider>();
-        dp.doUpdateStatus();
       }
     }
   }
@@ -375,9 +373,9 @@ class _SettingPageState extends State<SettingPage> {
                         await _doUpdateProccess(context);
                       }();
           }).whenComplete(() {
+            p.setUserEnvrionment(context);
             final dp = context.read<DeviceStatusProvider>();
             dp.doUpdateStatus();
-            p.setUserEnvrionment(context);
           });
         },
         child: Container(
