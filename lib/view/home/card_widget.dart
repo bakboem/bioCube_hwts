@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/home/card_one_widget.dart
  * Created Date: 2023-02-04 20:19:38
- * Last Modified: 2023-03-18 14:17:11
+ * Last Modified: 2023-03-18 18:52:58
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -100,7 +100,7 @@ class _CardWidgetState extends State<CardWidget>
         child: Container(
       width: cardWidth,
       decoration: BoxDecoration(
-          color: cardType == 1 ? AppColors.card1BgColor : AppColors.whiteText,
+          color: cardType == '1' ? AppColors.card1BgColor : AppColors.whiteText,
           borderRadius:
               BorderRadius.vertical(bottom: Radius.circular(AppSize.radius15))),
       child: Column(

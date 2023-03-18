@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-03-18 18:23:36
+ * Last Modified: 2023-03-18 18:52:01
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -283,34 +283,39 @@ class _SettingPageState extends State<SettingPage> {
         pr('2>');
 
         var downLoadPopupResult = await AppDialog.showPopup(
-            context,
-            buildDialogContents(context, updateContents(context), true,
-                AppSize.downloadPopupHeight, signgleButtonText: tr('cancel'),
-                canPopCallBackk: () async {
-              final fp = context.read<FaceDetectionProvider>();
-              if (fp.totalCount != fp.responseModel?.data?.length) {
-                var popupResult = await AppDialog.showPopup(
-                    context,
-                    buildTowButtonDialogContents(
-                        context,
-                        AppSize.appBarHeight * 3,
-                        AppText.text(tr('realy_exit_download_process'),
-                            textAlign: TextAlign.start, maxLines: 4),
-                        callback: () => 'success'));
-                if (popupResult == 'success') {
-                  fp.resetData();
-                  HiveService.deleteAll();
-
-                  p.setCameraRadioStr(cameraRadioList, 0);
-                  p.setFaceMoreSwich(false);
-
+          context,
+          Selector<FaceDetectionProvider, bool>(
+            selector: (context, provider) => provider.hasMore,
+            builder: (context, hasMore, _) {
+              return buildDialogContents(context, updateContents(context), true,
+                  AppSize.downloadPopupHeight,
+                  signgleButtonText: hasMore ? tr('cancel') : tr('ok'),
+                  canPopCallBackk: () async {
+                final fp = context.read<FaceDetectionProvider>();
+                if (fp.totalCount != fp.responseModel?.data?.length) {
+                  var popupResult = await AppDialog.showPopup(
+                      context,
+                      buildTowButtonDialogContents(
+                          context,
+                          AppSize.appBarHeight * 3,
+                          AppText.text(tr('realy_exit_download_process'),
+                              textAlign: TextAlign.start, maxLines: 4),
+                          callback: () => 'success'));
+                  if (popupResult == 'success') {
+                    fp.resetData();
+                    HiveService.deleteAll();
+                    p.setCameraRadioStr(cameraRadioList, 0);
+                    p.setFaceMoreSwich(false);
+                    return true;
+                  }
+                  return false;
+                } else {
                   return true;
                 }
-                return false;
-              } else {
-                return true;
-              }
-            }));
+              });
+            },
+          ),
+        );
         if (downLoadPopupResult != null && downLoadPopupResult) {
           fp.resetData();
         }

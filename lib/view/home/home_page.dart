@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-18 17:51:03
+ * Last Modified: 2023-03-18 18:49:59
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -231,42 +231,47 @@ class _HomePageState extends State<HomePage> {
             callback: () => 'success'));
     if (showIsStartDownloadPopupResult == 'success') {
       final fp = context.read<FaceDetectionProvider>();
+      pr('1>');
       fp.requestAllUserInfoData();
-      var downLoadPopupResult = await AppDialog.showPopup(
-          context,
-          buildDialogContents(context, updateContents(context), true,
-              AppSize.downloadPopupHeight, signgleButtonText: tr('cancel'),
-              canPopCallBackk: () async {
-            final fp = context.read<FaceDetectionProvider>();
-            if (fp.totalCount != fp.responseModel?.data?.length) {
-              var popupResult = await AppDialog.showPopup(
-                  context,
-                  buildTowButtonDialogContents(
-                      context,
-                      AppSize.appBarHeight * 3,
-                      AppText.text(tr('realy_exit_download_process'),
-                          textAlign: TextAlign.start, maxLines: 4),
-                      callback: () => 'success'));
-              if (popupResult == 'success') {
-                var isModelNotNull = fp.responseModel != null &&
-                    fp.responseModel!.data!.isNotEmpty;
-                if (isModelNotNull &&
-                    fp.totalCount! - 1 == fp.responseModel!.data!.length + 1) {
-                  final cp = context.read<CoreVerifyProcessProvider>();
-                  fp.setIsFaceFinded(false);
-                  cp.setIsShowCamera(val: true);
-                } else {}
-                fp.resetData();
+      pr('2>');
 
-                return true;
-              }
-              return false;
-            } else {
-              return true;
-            }
-          }));
+      var downLoadPopupResult = await AppDialog.showPopup(
+        context,
+        Selector<FaceDetectionProvider, bool>(
+          selector: (context, provider) => provider.hasMore,
+          builder: (context, hasMore, _) {
+            return buildDialogContents(
+              context,
+              updateContents(context),
+              true,
+              AppSize.downloadPopupHeight,
+              signgleButtonText: hasMore ? tr('cancel') : tr('ok'),
+              canPopCallBackk: () async {
+                final fp = context.read<FaceDetectionProvider>();
+                if (fp.totalCount != fp.responseModel?.data?.length) {
+                  var popupResult = await AppDialog.showPopup(
+                      context,
+                      buildTowButtonDialogContents(
+                          context,
+                          AppSize.appBarHeight * 3,
+                          AppText.text(tr('realy_exit_download_process'),
+                              textAlign: TextAlign.start, maxLines: 4),
+                          callback: () => 'success'));
+                  if (popupResult == 'success') {
+                    fp.resetData();
+                    HiveService.deleteAll();
+                    return true;
+                  }
+                  return false;
+                } else {
+                  return true;
+                }
+              },
+            );
+          },
+        ),
+      );
       if (downLoadPopupResult != null && downLoadPopupResult) {
-        pr('??');
         fp.resetData();
       }
     }
