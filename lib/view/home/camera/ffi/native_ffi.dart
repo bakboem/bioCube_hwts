@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/face_kit/truepass/lib/view/home/ffi/native_ffi.dart
  * Created Date: 2023-02-17 11:18:19
- * Last Modified: 2023-03-17 01:48:03
+ * Last Modified: 2023-03-20 18:28:20
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -15,6 +15,7 @@ import 'dart:ffi' as ffi;
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
+import 'package:hwst/model/db/user_info_table.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 
 // Getting a library that holds needed symbols
@@ -30,6 +31,10 @@ typedef _CInitDetector = ffi.Void Function(
   ffi.Pointer<Utf8>,
   ffi.Pointer<Utf8>,
 );
+typedef _CInitMnnModel = ffi.Void Function(
+  ffi.Pointer<Utf8>,
+  ffi.Pointer<Utf8>,
+);
 typedef _CDestroyDetector = ffi.Void Function();
 
 typedef _CDetectFrame = ffi.Pointer<ffi.Float> Function(
@@ -41,6 +46,11 @@ typedef _CDetectFrame = ffi.Pointer<ffi.Float> Function(
   ffi.Pointer<ffi.Int32> outCount,
   ffi.Pointer<ffi.Float> feat,
 );
+typedef _CExtractFeature = ffi.Pointer<ffi.Float> Function(
+  ffi.Pointer<Utf8>,
+  ffi.Pointer<ffi.Float> feat,
+  ffi.Pointer<ffi.Int32> isSuccessful,
+);
 
 /// Dart function signatures
 typedef _VersionFunc = ffi.Pointer<Utf8> Function();
@@ -49,6 +59,10 @@ typedef _InitDetector = void Function(
   int inSize,
   int bits,
   ffi.Pointer<Utf8>,
+  ffi.Pointer<Utf8>,
+  ffi.Pointer<Utf8>,
+);
+typedef _InitMnnModel = void Function(
   ffi.Pointer<Utf8>,
   ffi.Pointer<Utf8>,
 );
@@ -62,6 +76,12 @@ typedef _DetectFrame = ffi.Pointer<ffi.Float> Function(
     bool isYUV,
     ffi.Pointer<ffi.Int32> outCount,
     ffi.Pointer<ffi.Float> feat);
+
+typedef _ExtractFeature = ffi.Pointer<ffi.Float> Function(
+  ffi.Pointer<Utf8>,
+  ffi.Pointer<ffi.Float> feat,
+  ffi.Pointer<ffi.Int32> isSuccessful,
+);
 // Functions mapping.
 final _VersionFunc _version =
     _lib.lookup<ffi.NativeFunction<_CVersionFunc>>('version').asFunction();
@@ -69,9 +89,14 @@ final _VersionFunc _version =
 final _InitDetector _initDetector = _lib
     .lookup<ffi.NativeFunction<_CInitDetector>>('initDetector')
     .asFunction();
-
+final _InitMnnModel _initMnnModel = _lib
+    .lookup<ffi.NativeFunction<_CInitMnnModel>>('initMnnModel')
+    .asFunction();
 final _DetectFrame _detectFrame =
     _lib.lookup<ffi.NativeFunction<_CDetectFrame>>('detectFrame').asFunction();
+final _ExtractFeature _extractFaeture = _lib
+    .lookup<ffi.NativeFunction<_CExtractFeature>>('extractFaeture')
+    .asFunction();
 final _DestroyDetector _destroyDetector = _lib
     .lookup<ffi.NativeFunction<_CDestroyDetector>>('destroyDetector')
     .asFunction();
@@ -150,6 +175,14 @@ void initDetector(Uint8List markerPngBytes, int bits, String opencvModlePath,
 }
 
 // Native parameter transfer
+void initMnnModel(String mnnModlePath, String opencvPath) {
+  _initMnnModel(
+    mnnModlePath.toNativeUtf8(),
+    opencvPath.toNativeUtf8(),
+  );
+}
+
+// Native parameter transfer
 void destroy() {
   _destroyDetector();
   if (_imageBuffer != null) {
@@ -189,6 +222,23 @@ Float32List detectFrame(int width, int height, int rotation, Uint8List yBuffer,
   malloc.free(res);
   malloc.free(feat);
   return result;
+}
+
+// Native parameter transfer
+UserInfoTable? extractFeature(UserInfoTable user) {
+  var featCount = ffi.sizeOf<ffi.Float>();
+  ffi.Pointer<ffi.Int32> isSuccessful = malloc.allocate<ffi.Int32>(1);
+  ffi.Pointer<ffi.Float> feat = malloc.allocate<ffi.Float>(featCount * 512);
+  final base64Image = user.imageData!;
+  var res = _extractFaeture(base64Image.toNativeUtf8(), feat, isSuccessful);
+  user.feature = res.asTypedList(featCount * 512).toList();
+  user.isExtracted = isSuccessful.value == 1;
+  print(user.feature);
+  pr('user.isExtracted ? ${user.isExtracted}');
+  malloc.free(feat);
+  malloc.free(res);
+  malloc.free(isSuccessful);
+  return user;
 }
 
 // get platform dlib

@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/bioCube/face_kit/truepass/lib/globalProvider/face_detection_provider.dart
  * Created Date: 2023-02-19 15:22:53
- * Last Modified: 2023-03-18 17:11:01
+ * Last Modified: 2023-03-20 19:13:18
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -14,6 +14,7 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:hwst/model/db/user_info_table.dart';
 import 'package:hwst/util/date_util.dart';
 import 'package:hwst/enums/request_type.dart';
 import 'package:hwst/service/api_service.dart';
@@ -23,21 +24,25 @@ import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/model/common/result_model.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/model/user/get_user_all_response_model.dart';
+import 'package:hwst/view/home/camera/threadController/second_thread_process.dart';
 
 class FaceDetectionProvider extends ChangeNotifier {
   bool isFaceFinded = false;
   bool isShowFaceLine = false;
   double? cameraScale;
   List<double>? faceInfo;
-
   int pos = 1;
   int? totalCount;
+  int? extractFeatrueCount;
+  int extractFeatrueComplateCount = 0;
   bool hasMore = true;
   bool isLoadData = false;
   Duration downloadTime = Duration();
   Duration saveTime = Duration();
   Duration totalTime = Duration();
   GetUserAllResponseModel? responseModel;
+  bool? isExtractFeatureDone;
+  bool? isDownloadDone;
   void setIsFaceFinded(bool? val) {
     isFaceFinded = val ?? !isFaceFinded;
     notifyListeners();
@@ -64,10 +69,22 @@ class FaceDetectionProvider extends ChangeNotifier {
     totalCount = null;
     responseModel = null;
     hasMore = true;
+    extractFeatrueComplateCount = 0;
+    extractFeatrueCount = null;
     downloadTime = Duration();
     saveTime = Duration();
     totalTime = Duration();
+    isExtractFeatureDone = null;
     notifyListeners();
+  }
+
+  void setIsExtractedFeature(bool val) {
+    isExtractFeatureDone = val;
+  }
+
+  void setSaveTime(Duration duration) {
+    saveTime += duration;
+    totalTime = downloadTime + saveTime;
   }
 
   Future<ResultModel> requestAllUserInfoData() async {
@@ -75,21 +92,45 @@ class FaceDetectionProvider extends ChangeNotifier {
     return ResultModel(true);
   }
 
-  void startSaveData() async {
+  void startSaveData(SecondThread extractThread) async {
     if (responseModel != null && responseModel!.data!.isNotEmpty) {
-      var start = DateTime.now();
       HiveService.init(HiveBoxType.USER_INFO);
-      HiveService.updateAll(responseModel?.data).whenComplete(() {
-        saveTime += DateTime.now().difference(start);
-        totalTime = downloadTime + saveTime;
-        notifyListeners();
+      List<UserInfoTable> temp = responseModel!.data!
+          .where(
+              (user) => user.imageData!.isNotEmpty && user.mPhoto!.isNotEmpty)
+          .toList();
+      extractFeatrueCount = temp.length;
+      notifyListeners();
+      List<UserInfoTable> noneImageList =
+          responseModel!.data!.where((user) => user.mPhoto!.isEmpty).toList();
+
+      await Future.doWhile(() async {
+        var start = DateTime.now();
+        var resultUser = await extractThread.extractFaeture(temp[0]);
+        if (resultUser != null) {
+          HiveService.insert(resultUser);
+          saveTime += DateTime.now().difference(start);
+          temp.removeWhere((user) => user.mPerson == resultUser.mPerson);
+          extractFeatrueComplateCount++;
+          notifyListeners();
+        } else {
+          saveTime += DateTime.now().difference(start);
+          notifyListeners();
+        }
+        return responseModel != null && temp.isNotEmpty;
       });
+      await HiveService.save(noneImageList);
+      isExtractFeatureDone = true;
+      totalTime = downloadTime + saveTime;
+      notifyListeners();
     }
   }
 
   Future<bool> getUserDataForPageing() async {
     if (!hasMore) {
-      startSaveData();
+      isDownloadDone = true;
+      isExtractFeatureDone = false;
+      notifyListeners();
       return false;
     }
 

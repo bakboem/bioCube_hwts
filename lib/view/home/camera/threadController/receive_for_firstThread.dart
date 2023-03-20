@@ -97,7 +97,7 @@ class _ReceiveThreadOne {
     return result.toList();
   }
 
-  destroy() {
+  void destroy() {
     native_ffi.destroy();
   }
 }

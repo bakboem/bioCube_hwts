@@ -118,9 +118,10 @@
     "one_to_more":"1:N",
     "realy_exit_download_process":"다운로드 중단하시면 받은 데이터 모두 삭제됩니다.\n다운로드 중단 하시겠습니까? ",
     "done":"완료되었습니다.",
-    "downloadTime":"DownloadTime",
-    "saveDataTime":"SaveDataTime",
-    "totalTime":"TotalTime",
-    "totalComplete":"TotalComplete"
+    "downloadTime":"다운로드 시간",
+    "saveDataTime":"특정점추출 시간",
+    "totalTime":"시간 합계",
+    "totalComplete":"다운로드 진척도",
+    "extractFeatureComplete":"특징점추출 진척도"
 
 }

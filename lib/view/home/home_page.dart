@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-18 18:49:59
+ * Last Modified: 2023-03-20 20:00:14
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -51,6 +51,7 @@ import 'package:hwst/globalProvider/home_start_button_provider.dart';
 import 'package:hwst/globalProvider/core_verify_process_provider.dart';
 import 'package:hwst/view/common/function_of_check_card_is_valid.dart';
 import 'package:hwst/view/common/function_of_show_location_faild_popup.dart';
+import 'package:hwst/view/home/camera/threadController/second_thread_process.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -61,11 +62,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late PageController _pageController;
+  late SecondThread _secondThread;
   @override
   void initState() {
     super.initState();
-
     _pageController = PageController(initialPage: 0);
+
     pr('init home');
     ConnectService.startListener();
     Permission.camera.request();
@@ -80,7 +82,6 @@ class _HomePageState extends State<HomePage> {
         // 'FaceCubePlusDetect.mnn',
       ],
     );
-
     runBleStart();
   }
 
@@ -92,16 +93,20 @@ class _HomePageState extends State<HomePage> {
                 CacheService.getUserEnvironment()!.isUseBle!
             ? VerifyType.BLE
             : null));
-
     var lastVerfyType = CacheService.getLastVerfyType();
     Future.delayed(Duration(seconds: 2), () {
       _pageController.jumpToPage(lastVerfyType.getIndex);
+    });
+
+    Future.delayed(Duration(seconds: 3), () {
+      _secondThread = SecondThread();
     });
   }
 
   @override
   void dispose() {
     _pageController.dispose();
+    _secondThread.secondThreadDestroy();
     ConnectService.stopListener();
     super.dispose();
   }
@@ -231,21 +236,20 @@ class _HomePageState extends State<HomePage> {
             callback: () => 'success'));
     if (showIsStartDownloadPopupResult == 'success') {
       final fp = context.read<FaceDetectionProvider>();
-      pr('1>');
       fp.requestAllUserInfoData();
-      pr('2>');
 
       var downLoadPopupResult = await AppDialog.showPopup(
         context,
-        Selector<FaceDetectionProvider, bool>(
-          selector: (context, provider) => provider.hasMore,
-          builder: (context, hasMore, _) {
+        Selector<FaceDetectionProvider, bool?>(
+          selector: (context, provider) => provider.isExtractFeatureDone,
+          builder: (context, isDone, _) {
             return buildDialogContents(
               context,
               updateContents(context),
               true,
               AppSize.downloadPopupHeight,
-              signgleButtonText: hasMore ? tr('cancel') : tr('ok'),
+              signgleButtonText:
+                  (isDone == null || !isDone) ? tr('cancel') : tr('ok'),
               canPopCallBackk: () async {
                 final fp = context.read<FaceDetectionProvider>();
                 if (fp.totalCount != fp.responseModel?.data?.length) {
@@ -294,12 +298,13 @@ class _HomePageState extends State<HomePage> {
       } else {
         if ((CacheService.getUserEnvironment()?.isUseFaceMore ?? false) &&
             await HiveService.isNeedUpdate()) {
-          final dp = context.read<FaceDetectionProvider>();
           await _doUpdateProccess();
           if (!await HiveService.isNeedUpdate()) {
             final fp = context.read<FaceDetectionProvider>();
-            fp.setIsFaceFinded(false);
-            cp.setIsShowCamera(val: true);
+            Future.delayed(Duration(milliseconds: 300), () {
+              fp.setIsFaceFinded(false);
+              cp.setIsShowCamera(val: true);
+            });
           }
         } else {
           final fp = context.read<FaceDetectionProvider>();
@@ -490,6 +495,25 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildExtractFeatureSwich(context) {
+    return Selector<FaceDetectionProvider, Tuple3<bool, bool, bool?>>(
+      selector: (context, provider) => Tuple3(provider.isDownloadDone ?? false,
+          provider.hasMore, provider.isExtractFeatureDone),
+      builder: (context, tuple, _) {
+        var isCurrentPage =
+            ModalRoute.of(context)!.settings.name == HomePage.routeName;
+        if (tuple.item1 &&
+            !tuple.item2 &&
+            (tuple.item3 == null || !tuple.item3!) &&
+            isCurrentPage) {
+          final fp = context.read<FaceDetectionProvider>();
+          fp.startSaveData(_secondThread);
+        }
+        return SizedBox();
+      },
+    );
+  }
+
   Widget _buildContents(BuildContext context) {
     final userCard = CacheService.getUserCard()!;
     var isCard1 = userCard.mCardCode == '1';
@@ -515,6 +539,7 @@ class _HomePageState extends State<HomePage> {
             _buildStartMatchButton(context),
             _buildStartMatchButtonJumpToWidget(context),
             _buildTip(),
+            _buildExtractFeatureSwich(context)
           ],
         ));
   }

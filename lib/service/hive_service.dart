@@ -2,7 +2,7 @@
  * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/service/hive_service.dart
  * Created Date: 2021-08-17 13:17:07
- * Last Modified: 2023-03-18 13:22:53
+ * Last Modified: 2023-03-20 12:13:35
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -65,6 +65,24 @@ class HiveService {
           data as List<String>;
           box.addAll(data);
         });
+    }
+  }
+
+  static Future<void> insert(UserInfoTable? data, {int? index}) async {
+    switch (cureenBoxType) {
+      case HiveBoxType.USER_INFO:
+        await getBox().then((box) {
+          box as Box<UserInfoTable>;
+          if (data != null) {
+            if (index != null) {
+              box.putAt(index, data);
+            } else {
+              box.add(data);
+            }
+          }
+        });
+        break;
+      default:
     }
   }
 

@@ -1,16 +1,3 @@
-/*
- * Project Name:  [TruePass]
- * File: /Users/bakbeom/work/HWST/lib/view/common/widget_of_download_progress.dart
- * Created Date: 2023-03-15 01:40:21
- * Last Modified: 2023-03-18 15:18:52
- * Author: bakbeom
- * Modified By: bakbeom
- * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
- * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
- * 												Discription													
- * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
- */
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +19,6 @@ Widget textRow(String start, String end, isUseTime) {
 Widget updateContents(BuildContext context) {
   return Consumer<FaceDetectionProvider>(builder: (context, provider, _) {
     return Container(
-      height: AppSize.appBarHeight * 3,
       width: AppSize.defaultContentsWidth,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppSize.radius8),
@@ -53,7 +39,7 @@ Widget updateContents(BuildContext context) {
                   defaultSpacing(),
                   textRow(tr('totalTime'),
                       '${provider.totalTime.inMilliseconds}', true),
-                  defaultSpacing(),
+                  defaultSpacing(multiple: 2),
                   textRow(
                       tr('totalComplete'),
                       '${provider.responseModel?.data?.length}/${provider.totalCount}',
@@ -66,7 +52,23 @@ Widget updateContents(BuildContext context) {
                         (provider.totalCount ?? 0),
                   ),
                   defaultSpacing(multiple: 2),
-                  AppText.text(!provider.hasMore ? tr('done') : '',
+                  textRow(
+                      tr('extractFeatureComplete'),
+                      '${provider.extractFeatrueComplateCount}/${provider.extractFeatrueCount ?? 0}',
+                      false),
+                  defaultSpacing(),
+                  LinearProgressIndicator(
+                    key: Key('extracte'),
+                    backgroundColor: AppColors.textGrey,
+                    valueColor: AlwaysStoppedAnimation(AppColors.primary),
+                    value: provider.extractFeatrueComplateCount == 0
+                        ? 1
+                        : provider.extractFeatrueComplateCount /
+                            (provider.extractFeatrueCount ?? 0),
+                  ),
+                  defaultSpacing(multiple: 2),
+                  AppText.text(
+                      provider.isExtractFeatureDone ?? false ? tr('done') : '',
                       style: AppTextStyle.default_14,
                       textAlign: TextAlign.center),
                 ],

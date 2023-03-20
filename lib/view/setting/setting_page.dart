@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-03-18 18:52:01
+ * Last Modified: 2023-03-20 19:54:08
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -12,6 +12,7 @@
  */
 
 import 'dart:io';
+import 'package:hwst/enums/hive_box_type.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +31,6 @@ import 'package:hwst/service/pass_kit_service.dart';
 import 'package:hwst/model/common/result_model.dart';
 import 'package:hwst/view/common/base_app_dialog.dart';
 import 'package:hwst/globalProvider/auth_provider.dart';
-import 'package:hwst/view/common/function_of_print.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/globalProvider/app_theme_provider.dart';
 import 'package:hwst/view/common/widget_of_divider_line.dart';
@@ -42,6 +42,7 @@ import 'package:hwst/view/common/widget_of_dialog_contents.dart';
 import 'package:hwst/globalProvider/face_detection_provider.dart';
 import 'package:hwst/view/common/widget_of_download_progress.dart';
 import 'package:hwst/view/setting/provider/setting_page_provider.dart';
+import 'package:hwst/view/home/camera/threadController/second_thread_process.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -54,6 +55,7 @@ class _SettingPageState extends State<SettingPage> {
   var nfcSwich = ValueNotifier(false);
   var bleSwich = ValueNotifier(false);
   var faceSwich = ValueNotifier(false);
+  late SecondThread _secondThread;
   List<String> veifyRadioList = [];
   List<String> cameraRadioList = [];
   List<String> combinationVeifyRadioList = [];
@@ -62,6 +64,7 @@ class _SettingPageState extends State<SettingPage> {
   @override
   void initState() {
     super.initState();
+    _secondThread = SecondThread();
     Future.delayed(Duration.zero, () {
       final ap = context.read<AppThemeProvider>();
       ap.setLanguageType(
@@ -78,6 +81,7 @@ class _SettingPageState extends State<SettingPage> {
     bleSwich.dispose();
     nfcSwich.dispose();
     faceSwich.dispose();
+    _secondThread.secondThreadDestroy();
     super.dispose();
   }
 
@@ -247,6 +251,8 @@ class _SettingPageState extends State<SettingPage> {
                       p.setCurrenVeirfyRadioStr(veifyRadioList, index);
                     }()
                   : () async {
+                      await HiveService.init(HiveBoxType.USER_INFO);
+                      await HiveService.deleteAll();
                       p.setCameraRadioStr(cameraRadioList, index);
                       await _doUpdateProccess(context);
                     }();
@@ -278,19 +284,17 @@ class _SettingPageState extends State<SettingPage> {
               callback: () => 'success'));
       if (showIsStartDownloadPopupResult == 'success') {
         final fp = context.read<FaceDetectionProvider>();
-        pr('1>');
         fp.requestAllUserInfoData();
-        pr('2>');
-
         var downLoadPopupResult = await AppDialog.showPopup(
           context,
-          Selector<FaceDetectionProvider, bool>(
-            selector: (context, provider) => provider.hasMore,
-            builder: (context, hasMore, _) {
+          Selector<FaceDetectionProvider, bool?>(
+            selector: (context, provider) => provider.isExtractFeatureDone,
+            builder: (context, isDone, _) {
               return buildDialogContents(context, updateContents(context), true,
                   AppSize.downloadPopupHeight,
-                  signgleButtonText: hasMore ? tr('cancel') : tr('ok'),
-                  canPopCallBackk: () async {
+                  signgleButtonText: (isDone == null || !isDone)
+                      ? tr('cancel')
+                      : tr('ok'), canPopCallBackk: () async {
                 final fp = context.read<FaceDetectionProvider>();
                 if (fp.totalCount != fp.responseModel?.data?.length) {
                   var popupResult = await AppDialog.showPopup(
@@ -375,6 +379,8 @@ class _SettingPageState extends State<SettingPage> {
                         if (isSelectedOneToOne) {
                           p.setFaceMoreSwich(false);
                         }
+                        await HiveService.init(HiveBoxType.USER_INFO);
+                        await HiveService.deleteAll();
                         await _doUpdateProccess(context);
                       }();
           }).whenComplete(() {
@@ -629,6 +635,22 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
+  Widget _buildExtractFeatureSwich(context) {
+    return Selector<FaceDetectionProvider, Tuple3<bool, bool, bool?>>(
+      selector: (context, provider) => Tuple3(provider.isDownloadDone ?? false,
+          provider.hasMore, provider.isExtractFeatureDone),
+      builder: (context, tuple, _) {
+        if (tuple.item1 &&
+            !tuple.item2 &&
+            (tuple.item3 == null || !tuple.item3!)) {
+          final fp = context.read<FaceDetectionProvider>();
+          fp.startSaveData(_secondThread);
+        }
+        return SizedBox();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     veifyRadioList = [tr('fixed_type'), tr('personal')];
@@ -700,7 +722,8 @@ class _SettingPageState extends State<SettingPage> {
                             _buildTitle(context, tr('stop_using_request')),
                             defaultSpacing(),
                             _buidSignOutWidget(context),
-                            defaultSpacing(height: AppSize.appBarHeight)
+                            defaultSpacing(height: AppSize.appBarHeight),
+                            _buildExtractFeatureSwich(context)
                           ],
                         ))
                       ],
