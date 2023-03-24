@@ -1,1 +1,2 @@
 -keep class com.smavis.lib.** {*;}
+-keep class kr.co.biocube.face_kit.** {*;}
