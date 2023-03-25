@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-03-20 19:54:08
+ * Last Modified: 2023-03-25 13:01:06
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -13,6 +13,7 @@
 
 import 'dart:io';
 import 'package:hwst/enums/hive_box_type.dart';
+import 'package:hwst/view/common/function_of_print.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -640,9 +641,12 @@ class _SettingPageState extends State<SettingPage> {
       selector: (context, provider) => Tuple3(provider.isDownloadDone ?? false,
           provider.hasMore, provider.isExtractFeatureDone),
       builder: (context, tuple, _) {
+        var isCurrentPage =
+            ModalRoute.of(context)!.settings.name == SettingPage.routeName;
+        pr(isCurrentPage);
         if (tuple.item1 &&
             !tuple.item2 &&
-            (tuple.item3 == null || !tuple.item3!)) {
+            (tuple.item3 == null || !tuple.item3! && isCurrentPage)) {
           final fp = context.read<FaceDetectionProvider>();
           fp.startSaveData(_secondThread);
         }

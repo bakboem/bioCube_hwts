@@ -1,2 +1,7 @@
 -keep class com.smavis.lib.** {*;}
--keep class kr.co.biocube.face_kit.** {*;}
+-keep class io.flutter.app.** { *; }
+-keep class io.flutter.plugin.**  { *; }
+-keep class io.flutter.util.**  { *; }
+-keep class io.flutter.view.**  { *; }
+-keep class io.flutter.**  { *; }
+-keep class io.flutter.plugins.**  { *; }

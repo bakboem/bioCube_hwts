@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/bioCube/face_kit/truepass/lib/globalProvider/face_detection_provider.dart
  * Created Date: 2023-02-19 15:22:53
- * Last Modified: 2023-03-20 19:13:18
+ * Last Modified: 2023-03-25 13:02:10
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -100,7 +100,6 @@ class FaceDetectionProvider extends ChangeNotifier {
               (user) => user.imageData!.isNotEmpty && user.mPhoto!.isNotEmpty)
           .toList();
       extractFeatrueCount = temp.length;
-      notifyListeners();
       List<UserInfoTable> noneImageList =
           responseModel!.data!.where((user) => user.mPhoto!.isEmpty).toList();
 

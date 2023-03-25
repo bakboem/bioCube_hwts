@@ -34,6 +34,10 @@ dependencies:
   geolocator: ^9.0.2
   vibration: ^1.7.6
   soundpool: ^2.3.0
+  face_kit:
+    git:
+      url: git://github.com/bakboem/face_match_kit_android.git
+      ref: '1.1.6'
   # face_kit:
   #   path: ../../face_match_kit
   camera: ^0.10.3+2
