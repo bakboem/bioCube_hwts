@@ -34,10 +34,9 @@ dependencies:
   geolocator: ^9.0.2
   vibration: ^1.7.6
   soundpool: ^2.3.0
-  # face_plugin:
-  #   git:
-  #     url: git://github.com/bakboem/face_plugin.git
-
+  face_plugin:
+    git:
+      url: git://github.com/bakboem/face_plugin.git
   # face_plugin:
   #   path: ../../face_plugin
   camera: ^0.10.3+2
