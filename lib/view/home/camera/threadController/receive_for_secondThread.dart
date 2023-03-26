@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/HWST/lib/view/home/camera/threadController/receive_thread_one_process copy.dart
  * Created Date: 2023-03-14 12:36:47
- * Last Modified: 2023-03-20 18:05:54
+ * Last Modified: 2023-03-26 16:51:13
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -83,7 +83,10 @@ class _ReceiveThreadTwo {
   }
 
   void inits(String mnnPath, String opencvPath) {
+    pr(mnnPath);
+    pr(opencvPath);
     native_ffi.initMnnModel(mnnPath, opencvPath);
+    pr('path is ######### loaded!');
   }
 
   UserInfoTable? extractFeature(UserInfoTable user) {

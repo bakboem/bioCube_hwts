@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-20 20:00:14
+ * Last Modified: 2023-03-26 16:52:24
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -94,11 +94,11 @@ class _HomePageState extends State<HomePage> {
             ? VerifyType.BLE
             : null));
     var lastVerfyType = CacheService.getLastVerfyType();
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 3), () {
       _pageController.jumpToPage(lastVerfyType.getIndex);
     });
 
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(Duration(seconds: 5), () {
       _secondThread = SecondThread();
     });
   }
