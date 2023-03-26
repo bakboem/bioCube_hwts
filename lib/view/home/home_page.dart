@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-26 16:52:24
+ * Last Modified: 2023-03-26 16:55:56
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
         'FaceCubePlusRecognize.mnn',
         // 'FaceCubePlusDetect.mnn',
       ],
-    );
+    ).whenComplete(() => _secondThread = SecondThread());
     runBleStart();
   }
 
@@ -96,10 +96,6 @@ class _HomePageState extends State<HomePage> {
     var lastVerfyType = CacheService.getLastVerfyType();
     Future.delayed(Duration(seconds: 3), () {
       _pageController.jumpToPage(lastVerfyType.getIndex);
-    });
-
-    Future.delayed(Duration(seconds: 5), () {
-      _secondThread = SecondThread();
     });
   }
 
