@@ -1,0 +1,41 @@
+{
+  "buildFiles": [
+    "/Users/bakbeom/work/HWST/android/app/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/bakbeom/Library/Android/sdk/cmake/3.18.1/bin/ninja",
+      "-C",
+      "/Users/bakbeom/work/HWST/android/app/.cxx/Debug/3y6q4r2c/armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/bakbeom/Library/Android/sdk/cmake/3.18.1/bin/ninja",
+    "-C",
+    "/Users/bakbeom/work/HWST/android/app/.cxx/Debug/3y6q4r2c/armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "native_opencv::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "armeabi-v7a",
+      "artifactName": "native_opencv",
+      "output": "/Users/bakbeom/work/HWST/build/app/intermediates/cxx/Debug/3y6q4r2c/obj/armeabi-v7a/libnative_opencv.so",
+      "runtimeFiles": [
+        "/Users/bakbeom/Documents/bioCubeLib/hwts/opencvAndMnn/OpenCV-android-sdk/sdk/native/libs/armeabi-v7a/libopencv_java4.so",
+        "/Users/bakbeom/work/HWST/android/app/libs/armeabi-v7a/libMNN.so"
+      ]
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/Users/bakbeom/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/Users/bakbeom/Library/Android/sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

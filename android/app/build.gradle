@@ -27,7 +27,6 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     compileSdkVersion 33
-    ndkVersion '23.1.17779620'
     compileOptions {
         coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -54,8 +53,17 @@ android {
         versionName flutterVersionName
         externalNativeBuild {
             cmake {
-                cppFlags ''
+                cppFlags ""
             }
+        }
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+            version "3.18.1"
         }
     }
     signingConfigs {
@@ -66,7 +74,6 @@ android {
             keyPassword "smavis"
         }
     }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -74,7 +81,7 @@ android {
             signingConfig signingConfigs.release
         }
     }
-}
+}   
 
 flutter {
     source '../..'

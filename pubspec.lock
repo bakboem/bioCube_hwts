@@ -321,15 +321,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.2"
-  face_kit:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: "1.1.6"
-      resolved-ref: "0bdb4f6b438342770148d7cf128205f117351546"
-      url: "git://github.com/bakboem/face_match_kit_android.git"
-    source: git
-    version: "0.0.1"
   fake_async:
     dependency: transitive
     description:

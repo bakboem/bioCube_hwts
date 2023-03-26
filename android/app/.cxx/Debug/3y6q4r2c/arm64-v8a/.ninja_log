@@ -1,0 +1,11 @@
+# ninja log v5
+4	3272	1679807314	CMakeFiles/native_opencv.dir/src/main/cpp/FaceCubePlus.cpp.o	67fa7e1f859b82f5
+3	3355	1679807314	CMakeFiles/native_opencv.dir/src/main/cpp/recognizer.cpp.o	5fab8d8420b73fcf
+0	3454	1679807314	CMakeFiles/native_opencv.dir/src/main/cpp/native_opencv.cpp.o	fc099b56a0e30b60
+2	3477	1679807314	CMakeFiles/native_opencv.dir/src/main/cpp/detector.cpp.o	696e732558da6241
+3477	3637	1679807314	/Users/bakbeom/work/HWST/build/app/intermediates/cxx/Debug/3y6q4r2c/obj/arm64-v8a/libnative_opencv.so	41d6b49e5b375ca3
+6	6022	1679807464	CMakeFiles/native_opencv.dir/src/main/cpp/FaceCubePlus.cpp.o	cf51e1cc91ab2ab0
+5	6185	1679807464	CMakeFiles/native_opencv.dir/src/main/cpp/recognizer.cpp.o	5dfe66ca21e0b138
+2	6253	1679807464	CMakeFiles/native_opencv.dir/src/main/cpp/native_opencv.cpp.o	b51d95eb8c31a114
+4	6339	1679807465	CMakeFiles/native_opencv.dir/src/main/cpp/detector.cpp.o	a9ea9d4fa5d9ba39
+6339	6750	1679807465	/Users/bakbeom/work/HWST/build/app/intermediates/cxx/Debug/3y6q4r2c/obj/arm64-v8a/libnative_opencv.so	f7cd0e89c8a782d7
