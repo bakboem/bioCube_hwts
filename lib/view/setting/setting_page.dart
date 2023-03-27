@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-03-25 13:01:06
+ * Last Modified: 2023-03-27 19:51:10
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -82,7 +82,8 @@ class _SettingPageState extends State<SettingPage> {
     bleSwich.dispose();
     nfcSwich.dispose();
     faceSwich.dispose();
-    _secondThread.secondThreadDestroy();
+    _secondThread.secondThreadDestroy(killOnly: true);
+    pr('dispose settings');
     super.dispose();
   }
 
@@ -252,10 +253,15 @@ class _SettingPageState extends State<SettingPage> {
                       p.setCurrenVeirfyRadioStr(veifyRadioList, index);
                     }()
                   : () async {
-                      await HiveService.init(HiveBoxType.USER_INFO);
-                      await HiveService.deleteAll();
                       p.setCameraRadioStr(cameraRadioList, index);
-                      await _doUpdateProccess(context);
+                      p.setFaceMoreSwich(true);
+                      var isSelectedOneToOne =
+                          p.cameraRadioList.indexOf(p.cameraRadioStr) == 0;
+                      if (isSelectedOneToOne) {
+                        p.setFaceMoreSwich(false);
+                      } else {
+                        await _doUpdateProccess(context);
+                      }
                     }();
           p.setUserEnvrionment(context);
           final dp = context.read<DeviceStatusProvider>();
@@ -265,70 +271,78 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
+  void reset(BuildContext context) async {
+    final fp = context.read<FaceDetectionProvider>();
+    await fp.resetData();
+    // await HiveService.deleteAll();
+  }
+
   Future<void> _doUpdateProccess(BuildContext context) async {
     final p = context.read<SettinPageProivder>();
-    var isSelectedOneToMore = p.cameraRadioList.indexOf(p.cameraRadioStr) == 1;
+    final dp = context.read<DeviceStatusProvider>();
     var isNeedUpdate = await HiveService.isNeedUpdate();
+    if (!isNeedUpdate) return;
     // 1:N 선택했으면
-    if (isSelectedOneToMore && isNeedUpdate) {
-      final showIsStartDownloadPopupResult = await AppDialog.showPopup(
-          context,
-          buildTowButtonDialogContents(
-              context,
-              AppSize.appBarHeight * 3,
-              Padding(
-                  padding: AppSize.defaultSidePadding,
-                  child: AppText.text(
-                      tr('is_start_down_load_user_all_proccess'),
-                      textAlign: TextAlign.start,
-                      maxLines: 4)),
-              callback: () => 'success'));
-      if (showIsStartDownloadPopupResult == 'success') {
-        final fp = context.read<FaceDetectionProvider>();
-        fp.requestAllUserInfoData();
-        var downLoadPopupResult = await AppDialog.showPopup(
-          context,
-          Selector<FaceDetectionProvider, bool?>(
-            selector: (context, provider) => provider.isExtractFeatureDone,
-            builder: (context, isDone, _) {
-              return buildDialogContents(context, updateContents(context), true,
-                  AppSize.downloadPopupHeight,
-                  signgleButtonText: (isDone == null || !isDone)
-                      ? tr('cancel')
-                      : tr('ok'), canPopCallBackk: () async {
-                final fp = context.read<FaceDetectionProvider>();
-                if (fp.totalCount != fp.responseModel?.data?.length) {
-                  var popupResult = await AppDialog.showPopup(
-                      context,
-                      buildTowButtonDialogContents(
-                          context,
-                          AppSize.appBarHeight * 3,
-                          AppText.text(tr('realy_exit_download_process'),
+    final showIsStartDownloadPopupResult = await AppDialog.showPopup(
+        context,
+        buildTowButtonDialogContents(
+            context,
+            AppSize.appBarHeight * 3,
+            Padding(
+                padding: AppSize.defaultSidePadding,
+                child: AppText.text(tr('is_start_down_load_user_all_proccess'),
+                    textAlign: TextAlign.start, maxLines: 4)),
+            callback: () => 'success'));
+    if (showIsStartDownloadPopupResult == 'success') {
+      final fp = context.read<FaceDetectionProvider>();
+      fp.requestAllUserInfoData(_secondThread);
+      var downLoadPopupResult = await AppDialog.showPopup(
+        context,
+        Selector<FaceDetectionProvider, bool?>(
+          selector: (context, provider) => provider.isExtractFeatureDone,
+          builder: (context, isDone, _) {
+            return buildDialogContents(context, updateContents(context), true,
+                AppSize.downloadPopupHeight,
+                signgleButtonText: (isDone == null || !isDone)
+                    ? tr('cancel')
+                    : tr('ok'), canPopCallBackk: () async {
+              final fp = context.read<FaceDetectionProvider>();
+              if (fp.totalCount != fp.responseModel?.data?.length ||
+                  fp.extractFeatrueComplateCount != fp.extractFeatrueCount) {
+                var popupResult = await AppDialog.showPopup(
+                    context,
+                    buildTowButtonDialogContents(
+                        context,
+                        AppSize.appBarHeight * 3,
+                        Padding(
+                          padding: EdgeInsets.all(AppSize.padding),
+                          child: AppText.text(tr('realy_exit_download_process'),
                               textAlign: TextAlign.start, maxLines: 4),
-                          callback: () => 'success'));
-                  if (popupResult == 'success') {
-                    fp.resetData();
-                    HiveService.deleteAll();
-                    p.setCameraRadioStr(cameraRadioList, 0);
-                    p.setFaceMoreSwich(false);
-                    return true;
-                  }
-                  return false;
-                } else {
+                        ),
+                        callback: () => 'success'));
+                if (popupResult == 'success') {
+                  reset(context);
+                  p.setCameraRadioStr(cameraRadioList, 0);
+                  p.setFaceMoreSwich(false);
                   return true;
                 }
-              });
-            },
-          ),
-        );
-        if (downLoadPopupResult != null && downLoadPopupResult) {
-          fp.resetData();
-        }
-      } else {
-        p.setCameraRadioStr(cameraRadioList, 0);
-        p.setFaceMoreSwich(false);
+                return false;
+              } else {
+                return true;
+              }
+            });
+          },
+        ),
+      );
+      if (downLoadPopupResult != null && downLoadPopupResult) {
+        reset(context);
       }
+    } else {
+      p.setCameraRadioStr(cameraRadioList, 0);
+      p.setFaceMoreSwich(false);
     }
+    p.setUserEnvrionment(context);
+    dp.doUpdateStatus();
   }
 
   Widget _buildRadioText(BuildContext context, String? currenStr,
@@ -353,8 +367,8 @@ class _SettingPageState extends State<SettingPage> {
     final p = context.read<SettinPageProivder>();
     return GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () {
-          Future.delayed(Duration.zero, () {
+        onTap: () async {
+          await Future.delayed(Duration.zero, () {
             isCombinationVeify != null && isUseFace == null
                 ? () {
                     if (p.faceSwichVal == false) {
@@ -379,16 +393,14 @@ class _SettingPageState extends State<SettingPage> {
                             p.cameraRadioList.indexOf(p.cameraRadioStr) == 0;
                         if (isSelectedOneToOne) {
                           p.setFaceMoreSwich(false);
+                        } else {
+                          await _doUpdateProccess(context);
                         }
-                        await HiveService.init(HiveBoxType.USER_INFO);
-                        await HiveService.deleteAll();
-                        await _doUpdateProccess(context);
                       }();
-          }).whenComplete(() {
-            p.setUserEnvrionment(context);
-            final dp = context.read<DeviceStatusProvider>();
-            dp.doUpdateStatus();
           });
+          p.setUserEnvrionment(context);
+          final dp = context.read<DeviceStatusProvider>();
+          dp.doUpdateStatus();
         },
         child: Container(
           width: AppSize.defaultContentsWidth / 2,
@@ -636,25 +648,6 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
-  Widget _buildExtractFeatureSwich(context) {
-    return Selector<FaceDetectionProvider, Tuple3<bool, bool, bool?>>(
-      selector: (context, provider) => Tuple3(provider.isDownloadDone ?? false,
-          provider.hasMore, provider.isExtractFeatureDone),
-      builder: (context, tuple, _) {
-        var isCurrentPage =
-            ModalRoute.of(context)!.settings.name == SettingPage.routeName;
-        pr(isCurrentPage);
-        if (tuple.item1 &&
-            !tuple.item2 &&
-            (tuple.item3 == null || !tuple.item3! && isCurrentPage)) {
-          final fp = context.read<FaceDetectionProvider>();
-          fp.startSaveData(_secondThread);
-        }
-        return SizedBox();
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     veifyRadioList = [tr('fixed_type'), tr('personal')];
@@ -727,7 +720,6 @@ class _SettingPageState extends State<SettingPage> {
                             defaultSpacing(),
                             _buidSignOutWidget(context),
                             defaultSpacing(height: AppSize.appBarHeight),
-                            _buildExtractFeatureSwich(context)
                           ],
                         ))
                       ],

@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/face_kit/truepass/lib/view/home/ffi/native_ffi.dart
  * Created Date: 2023-02-17 11:18:19
- * Last Modified: 2023-03-27 12:32:24
+ * Last Modified: 2023-03-27 17:36:46
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -176,11 +176,6 @@ void initDetector(Uint8List markerPngBytes, int bits, String opencvModlePath,
 
 // Native parameter transfer
 void initMnnModel(String mnnModlePath, String opencvPath) {
-  pr('=========================================');
-  print(opencvPath);
-  print(mnnModlePath);
-  pr('=========================================');
-
   _initMnnModel(mnnModlePath.toNativeUtf8(), opencvPath.toNativeUtf8());
 }
 

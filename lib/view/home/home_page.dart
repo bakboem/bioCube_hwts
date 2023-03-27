@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-27 15:49:29
+ * Last Modified: 2023-03-27 19:50:46
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -101,6 +101,7 @@ class _HomePageState extends State<HomePage> {
     _pageController.dispose();
     _secondThread.secondThreadDestroy();
     ConnectService.stopListener();
+    pr('dispose home!');
     super.dispose();
   }
 
@@ -207,7 +208,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<void> _doUpdateProccess() async {
+  void reset(BuildContext context) async {
+    final fp = context.read<FaceDetectionProvider>();
+    await fp.resetData();
+    await HiveService.deleteAll();
+  }
+
+  Future<void> _doUpdateProccess(BuildContext context) async {
+    var isNeedUpdate = await HiveService.isNeedUpdate();
+    if (!isNeedUpdate) return;
     final showIsStartDownloadPopupResult = await AppDialog.showPopup(
         context,
         buildTowButtonDialogContents(
@@ -220,7 +229,7 @@ class _HomePageState extends State<HomePage> {
             callback: () => 'success'));
     if (showIsStartDownloadPopupResult == 'success') {
       final fp = context.read<FaceDetectionProvider>();
-      fp.requestAllUserInfoData();
+      fp.requestAllUserInfoData(_secondThread);
 
       var downLoadPopupResult = await AppDialog.showPopup(
         context,
@@ -242,12 +251,16 @@ class _HomePageState extends State<HomePage> {
                       buildTowButtonDialogContents(
                           context,
                           AppSize.appBarHeight * 3,
-                          AppText.text(tr('realy_exit_download_process'),
-                              textAlign: TextAlign.start, maxLines: 4),
+                          Padding(
+                            padding: EdgeInsets.all(AppSize.padding),
+                            child: AppText.text(
+                                tr('realy_exit_download_process'),
+                                textAlign: TextAlign.start,
+                                maxLines: 4),
+                          ),
                           callback: () => 'success'));
                   if (popupResult == 'success') {
-                    fp.resetData();
-                    HiveService.deleteAll();
+                    reset(context);
                     return true;
                   }
                   return false;
@@ -260,7 +273,7 @@ class _HomePageState extends State<HomePage> {
         ),
       );
       if (downLoadPopupResult != null && downLoadPopupResult) {
-        fp.resetData();
+        reset(context);
       }
     }
   }
@@ -282,7 +295,7 @@ class _HomePageState extends State<HomePage> {
       } else {
         if ((CacheService.getUserEnvironment()?.isUseFaceMore ?? false) &&
             await HiveService.isNeedUpdate()) {
-          await _doUpdateProccess();
+          await _doUpdateProccess(context);
           if (!await HiveService.isNeedUpdate()) {
             final fp = context.read<FaceDetectionProvider>();
             Future.delayed(Duration(milliseconds: 300), () {
@@ -483,25 +496,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildExtractFeatureSwich(context) {
-    return Selector<FaceDetectionProvider, Tuple3<bool, bool, bool?>>(
-      selector: (context, provider) => Tuple3(provider.isDownloadDone ?? false,
-          provider.hasMore, provider.isExtractFeatureDone),
-      builder: (context, tuple, _) {
-        var isCurrentPage =
-            ModalRoute.of(context)!.settings.name == HomePage.routeName;
-        if (tuple.item1 &&
-            !tuple.item2 &&
-            (tuple.item3 == null || !tuple.item3!) &&
-            isCurrentPage) {
-          final fp = context.read<FaceDetectionProvider>();
-          fp.startSaveData(_secondThread);
-        }
-        return SizedBox();
-      },
-    );
-  }
-
   Widget _buildContents(BuildContext context) {
     final userCard = CacheService.getUserCard()!;
     var isCard1 = userCard.mCardCode == '1';
@@ -527,7 +521,6 @@ class _HomePageState extends State<HomePage> {
             _buildStartMatchButton(context),
             _buildStartMatchButtonJumpToWidget(context),
             _buildTip(),
-            _buildExtractFeatureSwich(context)
           ],
         ));
   }

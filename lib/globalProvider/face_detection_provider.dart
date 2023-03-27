@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/bioCube/face_kit/truepass/lib/globalProvider/face_detection_provider.dart
  * Created Date: 2023-02-19 15:22:53
- * Last Modified: 2023-03-25 13:02:10
+ * Last Modified: 2023-03-27 19:48:43
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -63,8 +63,8 @@ class FaceDetectionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void resetData() {
-    ApiService().cancelAll();
+  Future<void> resetData() async {
+    ApiService().cancel(RequestType.GET_ALL_USER_INFO.tag);
     pos = 1;
     totalCount = null;
     responseModel = null;
@@ -74,7 +74,8 @@ class FaceDetectionProvider extends ChangeNotifier {
     downloadTime = Duration();
     saveTime = Duration();
     totalTime = Duration();
-    isExtractFeatureDone = null;
+    isExtractFeatureDone = false;
+
     notifyListeners();
   }
 
@@ -87,8 +88,9 @@ class FaceDetectionProvider extends ChangeNotifier {
     totalTime = downloadTime + saveTime;
   }
 
-  Future<ResultModel> requestAllUserInfoData() async {
-    Future.doWhile(getUserDataForPageing);
+  Future<ResultModel> requestAllUserInfoData(SecondThread extractThread) async {
+    await Future.doWhile(getUserDataForPageing);
+    startSaveData(extractThread);
     return ResultModel(true);
   }
 

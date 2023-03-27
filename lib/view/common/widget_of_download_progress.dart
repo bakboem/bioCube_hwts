@@ -25,7 +25,8 @@ Widget updateContents(BuildContext context) {
           color: AppColors.whiteText),
       child: Padding(
         padding: AppSize.defaultSidePadding,
-        child: provider.responseModel != null
+        child: provider.responseModel != null &&
+                provider.responseModel!.data!.isNotEmpty
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -61,10 +62,11 @@ Widget updateContents(BuildContext context) {
                     key: Key('extracte'),
                     backgroundColor: AppColors.textGrey,
                     valueColor: AlwaysStoppedAnimation(AppColors.primary),
-                    value: provider.extractFeatrueComplateCount == 0
+                    value: provider.extractFeatrueComplateCount == 0 ||
+                            provider.extractFeatrueCount == null
                         ? 1
                         : provider.extractFeatrueComplateCount /
-                            (provider.extractFeatrueCount ?? 0),
+                            (provider.extractFeatrueCount!),
                   ),
                   defaultSpacing(multiple: 2),
                   AppText.text(

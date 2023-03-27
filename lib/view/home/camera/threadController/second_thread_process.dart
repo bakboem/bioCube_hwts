@@ -49,18 +49,23 @@ class SecondThread {
     return res.future;
   }
 
-  void secondThreadDestroy() async {
+  void secondThreadDestroy({bool? killOnly}) async {
     if (!isSecondThreadReady) {
       return;
     }
-    isSecondThreadReady = false;
-    var reqId = ++_secondReqId;
-    var res = Completer();
-    _cbs[reqId] = res;
-    var msg = RequestTwo(reqId: reqId, method: 'destroy');
-    _secondThreadSendPort.send(msg);
-    await res.future;
-    _secondThreadIsolate.kill();
+    if (killOnly != null) {
+      isSecondThreadReady = false;
+      _secondThreadIsolate.kill();
+    } else {
+      isSecondThreadReady = false;
+      var reqId = ++_secondReqId;
+      var res = Completer();
+      _cbs[reqId] = res;
+      var msg = RequestTwo(reqId: reqId, method: 'destroy');
+      _secondThreadSendPort.send(msg);
+      await res.future;
+      _secondThreadIsolate.kill();
+    }
   }
 
   void _handleSecondThreadMessage(data) {

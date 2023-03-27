@@ -2,7 +2,7 @@
  * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/service/api_service.dart
  * Created Date: 2021-08-22 21:53:15
- * Last Modified: 2023-03-18 14:18:10
+ * Last Modified: 2023-03-27 17:27:03
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -153,7 +153,7 @@ class ApiService {
     }
   }
 
-  void cancelAll() {
+  Future<void> cancelAll() async {
     _cancelTokens.forEach((key, cancelToken) {
       cancelToken!.cancel();
     });
