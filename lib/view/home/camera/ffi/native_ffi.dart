@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/face_kit/truepass/lib/view/home/ffi/native_ffi.dart
  * Created Date: 2023-02-17 11:18:19
- * Last Modified: 2023-03-20 18:28:20
+ * Last Modified: 2023-03-27 12:32:24
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -176,10 +176,12 @@ void initDetector(Uint8List markerPngBytes, int bits, String opencvModlePath,
 
 // Native parameter transfer
 void initMnnModel(String mnnModlePath, String opencvPath) {
-  _initMnnModel(
-    mnnModlePath.toNativeUtf8(),
-    opencvPath.toNativeUtf8(),
-  );
+  pr('=========================================');
+  print(opencvPath);
+  print(mnnModlePath);
+  pr('=========================================');
+
+  _initMnnModel(mnnModlePath.toNativeUtf8(), opencvPath.toNativeUtf8());
 }
 
 // Native parameter transfer
@@ -230,10 +232,14 @@ UserInfoTable? extractFeature(UserInfoTable user) {
   ffi.Pointer<ffi.Int32> isSuccessful = malloc.allocate<ffi.Int32>(1);
   ffi.Pointer<ffi.Float> feat = malloc.allocate<ffi.Float>(featCount * 512);
   final base64Image = user.imageData!;
-  var res = _extractFaeture(base64Image.toNativeUtf8(), feat, isSuccessful);
+  var res = _extractFaeture(
+    base64Image.toNativeUtf8(),
+    feat,
+    isSuccessful,
+  );
   user.feature = res.asTypedList(featCount * 512).toList();
   user.isExtracted = isSuccessful.value == 1;
-  print(user.feature);
+  // print(user.feature);
   pr('user.isExtracted ? ${user.isExtracted}');
   malloc.free(feat);
   malloc.free(res);

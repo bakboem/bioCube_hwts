@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/HWST/lib/view/home/camera/threadController/receive_thread_one_process copy.dart
  * Created Date: 2023-03-14 12:36:47
- * Last Modified: 2023-03-26 16:51:13
+ * Last Modified: 2023-03-27 10:14:24
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -30,8 +30,10 @@ class InitRequestTwo {
 class RequestTwo {
   int reqId;
   String method;
+  dynamic params;
   UserInfoTable? userModel;
-  RequestTwo({required this.reqId, required this.method, this.userModel});
+  RequestTwo(
+      {required this.reqId, required this.method, this.userModel, this.params});
 }
 
 class ResponseTwo {
@@ -63,6 +65,7 @@ void _handleMessage(data) {
       case 'extractFeature':
         res = _receiveThreadTwo.extractFeature(data.userModel!);
         pr('return');
+
         break;
       case 'destroy':
         _receiveThreadTwo.destroy();

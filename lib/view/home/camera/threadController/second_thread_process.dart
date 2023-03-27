@@ -40,8 +40,11 @@ class SecondThread {
     var reqId = ++_secondReqId;
     var res = Completer<UserInfoTable?>();
     _cbs[reqId] = res;
-    var msg =
-        RequestTwo(reqId: reqId, method: 'extractFeature', userModel: user);
+    var msg = RequestTwo(
+      reqId: reqId,
+      method: 'extractFeature',
+      userModel: user,
+    );
     _secondThreadSendPort.send(msg);
     return res.future;
   }

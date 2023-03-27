@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-26 16:55:56
+ * Last Modified: 2023-03-27 15:49:29
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -77,10 +77,7 @@ class _HomePageState extends State<HomePage> {
     );
     loadFaceDetectionAndDeepLearningFile(
       'mnn',
-      [
-        'FaceCubePlusRecognize.mnn',
-        // 'FaceCubePlusDetect.mnn',
-      ],
+      ['FaceCubePlusRecognize.mnn'],
     ).whenComplete(() => _secondThread = SecondThread());
     runBleStart();
   }
@@ -121,23 +118,14 @@ class _HomePageState extends State<HomePage> {
       }
       file = await fileService.createFile(dir!.path + '/$fileName');
       if (await file.length() == 0) {
-        await file
-            .writeAsBytes(bytes.buffer.asUint8List())
-            .then((f) => dirName == 'opencv'
+        await file.writeAsBytes(bytes.buffer.asUint8List()).then((f) =>
+            dirName == 'opencv'
                 ? CacheService.saveOpencvModelFilePath(f.path)
-                : dirName == 'mnn'
-                    ? fileName == 'FaceCubePlusDetect.mnn'
-                        ? CacheService.saveOpencvModelFilePath(f.path)
-                        : CacheService.saveMnnModelFilePath(f.path)
-                    : DoNothingAction());
+                : CacheService.saveMnnModelFilePath(f.path));
       } else {
         dirName == 'opencv'
             ? CacheService.saveOpencvModelFilePath(file.path)
-            : dirName == 'mnn'
-                ? fileName == 'FaceCubePlusDetect.mnn'
-                    ? CacheService.saveOpencvModelFilePath(file.path)
-                    : CacheService.saveMnnModelFilePath(file.path)
-                : DoNothingAction();
+            : CacheService.saveMnnModelFilePath(file.path);
       }
     }
   }
@@ -357,6 +345,10 @@ class _HomePageState extends State<HomePage> {
               } else if (isSelectedNfc && isNfcOk && userEvn!.isUseNfc!) {
                 PassKitService.initKit(type: VerifyType.NFC);
               } else if (isSelectedFace && isFaceOk) {
+                // final fp = context.read<FaceDetectionProvider>();
+                // final cp = context.read<CoreVerifyProcessProvider>();
+                // fp.setIsFaceFinded(false);
+                // cp.setIsShowCamera(val: true);
                 doFacePreccess(userEvn!);
               } else {
                 routeToSettinsPage(userEvn!);

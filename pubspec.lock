@@ -326,7 +326,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: be2c1c0a730697eb0485d454e25127dee2228788
+      resolved-ref: d91722305e7db1695505f14140be1887689e4a64
       url: "git://github.com/bakboem/face_plugin.git"
     source: git
     version: "0.0.1"
