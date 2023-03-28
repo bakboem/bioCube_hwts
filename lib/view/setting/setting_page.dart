@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-03-27 19:51:10
+ * Last Modified: 2023-03-28 20:32:33
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -552,6 +552,7 @@ class _SettingPageState extends State<SettingPage> {
                 }));
             if (result != null && result == 'ok') {
               CacheService.deleteALL();
+              await HiveService.init(HiveBoxType.USER_INFO);
               await HiveService.deleteAll();
               final ap = context.read<AuthProvider>();
               ap.setIsLogedIn(false);

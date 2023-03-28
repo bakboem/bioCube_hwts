@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-27 19:50:46
+ * Last Modified: 2023-03-28 17:59:28
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -12,6 +12,7 @@
  */
 
 import 'dart:io';
+import 'package:hwst/service/key_service.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -80,6 +81,13 @@ class _HomePageState extends State<HomePage> {
       ['FaceCubePlusRecognize.mnn'],
     ).whenComplete(() => _secondThread = SecondThread());
     runBleStart();
+    checkIsFaceOk();
+  }
+
+  void checkIsFaceOk() {
+    final dp =
+        KeyService.baseAppKey.currentContext!.read<DeviceStatusProvider>();
+    dp.setFaceStatus(CacheService.getUserEnvironment()!.isUseFace!);
   }
 
   void runBleStart() {

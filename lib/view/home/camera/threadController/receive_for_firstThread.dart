@@ -58,8 +58,9 @@ void _handleMessage(data) {
         res = _receiveThreadOne.detect(image, rotation);
         break;
       case 'matchFeature':
-        var user = data.params as UserInfoTable;
-        res = _receiveThreadOne.matchFeature(user);
+        var user = data.params['user'] as UserInfoTable;
+        var feat = data.params['feat'] as String;
+        res = _receiveThreadOne.matchFeature(user, feat);
         break;
       case 'destroy':
         _receiveThreadOne.destroy();
@@ -84,7 +85,7 @@ class _ReceiveThreadOne {
         pngBytes, 36, opencvModlePath, mnnModlePath, testOutputPath);
   }
 
-  List<double>? detect(CameraImage image, int rotation) {
+  Map<String, dynamic>? detect(CameraImage image, int rotation) {
     // in iOS the format is BGRA and we get a single buffer for all channels.
     // So the yBuffer variable on Android will be just the Y channel but on iOS it will be
     var planes = image.planes;
@@ -102,8 +103,8 @@ class _ReceiveThreadOne {
     return result;
   }
 
-  UserInfoTable? matchFeature(UserInfoTable user) {
-    return native_ffi.matchFeature(user);
+  UserInfoTable? matchFeature(UserInfoTable user, String feat) {
+    return native_ffi.matchFeature(user, feat);
   }
 
   void destroy() {

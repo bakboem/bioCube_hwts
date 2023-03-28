@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/face_kit/truepass/lib/view/home/ffi/native_ffi.dart
  * Created Date: 2023-02-17 11:18:19
- * Last Modified: 2023-03-28 14:26:21
+ * Last Modified: 2023-03-28 20:02:44
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -202,7 +202,7 @@ void destroy() {
 }
 
 // Native parameter transfer
-List<double>? detectFrame(int width, int height, int rotation,
+Map<String, dynamic>? detectFrame(int width, int height, int rotation,
     Uint8List yBuffer, Uint8List? uBuffer, Uint8List? vBuffer) {
   var ySize = yBuffer.lengthInBytes;
   var uSize = uBuffer?.lengthInBytes ?? 0;
@@ -227,14 +227,19 @@ List<double>? detectFrame(int width, int height, int rotation,
       Platform.isAndroid ? true : false, outCount, feat, isSuccessful);
   final count = outCount.value;
   var result = res.asTypedList(count);
+  var featResult = feat.asTypedList(featCount * 512).toList();
   var isExtracted = isSuccessful.value == 1;
-  var featResul = feat.asTypedList(featCount * 512).toList();
-  pr(featResul);
+  var isFindFace = result.toList().isNotEmpty && isExtracted;
+  var temp = '';
+  for (var i = 0; i < featResult.length; i++) {
+    temp += '${featResult[i]}' + '${i != featResult.length - 1 ? ',' : ''}';
+  }
+
   malloc.free(outCount);
   malloc.free(res);
   malloc.free(feat);
   malloc.free(isSuccessful);
-  return result.toList().isNotEmpty && isExtracted ? result.toList() : null;
+  return isFindFace ? {'faceInfo': result.toList(), 'feat': temp} : null;
 }
 
 // Native parameter transfer
@@ -262,12 +267,11 @@ UserInfoTable? extractFeature(UserInfoTable user) {
   return user;
 }
 
-UserInfoTable? matchFeature(UserInfoTable user) {
-  // var feat1 = CacheService. .toNativeUtf8();
-  // var feat2 = user.feature!.toNativeUtf8();
-  // var score = _matchFeature(feat1, feat2);
-  // malloc.free(feat1);
-  // malloc.free(feat2);
+UserInfoTable? matchFeature(UserInfoTable user, String feat) {
+  var feat1 = feat.toNativeUtf8();
+  var feat2 = user.feature!.toNativeUtf8();
+  var score = _matchFeature(feat1, feat2);
+  user.score = score.value;
   return user;
 }
 

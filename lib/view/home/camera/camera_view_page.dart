@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:developer';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/view/home/camera/camera_overlay_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/service/key_service.dart';
@@ -85,7 +86,6 @@ class _CameraViewPageState extends State<CameraViewPage> {
     final fp =
         KeyService.baseAppKey.currentContext!.read<FaceDetectionProvider>();
     if (_detectionInProgress ||
-        fp.isFaceFinded ||
         !mounted ||
         DateTime.now().millisecondsSinceEpoch - _lastRun < 500) {
       return;
@@ -105,16 +105,20 @@ class _CameraViewPageState extends State<CameraViewPage> {
 
     // Call the detector
     _detectionInProgress = true;
-    List<double>? res;
-    res = await _firstThread.detect(image, _camFrameRotation);
-    if (res != null && res.isNotEmpty) {
-      fp.setIsShowFaceLine(true);
-      fp.setFaceInfo(res);
-      fp.setIsFaceFinded(true);
-      pr('find face x $res');
+    Map<String, dynamic>? res;
+    if (!fp.isFaceFinded) {
+      res = await _firstThread.detect(image, _camFrameRotation);
+      if (res != null && res.isNotEmpty) {
+        fp.setIsShowFaceLine(true);
+        fp.setFaceInfo(res['faceInfo']);
+        fp.setIsFaceFinded(true);
+        fp.startMatchData(_firstThread, res['feat']);
+        pr('find face x $res');
+      }
     } else {
       fp.setIsShowFaceLine(false);
     }
+
     _detectionInProgress = false;
     _lastRun = DateTime.now().millisecondsSinceEpoch;
 
@@ -138,20 +142,6 @@ class _CameraViewPageState extends State<CameraViewPage> {
     // });
   }
 
-  Widget _startMatchFeatureListenner() {
-    return Selector<FaceDetectionProvider, bool>(
-      selector: (context, provider) => provider.isFaceFinded,
-      builder: (context, isFinded, _) {
-        if (isFinded) {
-          Future.delayed(Duration.zero, () {
-            // _firstThread.matchFeature();
-          });
-        }
-        return SizedBox();
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     if (_camController == null || !_isCameraReady) {
@@ -171,7 +161,6 @@ class _CameraViewPageState extends State<CameraViewPage> {
                 ? CameraOverlayWidget(info: provider.faceInfo!)
                 : SizedBox();
           }),
-          _startMatchFeatureListenner()
         ],
       );
     }

@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/home/card_one_widget.dart
  * Created Date: 2023-02-04 20:19:38
- * Last Modified: 2023-03-18 18:52:58
+ * Last Modified: 2023-03-28 15:10:41
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -12,6 +12,8 @@
  */
 
 import 'dart:io';
+import 'package:hwst/globalProvider/face_detection_provider.dart';
+import 'package:hwst/view/common/widget_of_loading_view.dart';
 import 'package:lottie/lottie.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/material.dart';
@@ -235,21 +237,30 @@ class _CardWidgetState extends State<CardWidget>
                           //       ? CameraOverlayWidget(info: provider.faceInfo!)
                           //       : SizedBox();
                           // }),
-                          Lottie.asset(
-                            'assets/lottie/face.json',
-                            controller: _controller
-                              ..addListener(() {
-                                if (_controller.isCompleted) {
-                                  _controller.repeat();
-                                }
-                              }),
-                            onLoaded: (comp) {
-                              _controller
-                                ..duration = Duration(seconds: 5)
-                                ..forward();
+
+                          Selector<FaceDetectionProvider, bool>(
+                            selector: (context, provider) =>
+                                provider.isLoadData,
+                            builder: (context, isLoadData, _) {
+                              return BaseLoadingViewOnStackWidget.build(
+                                  context, isLoadData);
                             },
-                            options: LottieOptions(),
-                          ),
+                          )
+                          // Lottie.asset(
+                          //   'assets/lottie/face.json',
+                          //   controller: _controller
+                          //     ..addListener(() {
+                          //       if (_controller.isCompleted) {
+                          //         _controller.repeat();
+                          //       }
+                          //     }),
+                          //   onLoaded: (comp) {
+                          //     _controller
+                          //       ..duration = Duration(seconds: 5)
+                          //       ..forward();
+                          //   },
+                          //   options: LottieOptions(),
+                          // ),
                         ],
                       )
                     : Stack(

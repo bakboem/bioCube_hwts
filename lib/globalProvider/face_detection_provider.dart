@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/bioCube/face_kit/truepass/lib/globalProvider/face_detection_provider.dart
  * Created Date: 2023-02-19 15:22:53
- * Last Modified: 2023-03-28 10:25:20
+ * Last Modified: 2023-03-28 19:37:47
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -24,6 +24,7 @@ import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/model/common/result_model.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/model/user/get_user_all_response_model.dart';
+import 'package:hwst/view/home/camera/threadController/first_thread_process.dart';
 import 'package:hwst/view/home/camera/threadController/second_thread_process.dart';
 
 class FaceDetectionProvider extends ChangeNotifier {
@@ -92,6 +93,41 @@ class FaceDetectionProvider extends ChangeNotifier {
     await Future.doWhile(getUserDataForPageing);
     startSaveData(extractThread);
     return ResultModel(true);
+  }
+
+  void startMatchData(FirstThread firstThread, String feat1) async {
+    HiveService.init(HiveBoxType.USER_INFO);
+    List<UserInfoTable>? temp = await HiveService.getData(
+        (user) => user.imageData != null && (user.isExtracted ?? false));
+    int count = 0;
+
+    UserInfoTable? bestMatchUser;
+
+    if (temp != null) {
+      await Future.doWhile(() async {
+        if (temp.isEmpty) return false;
+        count++;
+        var start = DateTime.now();
+        var resultUser = await firstThread.matchFeature(temp[0], feat1,
+            isReady: count == 0 ? true : null);
+        if (resultUser != null) {
+          pr('resultUser.score :::${resultUser.score}');
+          if (bestMatchUser == null) {
+            bestMatchUser = resultUser;
+          }
+          pr('score: ${resultUser.mPerson == 'MP00000026' ? 'MY:' : ''} ${bestMatchUser!.score}');
+          if (resultUser.score! > bestMatchUser!.score!) {
+            bestMatchUser = resultUser;
+            pr('curren Score : ${bestMatchUser!.score}');
+          }
+          temp.removeWhere((user) => user.mPerson == resultUser.mPerson);
+        }
+        var endTime = DateTime.now().difference(start);
+        pr('$count WorkTime :: ${endTime.inMilliseconds} inMilliseconds');
+        return temp.isNotEmpty;
+      }).whenComplete(() => pr(
+          'The bestScore User Is : ${bestMatchUser!.mPerson} Score is:: ${bestMatchUser!.score}'));
+    }
   }
 
   void startSaveData(SecondThread extractThread) async {

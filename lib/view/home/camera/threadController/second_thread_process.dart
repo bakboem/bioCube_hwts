@@ -32,7 +32,7 @@ class SecondThread {
     );
   }
 
-  Future<UserInfoTable?> extractFaeture(UserInfoTable user) {
+  Future<UserInfoTable?> extractFeature(UserInfoTable user) {
     if (!isSecondThreadReady) {
       pr('??? not ready!');
       return Future.value(null);

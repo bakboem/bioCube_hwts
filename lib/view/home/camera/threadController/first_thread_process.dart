@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/HWST/lib/view/home/camera/threadController/main_thread_process copy.dart
  * Created Date: 2023-03-14 13:29:53
- * Last Modified: 2023-03-28 13:55:49
+ * Last Modified: 2023-03-28 16:15:04
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -57,13 +57,13 @@ class FirstThread {
     );
   }
 
-  Future<List<double>?> detect(CameraImage image, int rotation) {
+  Future<Map<String, dynamic>?> detect(CameraImage image, int rotation) {
     if (!isMainThreadReady) {
       return Future.value(null);
     }
 
     var reqId = ++_mainReqId;
-    var res = Completer<List<double>?>();
+    var res = Completer<Map<String, dynamic>?>();
     _cbs[reqId] = res;
     var msg = RequestOne(
       reqId: reqId,
@@ -75,7 +75,8 @@ class FirstThread {
     return res.future;
   }
 
-  Future<UserInfoTable?> matchFeature(UserInfoTable user, {bool? isReady}) {
+  Future<UserInfoTable?> matchFeature(UserInfoTable user, String feat1,
+      {bool? isReady}) {
     if (isReady != null) {
       isMainThreadReady = isReady;
     }
@@ -87,10 +88,9 @@ class FirstThread {
     var res = Completer<UserInfoTable?>();
     _cbs[reqId] = res;
     var msg = RequestOne(
-      reqId: reqId,
-      method: 'matchFeature',
-      params: user,
-    );
+        reqId: reqId,
+        method: 'matchFeature',
+        params: {'user': user, 'feat': feat1});
 
     _mainThreadSendPort.send(msg);
     return res.future;
