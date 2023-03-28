@@ -85,6 +85,7 @@ class _CameraViewPageState extends State<CameraViewPage> {
     final fp =
         KeyService.baseAppKey.currentContext!.read<FaceDetectionProvider>();
     if (_detectionInProgress ||
+        fp.isFaceFinded ||
         !mounted ||
         DateTime.now().millisecondsSinceEpoch - _lastRun < 500) {
       return;
@@ -97,7 +98,7 @@ class _CameraViewPageState extends State<CameraViewPage> {
       var w = (_camFrameRotation == 0 || _camFrameRotation == 180)
           ? image.width
           : image.height;
-      _camFrameToScreenScale = 360 / w;
+      _camFrameToScreenScale = 360 / w; // 360 is globle ui design width.
 
       fp.setCameraScale(_camFrameToScreenScale);
     }
@@ -108,7 +109,7 @@ class _CameraViewPageState extends State<CameraViewPage> {
     if (!fp.isFaceFinded) {
       res = await _firstThread.detect(image, _camFrameRotation);
     }
-    if (res != null && res.isNotEmpty && res[0] > 0) {
+    if (res != null && res.isNotEmpty) {
       fp.setIsShowFaceLine(true);
       fp.setFaceInfo(res);
       fp.setIsFaceFinded(true);
@@ -139,6 +140,20 @@ class _CameraViewPageState extends State<CameraViewPage> {
     // });
   }
 
+  Widget _startMatchFeatureListenner() {
+    return Selector<FaceDetectionProvider, bool>(
+      selector: (context, provider) => provider.isFaceFinded,
+      builder: (context, isFinded, _) {
+        if (isFinded) {
+          Future.delayed(Duration.zero, () {
+            // _firstThread.matchFeature();
+          });
+        }
+        return SizedBox();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_camController == null || !_isCameraReady) {
@@ -158,6 +173,7 @@ class _CameraViewPageState extends State<CameraViewPage> {
                 ? CameraOverlayWidget(info: provider.faceInfo!)
                 : SizedBox();
           }),
+          _startMatchFeatureListenner()
         ],
       );
     }

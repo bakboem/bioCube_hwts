@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/HWST/lib/view/home/camera/threadController/main_thread_process copy.dart
  * Created Date: 2023-03-14 13:29:53
- * Last Modified: 2023-03-14 13:44:18
+ * Last Modified: 2023-03-28 13:55:49
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -15,6 +15,7 @@ import 'dart:async';
 import 'dart:isolate';
 import 'dart:developer';
 import 'package:camera/camera.dart';
+import 'package:hwst/model/db/user_info_table.dart';
 import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/service/local_file_servicer.dart';
 import 'package:hwst/view/common/function_of_print.dart';
@@ -31,13 +32,13 @@ class FirstThread {
   FirstThread() {
     _initFirstThread();
   }
-
+  // thread 초기화.
   void _initFirstThread() async {
     ReceivePort mainThreadReceiver = ReceivePort();
     mainThreadReceiver.listen(_handleMessage, onDone: () {
+      // task 완성후 ready상태 혜지.
       isMainThreadReady = false;
     });
-// captrue full screen
 
     final bytes = await getBitmapFromContext();
     final dir = await LocalFileService().getLocalDirectory();
@@ -68,6 +69,27 @@ class FirstThread {
       reqId: reqId,
       method: 'detect',
       params: {'image': image, 'rotation': rotation},
+    );
+
+    _mainThreadSendPort.send(msg);
+    return res.future;
+  }
+
+  Future<UserInfoTable?> matchFeature(UserInfoTable user, {bool? isReady}) {
+    if (isReady != null) {
+      isMainThreadReady = isReady;
+    }
+    if (!isMainThreadReady) {
+      return Future.value(null);
+    }
+
+    var reqId = ++_mainReqId;
+    var res = Completer<UserInfoTable?>();
+    _cbs[reqId] = res;
+    var msg = RequestOne(
+      reqId: reqId,
+      method: 'matchFeature',
+      params: user,
     );
 
     _mainThreadSendPort.send(msg);

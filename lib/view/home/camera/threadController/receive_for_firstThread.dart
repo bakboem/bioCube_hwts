@@ -3,6 +3,7 @@ import 'dart:isolate';
 import 'dart:developer';
 import 'dart:typed_data';
 import 'package:camera/camera.dart';
+import 'package:hwst/model/db/user_info_table.dart';
 import 'package:hwst/view/home/camera/ffi/native_ffi.dart' as native_ffi;
 
 class InitRequestOne {
@@ -56,6 +57,10 @@ void _handleMessage(data) {
         var rotation = data.params['rotation'];
         res = _receiveThreadOne.detect(image, rotation);
         break;
+      case 'matchFeature':
+        var user = data.params as UserInfoTable;
+        res = _receiveThreadOne.matchFeature(user);
+        break;
       case 'destroy':
         _receiveThreadOne.destroy();
         break;
@@ -94,7 +99,11 @@ class _ReceiveThreadOne {
     var result = native_ffi.detectFrame(
         image.width, image.height, rotation, yBuffer, uBuffer, vBuffer);
 
-    return result.toList();
+    return result;
+  }
+
+  UserInfoTable? matchFeature(UserInfoTable user) {
+    return native_ffi.matchFeature(user);
   }
 
   void destroy() {

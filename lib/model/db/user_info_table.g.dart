@@ -1,16 +1,3 @@
-/*
- * Project Name:  [TruePass]
- * File: /Users/bakbeom/work/HWST/lib/model/db/user_info_table.g.dart
- * Created Date: 2023-03-17 14:40:55
- * Last Modified: 2023-03-17 18:23:03
- * Author: bakbeom
- * Modified By: bakbeom
- * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
- * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
- * 												Discription													
- * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
- */
-
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'user_info_table.dart';
@@ -34,7 +21,7 @@ class UserInfoTableAdapter extends TypeAdapter<UserInfoTable> {
       fields[2] as String?,
       fields[3] as DateTime?,
       fields[4] as String?,
-      (fields[5] as List?)?.cast<double>(),
+      fields[5] as String?,
       fields[6] as bool?,
     );
   }
@@ -78,10 +65,9 @@ UserInfoTable _$UserInfoTableFromJson(Map<String, dynamic> json) =>
       json['M_photo'] as String?,
       json['Adate'] == null ? null : DateTime.parse(json['Adate'] as String),
       json['M_photo_base64'] as String?,
-      (json['feature'] as List<dynamic>?)
-          ?.map((e) => (e as num).toDouble())
-          .toList(),
+      json['feature'] as String?,
       json['isExtracted'] as bool?,
+      (json['score'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$UserInfoTableToJson(UserInfoTable instance) =>
@@ -92,4 +78,5 @@ Map<String, dynamic> _$UserInfoTableToJson(UserInfoTable instance) =>
       'M_photo_base64': instance.imageData,
       'feature': instance.feature,
       'isExtracted': instance.isExtracted,
+      'score': instance.score,
     };

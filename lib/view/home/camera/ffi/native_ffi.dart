@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/face_kit/truepass/lib/view/home/ffi/native_ffi.dart
  * Created Date: 2023-02-17 11:18:19
- * Last Modified: 2023-03-27 17:36:46
+ * Last Modified: 2023-03-28 14:26:21
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -16,6 +16,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
 import 'package:hwst/model/db/user_info_table.dart';
+import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 
 // Getting a library that holds needed symbols
@@ -45,11 +46,16 @@ typedef _CDetectFrame = ffi.Pointer<ffi.Float> Function(
   ffi.Bool isYUV,
   ffi.Pointer<ffi.Int32> outCount,
   ffi.Pointer<ffi.Float> feat,
+  ffi.Pointer<ffi.Int32> isSuccessful,
 );
 typedef _CExtractFeature = ffi.Pointer<ffi.Float> Function(
   ffi.Pointer<Utf8>,
   ffi.Pointer<ffi.Float> feat,
   ffi.Pointer<ffi.Int32> isSuccessful,
+);
+typedef _CMatchFeature = ffi.Pointer<ffi.Float> Function(
+  ffi.Pointer<Utf8>,
+  ffi.Pointer<Utf8>,
 );
 
 /// Dart function signatures
@@ -75,12 +81,17 @@ typedef _DetectFrame = ffi.Pointer<ffi.Float> Function(
     ffi.Pointer<ffi.Uint8> bytes,
     bool isYUV,
     ffi.Pointer<ffi.Int32> outCount,
-    ffi.Pointer<ffi.Float> feat);
+    ffi.Pointer<ffi.Float> feat,
+    ffi.Pointer<ffi.Int32> isSuccessful);
 
 typedef _ExtractFeature = ffi.Pointer<ffi.Float> Function(
   ffi.Pointer<Utf8>,
   ffi.Pointer<ffi.Float> feat,
   ffi.Pointer<ffi.Int32> isSuccessful,
+);
+typedef _MatchFeature = ffi.Pointer<ffi.Float> Function(
+  ffi.Pointer<Utf8>,
+  ffi.Pointer<Utf8>,
 );
 // Functions mapping.
 final _VersionFunc _version =
@@ -94,8 +105,11 @@ final _InitMnnModel _initMnnModel = _lib
     .asFunction();
 final _DetectFrame _detectFrame =
     _lib.lookup<ffi.NativeFunction<_CDetectFrame>>('detectFrame').asFunction();
-final _ExtractFeature _extractFaeture = _lib
-    .lookup<ffi.NativeFunction<_CExtractFeature>>('extractFaeture')
+final _ExtractFeature _extractFeature = _lib
+    .lookup<ffi.NativeFunction<_CExtractFeature>>('extractFeature')
+    .asFunction();
+final _MatchFeature _matchFeature = _lib
+    .lookup<ffi.NativeFunction<_CMatchFeature>>('matchFeature')
     .asFunction();
 final _DestroyDetector _destroyDetector = _lib
     .lookup<ffi.NativeFunction<_CDestroyDetector>>('destroyDetector')
@@ -188,8 +202,8 @@ void destroy() {
 }
 
 // Native parameter transfer
-Float32List detectFrame(int width, int height, int rotation, Uint8List yBuffer,
-    Uint8List? uBuffer, Uint8List? vBuffer) {
+List<double>? detectFrame(int width, int height, int rotation,
+    Uint8List yBuffer, Uint8List? uBuffer, Uint8List? vBuffer) {
   var ySize = yBuffer.lengthInBytes;
   var uSize = uBuffer?.lengthInBytes ?? 0;
   var vSize = vBuffer?.lengthInBytes ?? 0;
@@ -206,19 +220,21 @@ Float32List detectFrame(int width, int height, int rotation, Uint8List yBuffer,
   }
 
   ffi.Pointer<ffi.Int32> outCount = malloc.allocate<ffi.Int32>(1);
+  ffi.Pointer<ffi.Int32> isSuccessful = malloc.allocate<ffi.Int32>(1);
   var featCount = ffi.sizeOf<ffi.Float>();
   ffi.Pointer<ffi.Float> feat = malloc.allocate<ffi.Float>(featCount * 512);
   var res = _detectFrame(width, height, rotation, _imageBuffer!,
-      Platform.isAndroid ? true : false, outCount, feat);
+      Platform.isAndroid ? true : false, outCount, feat, isSuccessful);
   final count = outCount.value;
   var result = res.asTypedList(count);
-
+  var isExtracted = isSuccessful.value == 1;
   var featResul = feat.asTypedList(featCount * 512).toList();
   pr(featResul);
   malloc.free(outCount);
   malloc.free(res);
   malloc.free(feat);
-  return result;
+  malloc.free(isSuccessful);
+  return result.toList().isNotEmpty && isExtracted ? result.toList() : null;
 }
 
 // Native parameter transfer
@@ -227,18 +243,31 @@ UserInfoTable? extractFeature(UserInfoTable user) {
   ffi.Pointer<ffi.Int32> isSuccessful = malloc.allocate<ffi.Int32>(1);
   ffi.Pointer<ffi.Float> feat = malloc.allocate<ffi.Float>(featCount * 512);
   final base64Image = user.imageData!;
-  var res = _extractFaeture(
+  var res = _extractFeature(
     base64Image.toNativeUtf8(),
     feat,
     isSuccessful,
   );
-  user.feature = res.asTypedList(featCount * 512).toList();
+  var result = res.asTypedList(featCount * 512).toList();
+  var temp = '';
+  for (var i = 0; i < result.length; i++) {
+    temp += '${result[i]}' + '${i != result.length - 1 ? ',' : ''}';
+  }
+  user.feature = temp;
   user.isExtracted = isSuccessful.value == 1;
-  // print(user.feature);
   pr('user.isExtracted ? ${user.isExtracted}');
   malloc.free(feat);
   malloc.free(res);
   malloc.free(isSuccessful);
+  return user;
+}
+
+UserInfoTable? matchFeature(UserInfoTable user) {
+  // var feat1 = CacheService. .toNativeUtf8();
+  // var feat2 = user.feature!.toNativeUtf8();
+  // var score = _matchFeature(feat1, feat2);
+  // malloc.free(feat1);
+  // malloc.free(feat2);
   return user;
 }
 

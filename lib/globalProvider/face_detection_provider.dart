@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/bioCube/face_kit/truepass/lib/globalProvider/face_detection_provider.dart
  * Created Date: 2023-02-19 15:22:53
- * Last Modified: 2023-03-27 19:48:43
+ * Last Modified: 2023-03-28 10:25:20
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -107,7 +107,7 @@ class FaceDetectionProvider extends ChangeNotifier {
 
       await Future.doWhile(() async {
         var start = DateTime.now();
-        var resultUser = await extractThread.extractFaeture(temp[0]);
+        var resultUser = await extractThread.extractFeature(temp[0]);
         if (resultUser != null) {
           HiveService.insert(resultUser);
           saveTime += DateTime.now().difference(start);
