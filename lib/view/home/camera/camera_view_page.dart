@@ -106,9 +106,7 @@ class _CameraViewPageState extends State<CameraViewPage> {
     // Call the detector
     _detectionInProgress = true;
     List<double>? res;
-    if (!fp.isFaceFinded) {
-      res = await _firstThread.detect(image, _camFrameRotation);
-    }
+    res = await _firstThread.detect(image, _camFrameRotation);
     if (res != null && res.isNotEmpty) {
       fp.setIsShowFaceLine(true);
       fp.setFaceInfo(res);

@@ -23,13 +23,14 @@ class UserInfoTableAdapter extends TypeAdapter<UserInfoTable> {
       fields[4] as String?,
       fields[5] as String?,
       fields[6] as bool?,
+      fields[7] as double?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserInfoTable obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(1)
       ..write(obj.mPerson)
       ..writeByte(2)
@@ -41,7 +42,9 @@ class UserInfoTableAdapter extends TypeAdapter<UserInfoTable> {
       ..writeByte(5)
       ..write(obj.feature)
       ..writeByte(6)
-      ..write(obj.isExtracted);
+      ..write(obj.isExtracted)
+      ..writeByte(7)
+      ..write(obj.score);
   }
 
   @override

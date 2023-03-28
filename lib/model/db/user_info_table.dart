@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/HWST/lib/model/db/user_info_table.dart
  * Created Date: 2023-03-14 20:10:24
- * Last Modified: 2023-03-28 13:37:59
+ * Last Modified: 2023-03-28 14:32:40
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -33,6 +33,7 @@ class UserInfoTable {
   String? feature;
   @HiveField(6)
   bool? isExtracted;
+  @HiveField(7)
   double? score;
   UserInfoTable(this.mPerson, this.mPhoto, this.updateDate, this.imageData,
       this.feature, this.isExtracted, this.score);
