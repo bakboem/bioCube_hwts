@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/signin/provider/signin_page_provider.dart
  * Created Date: 2023-01-25 12:36:45
- * Last Modified: 2023-03-14 16:43:57
+ * Last Modified: 2023-03-29 09:06:23
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -124,7 +124,7 @@ class SigninPageProvider extends ChangeNotifier {
         var accessInfo = AccessInfo(siteCodeInputStr, loginAccountInputStr,
             signinType.code, accessKeyInputStr);
         var userEvn =
-            UserEnvironmentModel(true, 1, false, false, true, 1, '-80', 20);
+            UserEnvironmentModel(true, 1, false, false, true, 1, '-80', 20, 75);
         var deviceInfo = await DeviceInfoService.getDeviceInfo();
         CacheService.saveUserEnvironment(userEvn.toJson());
         CacheService.saveDeviceInfo(deviceInfo.toJson());

@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-28 17:59:28
+ * Last Modified: 2023-03-29 10:44:28
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -344,6 +344,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildButtonWidget(BuildContext context, bool isBleOk, bool isNfcOk,
       bool isFaceOk, UserEnvironmentModel? userEvn) {
     final cp = context.read<CoreVerifyProcessProvider>();
+    final fp = context.read<FaceDetectionProvider>();
     Future.delayed(Duration.zero, () {
       _pageController.jumpToPage(
           CacheService.getLastVerfyType() == VerifyType.BLE ? 0 : 1);
@@ -391,6 +392,7 @@ class _HomePageState extends State<HomePage> {
                   if (_pageController.initialPage != 3) {
                     if (cp.isShowCamera) {
                       cp.setIsShowCamera(val: false);
+                      fp.setIsStartRecord(null);
                     }
                   }
                 }),

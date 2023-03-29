@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/model/user/user_evn_model.dart
  * Created Date: 2023-02-04 11:03:09
- * Last Modified: 2023-03-14 16:23:57
+ * Last Modified: 2023-03-29 09:04:16
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -23,6 +23,7 @@ class UserEnvironmentModel {
   int? alarmType; // 0 진동 1 안내음성 2 소리.(default 1)
   String? rssi;
   int? sessionTime;
+  int? scoreSetting;
 
   UserEnvironmentModel(
       this.isUseBle,
@@ -32,7 +33,8 @@ class UserEnvironmentModel {
       this.isUseNfc,
       this.useType,
       this.rssi,
-      this.sessionTime);
+      this.sessionTime,
+      this.scoreSetting);
   factory UserEnvironmentModel.fromJson(Object? json) =>
       _$UserEnvironmentModelFromJson(json as Map<String, dynamic>);
   Map<String, dynamic> toJson() => _$UserEnvironmentModelToJson(this);

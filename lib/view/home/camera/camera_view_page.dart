@@ -118,7 +118,9 @@ class _CameraViewPageState extends State<CameraViewPage> {
     } else {
       fp.setIsShowFaceLine(false);
     }
-
+    if (fp.isStartRecord != null && fp.isStartRecord!) {
+      pr('startRecord');
+    }
     _detectionInProgress = false;
     _lastRun = DateTime.now().millisecondsSinceEpoch;
 

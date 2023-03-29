@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/setting_page.dart
  * Created Date: 2023-01-27 11:51:50
- * Last Modified: 2023-03-28 20:32:33
+ * Last Modified: 2023-03-29 09:28:26
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -13,6 +13,7 @@
 
 import 'dart:io';
 import 'package:hwst/enums/hive_box_type.dart';
+import 'package:hwst/enums/slider_type.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/material.dart';
@@ -564,7 +565,7 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
-  Widget _buildSlider(BuildContext context) {
+  Widget _buildRssiSlider(BuildContext context) {
     return Selector<SettinPageProivder, String?>(
       selector: (context, provider) => provider.rssi,
       builder: (context, val, _) {
@@ -600,7 +601,7 @@ class _SettingPageState extends State<SettingPage> {
             maxLines: 2));
   }
 
-  Widget _buildSessionTimeInput(BuildContext context) {
+  Widget _buildSessionTimeSlider(BuildContext context) {
     return Selector<SettinPageProivder, int?>(
       selector: (context, provider) => provider.sessionSettingTime,
       builder: (context, session, _) {
@@ -623,27 +624,57 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
+  Widget _buildScoreSlider(BuildContext context) {
+    return Selector<SettinPageProivder, int?>(
+      selector: (context, provider) => provider.scoreSetting,
+      builder: (context, score, _) {
+        return Slider(
+            max: 80,
+            min: 0,
+            divisions: 80,
+            label: '${score ?? 0} score',
+            value: score != null ? score.toDouble() : 75,
+            onChangeEnd: (s) {
+              final p = context.read<SettinPageProivder>();
+              p.setUserEnvrionment(context);
+            },
+            onChanged: (s) {
+              final p = context.read<SettinPageProivder>();
+              p.setScore(s.toInt());
+            });
+      },
+    );
+  }
+
   Widget _buildTitleRow(BuildContext context, String title,
-      {required bool isRssi}) {
+      {required SliderType type}) {
     return Padding(
       padding: EdgeInsets.only(right: AppSize.padding),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           AppText.text(title),
-          isRssi
+          type == SliderType.RSSI
               ? Selector<SettinPageProivder, String?>(
                   selector: (context, provider) => provider.rssi,
                   builder: (context, val, _) {
                     return AppText.text('$val dBm');
                   },
                 )
-              : Selector<SettinPageProivder, int?>(
-                  selector: (context, provider) => provider.sessionSettingTime,
-                  builder: (context, val, _) {
-                    return AppText.text('$val sec');
-                  },
-                )
+              : type == SliderType.SESSION
+                  ? Selector<SettinPageProivder, int?>(
+                      selector: (context, provider) =>
+                          provider.sessionSettingTime,
+                      builder: (context, val, _) {
+                        return AppText.text('$val sec');
+                      },
+                    )
+                  : Selector<SettinPageProivder, int?>(
+                      selector: (context, provider) => provider.scoreSetting,
+                      builder: (context, val, _) {
+                        return AppText.text('$val score');
+                      },
+                    )
         ],
       ),
     );
@@ -691,18 +722,25 @@ class _SettingPageState extends State<SettingPage> {
                                       defaultSpacing(multiple: 2),
                                       _buildTitleRow(
                                           context, tr('rssi_setting'),
-                                          isRssi: true),
+                                          type: SliderType.RSSI),
                                       defaultSpacing(),
-                                      _buildSlider(context),
+                                      _buildRssiSlider(context),
                                       defaultSpacing(),
                                       _buildTips(tr('slider_description')),
                                       defaultSpacing(),
                                       _buildTitleRow(
                                           context, tr('session_setting'),
-                                          isRssi: false),
-                                      _buildSessionTimeInput(context),
+                                          type: SliderType.SESSION),
+                                      _buildSessionTimeSlider(context),
                                       defaultSpacing(),
                                       _buildTips(tr('session_description')),
+                                      defaultSpacing(),
+                                      _buildTitleRow(
+                                          context, tr('score_setting'),
+                                          type: SliderType.SCORE),
+                                      _buildScoreSlider(context),
+                                      defaultSpacing(),
+                                      _buildTips(tr('score_description')),
                                     ],
                                   )
                                 : SizedBox(),

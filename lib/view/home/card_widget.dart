@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/home/card_one_widget.dart
  * Created Date: 2023-02-04 20:19:38
- * Last Modified: 2023-03-28 15:10:41
+ * Last Modified: 2023-03-29 10:34:10
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -13,6 +13,7 @@
 
 import 'dart:io';
 import 'package:hwst/globalProvider/face_detection_provider.dart';
+import 'package:hwst/styles/export_common.dart';
 import 'package:hwst/view/common/widget_of_loading_view.dart';
 import 'package:lottie/lottie.dart';
 import 'package:tuple/tuple.dart';
@@ -215,54 +216,77 @@ class _CardWidgetState extends State<CardWidget>
                           width: AppSize.cardBorderWidth),
                 ),
                 child: isShowCamera
-                    ? Stack(
-                        children: [
-                          ClipRRect(
-                            clipBehavior: Clip.antiAlias,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(AppSize.radius15),
-                              topRight: Radius.circular(AppSize.radius15),
-                              bottomRight: Radius.circular(AppSize.radius15),
-                              bottomLeft: Radius.circular(AppSize.radius15),
+                    ? GestureDetector(
+                        onDoubleTap: () {
+                          final fp = context.read<FaceDetectionProvider>();
+                          fp.setTestSwich();
+                        },
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            ClipRRect(
+                              clipBehavior: Clip.antiAlias,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(AppSize.radius15),
+                                topRight: Radius.circular(AppSize.radius15),
+                                bottomRight: Radius.circular(AppSize.radius15),
+                                bottomLeft: Radius.circular(AppSize.radius15),
+                              ),
+                              child: CameraViewPage(
+                                key: Key('fromCardPage'),
+                              ),
                             ),
-                            child: CameraViewPage(
-                              key: Key('fromCardPage'),
-                            ),
-                          ),
-                          // Consumer<FaceDetectionProvider>(
-                          //     builder: (context, provider, _) {
-                          //   return provider.faceInfo != null &&
-                          //           provider.faceInfo!.isNotEmpty &&
-                          //           provider.isShowFaceLine
-                          //       ? CameraOverlayWidget(info: provider.faceInfo!)
-                          //       : SizedBox();
-                          // }),
+                            // Consumer<FaceDetectionProvider>(
+                            //     builder: (context, provider, _) {
+                            //   return provider.faceInfo != null &&
+                            //           provider.faceInfo!.isNotEmpty &&
+                            //           provider.isShowFaceLine
+                            //       ? CameraOverlayWidget(info: provider.faceInfo!)
+                            //       : SizedBox();
+                            // }),
 
-                          Selector<FaceDetectionProvider, bool>(
-                            selector: (context, provider) =>
-                                provider.isLoadData,
-                            builder: (context, isLoadData, _) {
-                              return BaseLoadingViewOnStackWidget.build(
-                                  context, isLoadData);
-                            },
-                          )
-                          // Lottie.asset(
-                          //   'assets/lottie/face.json',
-                          //   controller: _controller
-                          //     ..addListener(() {
-                          //       if (_controller.isCompleted) {
-                          //         _controller.repeat();
-                          //       }
-                          //     }),
-                          //   onLoaded: (comp) {
-                          //     _controller
-                          //       ..duration = Duration(seconds: 5)
-                          //       ..forward();
-                          //   },
-                          //   options: LottieOptions(),
-                          // ),
-                        ],
-                      )
+                            Selector<FaceDetectionProvider,
+                                Tuple2<bool?, bool?>>(
+                              selector: (context, provider) => Tuple2(
+                                  provider.isMatchSuccess,
+                                  provider.isStartRecord),
+                              builder: (context, tuple, _) {
+                                return tuple.item1 == null
+                                    ? SizedBox()
+                                    : SizedBox(
+                                        width: AppSize.realWidth / 2,
+                                        height: AppSize.realWidth / 2,
+                                        child: AppImage.getImage(tuple.item1!
+                                            ? ImageType.SUCCESS
+                                            : ImageType.FAILD),
+                                      );
+                              },
+                            ),
+                            Selector<FaceDetectionProvider, bool?>(
+                              selector: (context, provider) =>
+                                  provider.isStartRecord,
+                              builder: (context, isStart, _) {
+                                return isStart == null
+                                    ? SizedBox()
+                                    : Lottie.asset(
+                                        'assets/lottie/face.json',
+                                        controller: _controller
+                                          ..addListener(() {
+                                            if (_controller.isCompleted) {
+                                              _controller.repeat();
+                                            }
+                                          }),
+                                        onLoaded: (comp) {
+                                          _controller
+                                            ..duration = Duration(seconds: 5)
+                                            ..forward();
+                                        },
+                                        options: LottieOptions(),
+                                      );
+                              },
+                            ),
+                          ],
+                        ))
                     : Stack(
                         children: [
                           Column(

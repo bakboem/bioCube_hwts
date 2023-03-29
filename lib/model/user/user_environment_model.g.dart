@@ -17,6 +17,7 @@ UserEnvironmentModel _$UserEnvironmentModelFromJson(
       json['useType'] as int?,
       json['rssi'] as String?,
       json['sessionTime'] as int?,
+      json['scoreSetting'] as int?,
     );
 
 Map<String, dynamic> _$UserEnvironmentModelToJson(
@@ -30,4 +31,5 @@ Map<String, dynamic> _$UserEnvironmentModelToJson(
       'alarmType': instance.alarmType,
       'rssi': instance.rssi,
       'sessionTime': instance.sessionTime,
+      'scoreSetting': instance.scoreSetting,
     };

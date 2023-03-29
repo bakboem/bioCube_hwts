@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/setting/provider/setting_page_provider.dart
  * Created Date: 2023-01-27 12:15:53
- * Last Modified: 2023-03-18 14:24:13
+ * Last Modified: 2023-03-29 09:23:41
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -33,11 +33,16 @@ class SettinPageProivder extends ChangeNotifier {
   String? cameraRadioStr;
   String? rssi;
   int? sessionSettingTime;
+  int? scoreSetting;
 
   var veifyRadioList = [];
   var combinationVeifyRadioList = [];
   var guideMethodRadioList = [];
   var cameraRadioList = [];
+  void setScore(int val) {
+    scoreSetting = val;
+    notifyListeners();
+  }
 
   void setUserEnvrionment(BuildContext context) {
     var temp = UserEnvironmentModel(
@@ -50,7 +55,8 @@ class SettinPageProivder extends ChangeNotifier {
             ? veifyRadioList.indexOf(currenVeirfyRadioStr!)
             : combinationVeifyRadioList.indexOf(combinationVeifyRadioStr!) + 2,
         rssi,
-        sessionSettingTime);
+        sessionSettingTime,
+        scoreSetting);
     pr(temp.toJson());
     CacheService.saveUserEnvironment(temp.toJson());
     final dp = context.read<DeviceStatusProvider>();
@@ -125,6 +131,7 @@ class SettinPageProivder extends ChangeNotifier {
       faceSwichVal = false;
       sessionSettingTime = 20;
       rssi = '-80';
+      scoreSetting = 75;
     } else {
       nfcSwichVal = userEvn.isUseNfc!;
       bleSwichVal = userEvn.isUseBle!;
@@ -140,6 +147,7 @@ class SettinPageProivder extends ChangeNotifier {
       cameraRadioStr = cameraRadioList[userEvn.isUseFaceMore! ? 1 : 0];
       sessionSettingTime = userEvn.sessionTime;
       rssi = userEvn.rssi;
+      scoreSetting = userEvn.scoreSetting;
     }
     return ResultModel(true);
   }

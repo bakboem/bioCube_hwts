@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/enums/image_type.dart
  * Created Date: 2021-08-20 14:37:40
- * Last Modified: 2023-02-22 23:23:48
+ * Last Modified: 2023-03-29 09:50:25
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -63,7 +63,9 @@ enum ImageType {
   DRAWER_HOME_INFO,
   CARD_ONE,
   CARD_TWO,
-  CARD_THREE
+  CARD_THREE,
+  SUCCESS,
+  FAILD
 }
 
 extension RequestTypeExtension on ImageType {
@@ -71,6 +73,10 @@ extension RequestTypeExtension on ImageType {
     switch (this) {
       case ImageType.INFO:
         return 'assets/images/info.svg';
+      case ImageType.SUCCESS:
+        return 'assets/images/success.png';
+      case ImageType.FAILD:
+        return 'assets/images/note.png';
       case ImageType.SETTINGS_ICON:
         return 'assets/images/icon_outlined_24_lg_1_settings.svg';
       case ImageType.SEARCH:
@@ -143,6 +149,10 @@ extension RequestTypeExtension on ImageType {
       case ImageType.PEOPLE:
         return false;
       case ImageType.PEOPLE_WHITE:
+        return false;
+      case ImageType.SUCCESS:
+        return false;
+      case ImageType.FAILD:
         return false;
       // case ImageType.BLE:
       //   return false;
