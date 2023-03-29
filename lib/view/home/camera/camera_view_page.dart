@@ -26,6 +26,7 @@ class _CameraViewPageState extends State<CameraViewPage> {
   double _camFrameToScreenScale = 0;
   int _lastRun = 0;
   bool _detectionInProgress = false;
+  bool _recordInProgress = false;
   bool _isCameraReady = false;
   @override
   void initState() {
@@ -86,8 +87,14 @@ class _CameraViewPageState extends State<CameraViewPage> {
   void _processCameraImage(CameraImage image) async {
     final fp =
         KeyService.baseAppKey.currentContext!.read<FaceDetectionProvider>();
+    if (fp.recordstatus == RecordStatus.WORKING) {
+      // do record proccess.
+      _firstThread.startRecord(image, _camFrameRotation,
+          isReady: _recordInProgress == false ? true : null);
+      _recordInProgress = true;
+      return;
+    }
     if (_detectionInProgress ||
-        fp.recordstatus == RecordStatus.WORKING ||
         !mounted ||
         DateTime.now().millisecondsSinceEpoch - _lastRun < 500) {
       return;
@@ -125,6 +132,7 @@ class _CameraViewPageState extends State<CameraViewPage> {
       pr('startRecord');
       Future.delayed(Duration(seconds: 5), () {
         fp.setRecodeStatus(RecordStatus.END);
+        _recordInProgress = false;
       });
     }
     _detectionInProgress = false;

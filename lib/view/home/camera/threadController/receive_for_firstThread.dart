@@ -62,6 +62,11 @@ void _handleMessage(data) {
         var feat = data.params['feat'] as String;
         res = _receiveThreadOne.matchFeature(user, feat);
         break;
+      case 'startRecord':
+        var image = data.params['image'] as CameraImage;
+        var rotation = data.params['rotation'];
+        res = _receiveThreadOne.startRecord(image, rotation);
+        break;
       case 'destroy':
         _receiveThreadOne.destroy();
         break;
@@ -101,6 +106,12 @@ class _ReceiveThreadOne {
         image.width, image.height, rotation, yBuffer, uBuffer, vBuffer);
 
     return result;
+  }
+
+  bool? startRecord(CameraImage image, int rotation) {
+    // in iOS the format is BGRA and we get a single buffer for all channels.
+    // So the yBuffer variable on Android will be just the Y channel but on iOS it will be
+    return true;
   }
 
   UserInfoTable? matchFeature(UserInfoTable user, String feat) {

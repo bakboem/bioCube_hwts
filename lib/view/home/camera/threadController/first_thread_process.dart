@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/HWST/lib/view/home/camera/threadController/main_thread_process copy.dart
  * Created Date: 2023-03-14 13:29:53
- * Last Modified: 2023-03-28 16:15:04
+ * Last Modified: 2023-03-29 12:25:53
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -91,6 +91,27 @@ class FirstThread {
         reqId: reqId,
         method: 'matchFeature',
         params: {'user': user, 'feat': feat1});
+
+    _mainThreadSendPort.send(msg);
+    return res.future;
+  }
+
+  Future<bool?> startRecord(CameraImage image, int rotation, {bool? isReady}) {
+    if (isReady != null) {
+      isMainThreadReady = isReady;
+    }
+    if (!isMainThreadReady) {
+      return Future.value(null);
+    }
+
+    var reqId = ++_mainReqId;
+    var res = Completer<bool?>();
+    _cbs[reqId] = res;
+    var msg = RequestOne(
+      reqId: reqId,
+      method: 'startRecord',
+      params: {'image': image, 'rotation': rotation},
+    );
 
     _mainThreadSendPort.send(msg);
     return res.future;
