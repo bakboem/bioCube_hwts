@@ -124,6 +124,7 @@
     "totalComplete":"다운로드 진척도",
     "extractFeatureComplete":"특징점추출 진척도",
     "score_setting":"얼굴인식 스코어 설정",
-    "score_description":"스코어 점수가 높을수록 인식 정확도가 향상됩니다."
+    "score_description":"스코어 점수가 높을수록 인식 정확도가 향상됩니다.",
+    "face_success_text":"얼굴인식 됬습니다."
 
 }

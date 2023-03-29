@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/truepass/lib/service/sound_service.dart
  * Created Date: 2023-01-29 12:31:55
- * Last Modified: 2023-01-29 18:07:15
+ * Last Modified: 2023-03-29 11:47:11
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -24,6 +24,7 @@ class SoundService {
 
   static Soundpool? pool;
   static int? soundId;
+  static int? successSound;
   static Future<void> init() async {
     pool = Soundpool.fromOptions();
     soundId = await rootBundle
@@ -31,10 +32,19 @@ class SoundService {
         .then((ByteData soundData) {
       return pool!.load(soundData);
     });
+    successSound = await rootBundle
+        .load("assets/sound/Cut_Cert_OK.wav")
+        .then((ByteData soundData) {
+      return pool!.load(soundData);
+    });
   }
 
   static Future<void> playSound() async {
     await pool!.play(soundId!);
+  }
+
+  static Future<void> playSuccessSound() async {
+    await pool!.play(successSound!);
   }
 
   static void dispose() {

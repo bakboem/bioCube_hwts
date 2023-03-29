@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/truepass/lib/view/home/provider/core_process_provider.dart
  * Created Date: 2023-01-25 12:24:10
- * Last Modified: 2023-03-18 14:13:11
+ * Last Modified: 2023-03-29 12:04:30
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -41,6 +41,7 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
 
   bool? isBleSuccess; // toast
   bool? isNfcSuccess; // toast
+  bool? isFaceSuccess; // toast
   Timer? timer;
   Timer? sessionTimer;
 
@@ -101,6 +102,7 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
   void reset() {
     isBleSuccess = null;
     isNfcSuccess = null;
+    isFaceSuccess = null;
     message = null;
     timer = null;
     notifyListeners();
@@ -162,7 +164,9 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
         pr('body:::${result.body}');
         verifyType == VerifyType.BLE
             ? isBleSuccess = true
-            : isNfcSuccess = true;
+            : verifyType == VerifyType.NFC
+                ? isNfcSuccess = true
+                : isFaceSuccess = true;
         notifyListeners();
         return ResultModel(true);
       }

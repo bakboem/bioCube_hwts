@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-29 10:44:28
+ * Last Modified: 2023-03-29 12:09:40
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -12,6 +12,7 @@
  */
 
 import 'dart:io';
+import 'package:hwst/enums/record_status.dart';
 import 'package:hwst/service/key_service.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/services.dart';
@@ -140,17 +141,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _popupContents(BuildContext context) {
-    return Selector<CoreVerifyProcessProvider, Tuple2<bool?, bool?>>(
-      selector: (context, provider) =>
-          Tuple2(provider.isBleSuccess, provider.isNfcSuccess),
+    return Selector<CoreVerifyProcessProvider, Tuple3<bool?, bool?, bool?>>(
+      selector: (context, provider) => Tuple3(
+          provider.isBleSuccess, provider.isNfcSuccess, provider.isFaceSuccess),
       builder: (context, tuple, _) {
         var userEvn = CacheService.getUserEnvironment()!;
         var bleSuccess = tuple.item1 != null && tuple.item1!;
         var nfcSuccess = tuple.item2 != null && tuple.item2!;
-        if (bleSuccess || nfcSuccess) {
+        var faceSuccess = tuple.item3 != null && tuple.item3!;
+        if (bleSuccess || nfcSuccess || faceSuccess) {
           Future.delayed(Duration.zero, () async {
-            await AppToast().show(context,
-                bleSuccess ? tr('ble_success_text') : tr('nfc_success_text'));
+            await AppToast().show(
+                context,
+                bleSuccess
+                    ? tr('ble_success_text')
+                    : nfcSuccess
+                        ? tr('nfc_success_text')
+                        : tr('face_success_text'));
             switch (userEvn.alarmType) {
               case 0:
                 await ViBrationService.hasVibrator()
@@ -158,10 +165,14 @@ class _HomePageState extends State<HomePage> {
                     : DoNothingAction();
                 break;
               case 1:
-                await SoundService.playSound();
+                faceSuccess
+                    ? await SoundService.playSuccessSound()
+                    : await SoundService.playSound();
                 break;
               case 2:
-                await SoundService.playSound();
+                faceSuccess
+                    ? await SoundService.playSuccessSound()
+                    : await SoundService.playSound();
                 break;
             }
           });
@@ -392,7 +403,7 @@ class _HomePageState extends State<HomePage> {
                   if (_pageController.initialPage != 3) {
                     if (cp.isShowCamera) {
                       cp.setIsShowCamera(val: false);
-                      fp.setIsStartRecord(null);
+                      fp.setRecodeStatus(RecordStatus.INIT);
                     }
                   }
                 }),

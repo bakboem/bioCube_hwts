@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/bioCube/face_kit/truepass/lib/globalProvider/face_detection_provider.dart
  * Created Date: 2023-02-19 15:22:53
- * Last Modified: 2023-03-29 10:48:40
+ * Last Modified: 2023-03-29 12:10:05
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -14,6 +14,11 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:hwst/enums/record_status.dart';
+import 'package:hwst/enums/verify_type.dart';
+import 'package:hwst/globalProvider/core_verify_process_provider.dart';
+import 'package:hwst/service/key_service.dart';
+import 'package:hwst/service/sound_service.dart';
 import 'package:hwst/util/date_util.dart';
 import 'package:hwst/enums/request_type.dart';
 import 'package:hwst/service/api_service.dart';
@@ -26,6 +31,7 @@ import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/model/user/get_user_all_response_model.dart';
 import 'package:hwst/view/home/camera/threadController/first_thread_process.dart';
 import 'package:hwst/view/home/camera/threadController/second_thread_process.dart';
+import 'package:provider/provider.dart';
 
 class FaceDetectionProvider extends ChangeNotifier {
   bool testSwich = false;
@@ -46,20 +52,30 @@ class FaceDetectionProvider extends ChangeNotifier {
   bool? isExtractFeatureDone;
   bool? isDownloadDone;
   bool? isMatchSuccess;
-  bool? isStartRecord;
+  RecordStatus recordstatus = RecordStatus.INIT;
   void setIsFaceFinded(bool? val) {
     isFaceFinded = val ?? !isFaceFinded;
     notifyListeners();
   }
 
+  void setRecodeStatus(RecordStatus status) {
+    recordstatus = status;
+    notifyListeners();
+    if (status == RecordStatus.END) {
+      Future.delayed(Duration(seconds: 1), () {
+        recordstatus = RecordStatus.INIT;
+        final cp = KeyService.baseAppKey.currentContext!
+            .read<CoreVerifyProcessProvider>();
+        cp.setVerifyType(VerifyType.FACE);
+        cp.sendDataToSever();
+        notifyListeners();
+      });
+    }
+  }
+
   void setTestSwich() {
     testSwich = !testSwich;
     pr('change test swich $testSwich');
-    notifyListeners();
-  }
-
-  void setIsStartRecord(bool? val) {
-    isStartRecord = val;
     notifyListeners();
   }
 
@@ -150,7 +166,8 @@ class FaceDetectionProvider extends ChangeNotifier {
         isMatchSuccess = testSwich;
         notifyListeners();
         Future.delayed(Duration(seconds: 2), () {
-          isStartRecord = isMatchSuccess! ? true : null;
+          recordstatus =
+              isMatchSuccess! ? RecordStatus.START : RecordStatus.INIT;
           isMatchSuccess = null;
           notifyListeners();
         });

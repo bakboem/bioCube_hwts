@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/home/card_one_widget.dart
  * Created Date: 2023-02-04 20:19:38
- * Last Modified: 2023-03-29 10:34:10
+ * Last Modified: 2023-03-29 12:16:28
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -12,23 +12,19 @@
  */
 
 import 'dart:io';
-import 'package:hwst/globalProvider/face_detection_provider.dart';
-import 'package:hwst/styles/export_common.dart';
-import 'package:hwst/view/common/widget_of_loading_view.dart';
 import 'package:lottie/lottie.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:hwst/styles/app_size.dart';
-import 'package:hwst/styles/app_text.dart';
 import 'package:hwst/enums/image_type.dart';
-import 'package:hwst/styles/app_colors.dart';
+import 'package:hwst/enums/record_status.dart';
+import 'package:hwst/styles/export_common.dart';
 import 'package:hwst/service/cache_service.dart';
-import 'package:hwst/styles/app_text_style.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/view/home/camera/camera_view_page.dart';
 import 'package:hwst/view/common/widget_of_default_spacing.dart';
+import 'package:hwst/globalProvider/face_detection_provider.dart';
 import 'package:hwst/globalProvider/core_verify_process_provider.dart';
 
 class CardWidget extends StatefulWidget {
@@ -245,30 +241,26 @@ class _CardWidgetState extends State<CardWidget>
                             //       : SizedBox();
                             // }),
 
-                            Selector<FaceDetectionProvider,
-                                Tuple2<bool?, bool?>>(
-                              selector: (context, provider) => Tuple2(
+                            Selector<FaceDetectionProvider, bool?>(
+                              selector: (context, provider) =>
                                   provider.isMatchSuccess,
-                                  provider.isStartRecord),
-                              builder: (context, tuple, _) {
-                                return tuple.item1 == null
+                              builder: (context, issuccess, _) {
+                                return issuccess == null || issuccess
                                     ? SizedBox()
                                     : SizedBox(
                                         width: AppSize.realWidth / 2,
                                         height: AppSize.realWidth / 2,
-                                        child: AppImage.getImage(tuple.item1!
-                                            ? ImageType.SUCCESS
-                                            : ImageType.FAILD),
+                                        child:
+                                            AppImage.getImage(ImageType.FAILD),
                                       );
                               },
                             ),
-                            Selector<FaceDetectionProvider, bool?>(
+                            Selector<FaceDetectionProvider, RecordStatus>(
                               selector: (context, provider) =>
-                                  provider.isStartRecord,
-                              builder: (context, isStart, _) {
-                                return isStart == null
-                                    ? SizedBox()
-                                    : Lottie.asset(
+                                  provider.recordstatus,
+                              builder: (context, status, _) {
+                                return status == RecordStatus.WORKING
+                                    ? Lottie.asset(
                                         'assets/lottie/face.json',
                                         controller: _controller
                                           ..addListener(() {
@@ -282,7 +274,22 @@ class _CardWidgetState extends State<CardWidget>
                                             ..forward();
                                         },
                                         options: LottieOptions(),
-                                      );
+                                      )
+                                    : SizedBox();
+                              },
+                            ),
+                            Selector<FaceDetectionProvider, RecordStatus>(
+                              selector: (context, provider) =>
+                                  provider.recordstatus,
+                              builder: (context, suatus, _) {
+                                return suatus == RecordStatus.END
+                                    ? SizedBox(
+                                        width: AppSize.realWidth / 2,
+                                        height: AppSize.realWidth / 2,
+                                        child: AppImage.getImage(
+                                            ImageType.SUCCESS),
+                                      )
+                                    : SizedBox();
                               },
                             ),
                           ],

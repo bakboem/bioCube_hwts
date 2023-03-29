@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:developer';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:hwst/enums/record_status.dart';
 import 'package:hwst/service/cache_service.dart';
 import 'package:hwst/view/home/camera/camera_overlay_widget.dart';
 import 'package:provider/provider.dart';
@@ -86,6 +87,7 @@ class _CameraViewPageState extends State<CameraViewPage> {
     final fp =
         KeyService.baseAppKey.currentContext!.read<FaceDetectionProvider>();
     if (_detectionInProgress ||
+        fp.recordstatus == RecordStatus.WORKING ||
         !mounted ||
         DateTime.now().millisecondsSinceEpoch - _lastRun < 500) {
       return;
@@ -118,8 +120,12 @@ class _CameraViewPageState extends State<CameraViewPage> {
     } else {
       fp.setIsShowFaceLine(false);
     }
-    if (fp.isStartRecord != null && fp.isStartRecord!) {
+    if (fp.recordstatus == RecordStatus.START) {
+      fp.setRecodeStatus(RecordStatus.WORKING);
       pr('startRecord');
+      Future.delayed(Duration(seconds: 5), () {
+        fp.setRecodeStatus(RecordStatus.END);
+      });
     }
     _detectionInProgress = false;
     _lastRun = DateTime.now().millisecondsSinceEpoch;
