@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-29 12:09:40
+ * Last Modified: 2023-03-29 12:59:29
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -141,15 +141,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _popupContents(BuildContext context) {
-    return Selector<CoreVerifyProcessProvider, Tuple3<bool?, bool?, bool?>>(
-      selector: (context, provider) => Tuple3(
-          provider.isBleSuccess, provider.isNfcSuccess, provider.isFaceSuccess),
+    return Selector<CoreVerifyProcessProvider,
+        Tuple4<bool?, bool?, bool?, VerifyType>>(
+      selector: (context, provider) => Tuple4(provider.isBleSuccess,
+          provider.isNfcSuccess, provider.isFaceSuccess, provider.verifyType),
       builder: (context, tuple, _) {
         var userEvn = CacheService.getUserEnvironment()!;
         var bleSuccess = tuple.item1 != null && tuple.item1!;
         var nfcSuccess = tuple.item2 != null && tuple.item2!;
         var faceSuccess = tuple.item3 != null && tuple.item3!;
         if (bleSuccess || nfcSuccess || faceSuccess) {
+          pr('faceSuccess ??? $faceSuccess');
           Future.delayed(Duration.zero, () async {
             await AppToast().show(
                 context,
@@ -165,14 +167,14 @@ class _HomePageState extends State<HomePage> {
                     : DoNothingAction();
                 break;
               case 1:
-                faceSuccess
+                tuple.item4 != VerifyType.FACE
                     ? await SoundService.playSuccessSound()
-                    : await SoundService.playSound();
+                    : DoNothingAction();
                 break;
               case 2:
-                faceSuccess
+                tuple.item4 != VerifyType.FACE
                     ? await SoundService.playSuccessSound()
-                    : await SoundService.playSound();
+                    : DoNothingAction();
                 break;
             }
           });

@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/bioCube/face_kit/truepass/lib/globalProvider/face_detection_provider.dart
  * Created Date: 2023-02-19 15:22:53
- * Last Modified: 2023-03-29 12:10:05
+ * Last Modified: 2023-03-29 12:56:30
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -64,11 +64,12 @@ class FaceDetectionProvider extends ChangeNotifier {
     if (status == RecordStatus.END) {
       Future.delayed(Duration(seconds: 1), () {
         recordstatus = RecordStatus.INIT;
+        SoundService.playSuccessSound();
+        notifyListeners();
         final cp = KeyService.baseAppKey.currentContext!
             .read<CoreVerifyProcessProvider>();
         cp.setVerifyType(VerifyType.FACE);
         cp.sendDataToSever();
-        notifyListeners();
       });
     }
   }

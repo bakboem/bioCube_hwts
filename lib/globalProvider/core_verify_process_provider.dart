@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/truepass/lib/view/home/provider/core_process_provider.dart
  * Created Date: 2023-01-25 12:24:10
- * Last Modified: 2023-03-29 12:04:30
+ * Last Modified: 2023-03-29 12:48:52
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -162,6 +162,9 @@ class CoreVerifyProcessProvider extends ChangeNotifier {
       }
       if (result.statusCode == 200 && result.body['result'] == 'success') {
         pr('body:::${result.body}');
+        isBleSuccess = null;
+        isNfcSuccess = null;
+        isFaceSuccess = null;
         verifyType == VerifyType.BLE
             ? isBleSuccess = true
             : verifyType == VerifyType.NFC
