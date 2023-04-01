@@ -25,7 +25,8 @@ class SecondThread {
     final initReqTwo = InitRequestTwo(
         mainSendPortTwo: secondThreadReceiver.sendPort,
         mnnModelPath: CacheService.getMnnModelFilePath()!,
-        opencvPath: CacheService.getOpencvModelFilePath()!);
+        opencvPath: CacheService.getOpencvModelFilePath()!,
+        testPath: CacheService.getTestFilePath()!);
     _secondThreadIsolate = await Isolate.spawn(
       initTwo,
       initReqTwo,

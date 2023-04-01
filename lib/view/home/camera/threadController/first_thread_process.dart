@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/HWST/lib/view/home/camera/threadController/main_thread_process copy.dart
  * Created Date: 2023-03-14 13:29:53
- * Last Modified: 2023-03-29 12:25:53
+ * Last Modified: 2023-03-31 17:35:31
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -17,8 +17,6 @@ import 'dart:developer';
 import 'package:camera/camera.dart';
 import 'package:hwst/model/db/user_info_table.dart';
 import 'package:hwst/service/cache_service.dart';
-import 'package:hwst/service/local_file_servicer.dart';
-import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/view/common/fuction_of_capture_full_screen.dart';
 import 'package:hwst/view/home/camera/threadController/receive_for_firstThread.dart';
 
@@ -41,16 +39,12 @@ class FirstThread {
     });
 
     final bytes = await getBitmapFromContext();
-    final dir = await LocalFileService().getLocalDirectory();
-    final testOutputFile =
-        await LocalFileService().createFile('${dir!.path}/test/test.png');
-    pr(testOutputFile.path);
     final initReq = InitRequestOne(
         mainSendPortOne: mainThreadReceiver.sendPort,
         markerPng: bytes,
         opencvModelPath: CacheService.getOpencvModelFilePath()!,
         mnnModelPath: CacheService.getMnnModelFilePath()!,
-        testOutputPath: testOutputFile.path);
+        testOutputPath: CacheService.getTestFilePath()!);
     _mainThreadIsolate = await Isolate.spawn(
       initOne,
       initReq,

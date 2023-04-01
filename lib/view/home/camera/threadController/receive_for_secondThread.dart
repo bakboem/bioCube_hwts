@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/HWST/lib/view/home/camera/threadController/receive_thread_one_process copy.dart
  * Created Date: 2023-03-14 12:36:47
- * Last Modified: 2023-03-28 13:12:33
+ * Last Modified: 2023-03-31 12:19:09
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -21,10 +21,12 @@ class InitRequestTwo {
   SendPort mainSendPortTwo;
   String mnnModelPath;
   String opencvPath;
+  String testPath;
   InitRequestTwo(
       {required this.mainSendPortTwo,
       required this.mnnModelPath,
-      required this.opencvPath});
+      required this.opencvPath,
+      required this.testPath});
 }
 
 class RequestTwo {
@@ -47,14 +49,11 @@ late SendPort _mainReceiveSendPort;
 late _ReceiveThreadTwo _receiveThreadTwo;
 
 void initTwo(InitRequestTwo initReq) {
-  _receiveThreadTwo =
-      _ReceiveThreadTwo(initReq.mnnModelPath, initReq.opencvPath);
-
+  _receiveThreadTwo = _ReceiveThreadTwo(
+      initReq.mnnModelPath, initReq.opencvPath, initReq.testPath);
   _mainReceiveSendPort = initReq.mainSendPortTwo;
-
   ReceivePort fromMainThread = ReceivePort();
   fromMainThread.listen(_handleMessage);
-
   _mainReceiveSendPort.send(fromMainThread.sendPort);
 }
 
@@ -81,14 +80,14 @@ void _handleMessage(data) {
 }
 
 class _ReceiveThreadTwo {
-  _ReceiveThreadTwo(String mnnModelPath, String opencvPath) {
-    inits(mnnModelPath, opencvPath);
+  _ReceiveThreadTwo(String mnnModelPath, String opencvPath, String testPath) {
+    inits(mnnModelPath, opencvPath, testPath);
   }
 
-  void inits(String mnnPath, String opencvPath) {
+  void inits(String mnnPath, String opencvPath, String testPath) {
     pr(mnnPath);
     pr(opencvPath);
-    native_ffi.initMnnModel(mnnPath, opencvPath);
+    native_ffi.initMnnModel(mnnPath, opencvPath, testPath);
     pr('path is ######### loaded!');
   }
 

@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/bioCube/face_kit/truepass/lib/globalProvider/face_detection_provider.dart
  * Created Date: 2023-02-19 15:22:53
- * Last Modified: 2023-03-29 12:56:30
+ * Last Modified: 2023-04-01 14:51:18
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -154,6 +154,7 @@ class FaceDetectionProvider extends ChangeNotifier {
           temp.removeWhere((user) => user.mPerson == resultUser.mPerson);
         }
         var endTime = DateTime.now().difference(start);
+        count++;
         pr('$count WorkTime :: ${endTime.inMilliseconds} inMilliseconds');
         return temp.isNotEmpty;
       }).whenComplete(() {
@@ -168,7 +169,7 @@ class FaceDetectionProvider extends ChangeNotifier {
         notifyListeners();
         Future.delayed(Duration(seconds: 2), () {
           recordstatus =
-              isMatchSuccess! ? RecordStatus.START : RecordStatus.INIT;
+              isMatchSuccess ?? false ? RecordStatus.START : RecordStatus.INIT;
           isMatchSuccess = null;
           notifyListeners();
         });
@@ -244,14 +245,7 @@ class FaceDetectionProvider extends ChangeNotifier {
       var temp = GetUserAllResponseModel.fromJson(result.body);
       totalCount ??= int.parse(temp.totalCount!);
       notifyListeners();
-      print('totalCount  ${totalCount}');
-      print('response Lenght :${responseModel?.data?.length}');
-      if (totalCount != null &&
-          responseModel != null &&
-          responseModel!.data!.length + 1 == totalCount! - 1) {
-        hasMore = false;
-        pr('hasMore?????${hasMore}');
-      }
+      print('response curren Length :${temp.data!.length}');
       if (temp.data != null && temp.data!.isNotEmpty) {
         if (responseModel == null) {
           responseModel = temp;
@@ -262,6 +256,14 @@ class FaceDetectionProvider extends ChangeNotifier {
         }
         pos++;
       }
+      if (totalCount != null &&
+          responseModel != null &&
+          responseModel!.data!.length == totalCount!) {
+        hasMore = false;
+        pr('hasMore?????${hasMore}');
+      }
+      print('totalCount  ${totalCount}');
+      print('response total Lenght :${responseModel?.data?.length}');
     }
     downloadTime += DateTime.now().difference(start);
     notifyListeners();

@@ -56,7 +56,6 @@ class DeviceStatusProvider extends ChangeNotifier {
 
   void setFaceStatus(bool val) {
     isFaceOk = val;
-    notifyListeners();
   }
 
   void setLocationStatus(bool val) {

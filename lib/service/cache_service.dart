@@ -2,7 +2,7 @@
  * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/service/cache_service.dart
  * Created Date: 2021-08-22 19:45:10
- * Last Modified: 2023-03-28 15:29:14
+ * Last Modified: 2023-03-31 00:27:12
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -109,6 +109,14 @@ class CacheService {
 
   static String? getSvUrl() {
     return getData('svUrl');
+  }
+
+  static void saveTestFilePath(String path) {
+    saveData('testFilePath', path);
+  }
+
+  static String? getTestFilePath() {
+    return getData('testFilePath');
   }
 
   static void saveLastExtractedFeature(String feat) {

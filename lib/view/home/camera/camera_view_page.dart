@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:hwst/enums/record_status.dart';
 import 'package:hwst/service/cache_service.dart';
+import 'package:hwst/service/local_file_servicer.dart';
 import 'package:hwst/view/home/camera/camera_overlay_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/service/key_service.dart';

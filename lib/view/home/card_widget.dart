@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/home/card_one_widget.dart
  * Created Date: 2023-02-04 20:19:38
- * Last Modified: 2023-03-29 12:16:28
+ * Last Modified: 2023-04-01 23:57:08
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -74,6 +74,7 @@ class _CardWidgetState extends State<CardWidget>
         if (bleSuccess || nfcSuccess) {
           return AppText.text(tr('process_success'));
         }
+
         if (tuple.item3 != null) {
           return AppText.text(
               tuple.item3 == 'nfcStart' || tuple.item3 == 'bleStart'
@@ -129,8 +130,9 @@ class _CardWidgetState extends State<CardWidget>
         (userCard.mPhoto != null && userCard.mPhoto!.isNotEmpty);
     ImageProvider<Object>? assertImage =
         isUserCardImageNotNull ? null : AssetImage('assets/images/people.png');
-    ImageProvider<Object>? networkImage =
-        isUserCardImageNotNull ? NetworkImage(userCard.mPhoto!) : null;
+    ImageProvider<Object>? networkImage = isUserCardImageNotNull
+        ? NetworkImage(userCard.mPhoto!.replaceAll('//TruePass1.0', ''))
+        : null;
     return Positioned(
         top: cardType == '1' ? colorBoxHeight * .3 : colorBoxHeight - avataSize,
         left: cardWidth / 2 - avataSize,
