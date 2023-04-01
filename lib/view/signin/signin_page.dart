@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/auth/auth_page.dart
  * Created Date: 2023-01-22 19:10:16
- * Last Modified: 2023-03-04 10:45:25
+ * Last Modified: 2023-04-02 02:25:33
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -51,8 +51,6 @@ class SigninPage extends StatefulWidget {
 class _SigninPageState extends State<SigninPage> {
   @override
   void initState() {
-    final ap = context.read<AuthProvider>();
-    ap.checkIsLogedIn(false);
     PermissionService.requestLocationAndBle()
         .then((_) => PermissionService.checkLocationAndBle());
     super.initState();

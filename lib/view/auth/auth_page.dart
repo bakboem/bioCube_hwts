@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/auth/auth_page.dart
  * Created Date: 2023-02-01 10:56:03
- * Last Modified: 2023-03-12 17:33:09
+ * Last Modified: 2023-04-02 02:24:22
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 

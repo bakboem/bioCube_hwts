@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-03-31 18:13:38
+ * Last Modified: 2023-04-02 00:34:06
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -70,10 +70,11 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _pageController = PageController(initialPage: 0);
     pr('init home');
-    createTestFile();
+
     checkIsFaceOk();
     ConnectService.startListener();
     Permission.camera.request();
+    createTestFile();
     loadFaceDetectionAndDeepLearningFile(
       'opencv',
       ['haarcascade_frontalface_default.xml'],
@@ -82,6 +83,7 @@ class _HomePageState extends State<HomePage> {
       'mnn',
       ['FaceCubePlusRecognize.mnn'],
     ).whenComplete(() => _secondThread = SecondThread());
+
     runBleStart();
   }
 
@@ -107,9 +109,7 @@ class _HomePageState extends State<HomePage> {
             ? VerifyType.BLE
             : null));
     var lastVerfyType = CacheService.getLastVerfyType();
-    Future.delayed(Duration(seconds: 3), () {
-      _pageController.jumpToPage(lastVerfyType.getIndex);
-    });
+    // _pageController.jumpToPage(lastVerfyType.getIndex);
   }
 
   @override

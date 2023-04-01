@@ -2,7 +2,7 @@
  * Project Name:  [mKolon3.0] - MedicalSalesPortal
  * File: /Users/bakbeom/work/sm/si/medsalesportal/lib/globalProvider/login_provider.dart
  * Created Date: 2022-10-18 00:31:14
- * Last Modified: 2023-03-18 14:17:58
+ * Last Modified: 2023-04-02 02:07:21
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -36,7 +36,8 @@ class AuthProvider extends ChangeNotifier {
   // }
 
   void checkIsLogedIn(bool mounted) {
-    if (CacheService.getUserCard() != null &&
+    if (mounted &&
+        CacheService.getUserCard() != null &&
         CacheService.getAccessInfo() != null) {
       isLogedin = true;
     }

@@ -2,7 +2,7 @@
  * Project Name:  [HWST] - hwst
  * File: /Users/bakbeom/work/hwst/lib/service/api_service.dart
  * Created Date: 2021-08-22 21:53:15
- * Last Modified: 2023-03-27 17:27:03
+ * Last Modified: 2023-04-02 01:11:07
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -51,9 +51,9 @@ class ApiService {
   ApiService._internal() {
     if (_client == null) {
       final _baseOption = BaseOptions(
-          connectTimeout: 5000,
-          receiveTimeout: 5000,
-          sendTimeout: 5000,
+          connectTimeout: 100000,
+          receiveTimeout: 100000,
+          sendTimeout: 100000,
           contentType: 'application/json');
       _client = Dio(_baseOption)
         ..interceptors.add(

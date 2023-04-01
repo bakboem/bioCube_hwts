@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/home/card_one_widget.dart
  * Created Date: 2023-02-04 20:19:38
- * Last Modified: 2023-04-01 23:57:08
+ * Last Modified: 2023-04-02 01:57:58
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -23,6 +23,7 @@ import 'package:hwst/service/cache_service.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/view/home/camera/camera_view_page.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hwst/view/common/widget_of_default_spacing.dart';
 import 'package:hwst/globalProvider/face_detection_provider.dart';
 import 'package:hwst/globalProvider/core_verify_process_provider.dart';
@@ -126,27 +127,36 @@ class _CardWidgetState extends State<CardWidget>
     var userCard = CacheService.getUserCard()!;
     var avataSize = AppSize.cardAvataWidth;
     var colorBoxHeight = cardHeight * .35;
-    var isUserCardImageNotNull =
-        (userCard.mPhoto != null && userCard.mPhoto!.isNotEmpty);
-    ImageProvider<Object>? assertImage =
-        isUserCardImageNotNull ? null : AssetImage('assets/images/people.png');
-    ImageProvider<Object>? networkImage = isUserCardImageNotNull
-        ? NetworkImage(userCard.mPhoto!.replaceAll('//TruePass1.0', ''))
-        : null;
+    var tempAvata = () {
+      return Container(
+        decoration: BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage('assets/images/people.png'),
+                fit: BoxFit.contain),
+            borderRadius: BorderRadius.circular(
+                cardType == '3' ? (avataSize * 2) / 2 : AppSize.radius25)),
+      );
+    }();
     return Positioned(
         top: cardType == '1' ? colorBoxHeight * .3 : colorBoxHeight - avataSize,
         left: cardWidth / 2 - avataSize,
         child: Container(
-          width: avataSize * 2,
-          height: avataSize * 2,
-          decoration: BoxDecoration(
-              color: AppColors.primary,
-              image: DecorationImage(
-                  image: isUserCardImageNotNull ? networkImage! : assertImage!,
-                  fit: isUserCardImageNotNull ? BoxFit.cover : BoxFit.contain),
+            width: avataSize * 2,
+            height: avataSize * 2,
+            child: ClipRRect(
               borderRadius: BorderRadius.circular(
-                  cardType == '3' ? (avataSize * 2) / 2 : AppSize.radius25)),
-        ));
+                  cardType == '3' ? (avataSize * 2) / 2 : AppSize.radius25),
+              child: CachedNetworkImage(
+                fit: BoxFit.cover,
+                imageUrl: userCard.mPhoto!.replaceAll('//TruePass1.0', ''),
+                progressIndicatorBuilder: (context, _, __) {
+                  return tempAvata;
+                },
+                errorWidget: (context, e, f) {
+                  return tempAvata;
+                },
+              ),
+            )));
   }
 
   Widget _buildCompanyLogo(
