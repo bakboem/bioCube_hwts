@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/bioCube/face_kit/truepass/lib/globalProvider/face_detection_provider.dart
  * Created Date: 2023-02-19 15:22:53
- * Last Modified: 2023-04-02 00:07:02
+ * Last Modified: 2023-04-16 17:45:37
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -34,7 +34,7 @@ import 'package:hwst/view/home/camera/threadController/second_thread_process.dar
 import 'package:provider/provider.dart';
 
 class FaceDetectionProvider extends ChangeNotifier {
-  bool testSwich = false;
+  // bool testSwich = false;
   bool isFaceFinded = false;
   bool isShowFaceLine = false;
   double? cameraScale;
@@ -62,23 +62,21 @@ class FaceDetectionProvider extends ChangeNotifier {
     recordstatus = status;
     notifyListeners();
     if (status == RecordStatus.END) {
-      Future.delayed(Duration(seconds: 1), () {
-        recordstatus = RecordStatus.INIT;
-        SoundService.playSuccessSound();
-        notifyListeners();
-        final cp = KeyService.baseAppKey.currentContext!
-            .read<CoreVerifyProcessProvider>();
-        cp.setVerifyType(VerifyType.FACE);
-        cp.sendDataToSever();
-      });
+      recordstatus = RecordStatus.INIT;
+      notifyListeners();
+      SoundService.playSuccessSound();
+      final cp = KeyService.baseAppKey.currentContext!
+          .read<CoreVerifyProcessProvider>();
+      cp.setVerifyType(VerifyType.FACE);
+      cp.sendDataToSever();
     }
   }
 
-  void setTestSwich() {
-    testSwich = !testSwich;
-    pr('change test swich $testSwich');
-    notifyListeners();
-  }
+  // void setTestSwich() {
+  //   testSwich = !testSwich;
+  //   pr('change test swich $testSwich');
+  //   notifyListeners();
+  // }
 
   void setCameraScale(double scale) {
     cameraScale = scale;
@@ -135,7 +133,7 @@ class FaceDetectionProvider extends ChangeNotifier {
         (user) => user.imageData != null && (user.isExtracted ?? false));
     int count = 0;
     UserInfoTable? bestMatchUser;
-    if (temp != null) {
+    if (temp != null && temp.isNotEmpty) {
       await Future.doWhile(() async {
         if (temp.isEmpty) return false;
         var start = DateTime.now();
@@ -145,11 +143,11 @@ class FaceDetectionProvider extends ChangeNotifier {
           pr('resultUser.score :::${resultUser.score}');
           if (bestMatchUser == null) {
             bestMatchUser = resultUser;
-          }
-          pr('score: ${resultUser.mPerson == 'MP00000026' ? 'MY:' : ''} ${bestMatchUser!.score}');
-          if (resultUser.score! > bestMatchUser!.score!) {
-            bestMatchUser = resultUser;
-            pr('curren Score : ${bestMatchUser!.score}');
+            pr('first result :: ${bestMatchUser!.score}');
+          } else {
+            if (resultUser.score! > bestMatchUser!.score!) {
+              bestMatchUser = resultUser;
+            }
           }
           temp.removeWhere((user) => user.mPerson == resultUser.mPerson);
         }
@@ -158,20 +156,27 @@ class FaceDetectionProvider extends ChangeNotifier {
         pr('$count WorkTime :: ${endTime.inMilliseconds} inMilliseconds');
         return temp.isNotEmpty;
       }).whenComplete(() {
-        var bestScore = bestMatchUser?.score;
-        var person = bestMatchUser!.mPerson;
+        var bestScore = bestMatchUser?.score!;
+        var matchedPerson = bestMatchUser?.mPerson!;
         var settingScore = CacheService.getUserEnvironment()!.scoreSetting!;
-        pr('The bestScore User Is : $person Score is:: $bestScore');
-        // isMatchSuccess = testSwich
-        //     ? bestScore! <= settingScore.toDouble()
-        //     : bestScore! >= settingScore.toDouble();
-        isMatchSuccess = testSwich;
+        if (bestScore != null) {
+          isMatchSuccess = bestScore * 10 > settingScore;
+          pr('Match Complate::  isMatched:$isMatchSuccess  The bestScore User Is : $matchedPerson  Score is:: ${bestScore * 10}');
+        }
         notifyListeners();
-        Future.delayed(Duration(seconds: 2), () {
-          recordstatus =
-              isMatchSuccess ?? false ? RecordStatus.START : RecordStatus.INIT;
+        recordstatus =
+            isMatchSuccess ?? false ? RecordStatus.START : RecordStatus.INIT;
+        Future.delayed(Duration(seconds: 1), () {
           isMatchSuccess = null;
           notifyListeners();
+        });
+        Future.delayed(Duration(seconds: 4), () {
+          final cp = KeyService.baseAppKey.currentContext!
+              .read<CoreVerifyProcessProvider>();
+          if (cp.isShowCamera) {
+            isFaceFinded = false;
+            notifyListeners();
+          }
         });
       });
     }
@@ -187,7 +192,6 @@ class FaceDetectionProvider extends ChangeNotifier {
       extractFeatrueCount = temp.length;
       List<UserInfoTable> noneImageList =
           responseModel!.data!.where((user) => user.mPhoto!.isEmpty).toList();
-
       await Future.doWhile(() async {
         var start = DateTime.now();
         var resultUser = await extractThread.extractFeature(temp[0]);

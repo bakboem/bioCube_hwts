@@ -177,6 +177,9 @@ class PassKitService :  UtilsCallBack{
             val guideRssi: Int = rssiFromUserSettings.toInt()
             Log.d(tag,"[BLE][scan] device Name : $deviceName")
             Log.d(tag, "[BLE][scan] rssi : $rssi")
+           
+            sendMessage("$rssi") // 여기서 보내주면되요.
+           
             if (BluetoothUtils.checkTMobilepassDevice(rssi, guideRssi, deviceName)) { //-45
                 sendMessage("bleSuccess:$deviceName")
                 bleScanningStop()

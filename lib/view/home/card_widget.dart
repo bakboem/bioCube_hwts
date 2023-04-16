@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/home/card_one_widget.dart
  * Created Date: 2023-02-04 20:19:38
- * Last Modified: 2023-04-02 01:57:58
+ * Last Modified: 2023-04-16 16:39:27
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -224,88 +224,82 @@ class _CardWidgetState extends State<CardWidget>
                           width: AppSize.cardBorderWidth),
                 ),
                 child: isShowCamera
-                    ? GestureDetector(
-                        onDoubleTap: () {
-                          final fp = context.read<FaceDetectionProvider>();
-                          fp.setTestSwich();
-                        },
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            ClipRRect(
-                              clipBehavior: Clip.antiAlias,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(AppSize.radius15),
-                                topRight: Radius.circular(AppSize.radius15),
-                                bottomRight: Radius.circular(AppSize.radius15),
-                                bottomLeft: Radius.circular(AppSize.radius15),
-                              ),
-                              child: CameraViewPage(
-                                key: Key('fromCardPage'),
-                              ),
+                    ? Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          ClipRRect(
+                            clipBehavior: Clip.antiAlias,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(AppSize.radius15),
+                              topRight: Radius.circular(AppSize.radius15),
+                              bottomRight: Radius.circular(AppSize.radius15),
+                              bottomLeft: Radius.circular(AppSize.radius15),
                             ),
-                            // Consumer<FaceDetectionProvider>(
-                            //     builder: (context, provider, _) {
-                            //   return provider.faceInfo != null &&
-                            //           provider.faceInfo!.isNotEmpty &&
-                            //           provider.isShowFaceLine
-                            //       ? CameraOverlayWidget(info: provider.faceInfo!)
-                            //       : SizedBox();
-                            // }),
+                            child: CameraViewPage(
+                              key: Key('fromCardPage'),
+                            ),
+                          ),
+                          // Consumer<FaceDetectionProvider>(
+                          //     builder: (context, provider, _) {
+                          //   return provider.faceInfo != null &&
+                          //           provider.faceInfo!.isNotEmpty &&
+                          //           provider.isShowFaceLine
+                          //       ? CameraOverlayWidget(info: provider.faceInfo!)
+                          //       : SizedBox();
+                          // }),
 
-                            Selector<FaceDetectionProvider, bool?>(
-                              selector: (context, provider) =>
-                                  provider.isMatchSuccess,
-                              builder: (context, issuccess, _) {
-                                return issuccess == null || issuccess
-                                    ? SizedBox()
-                                    : SizedBox(
-                                        width: AppSize.realWidth / 2,
-                                        height: AppSize.realWidth / 2,
-                                        child:
-                                            AppImage.getImage(ImageType.FAILD),
-                                      );
-                              },
-                            ),
-                            Selector<FaceDetectionProvider, RecordStatus>(
-                              selector: (context, provider) =>
-                                  provider.recordstatus,
-                              builder: (context, status, _) {
-                                return status == RecordStatus.WORKING
-                                    ? Lottie.asset(
-                                        'assets/lottie/face.json',
-                                        controller: _controller
-                                          ..addListener(() {
-                                            if (_controller.isCompleted) {
-                                              _controller.repeat();
-                                            }
-                                          }),
-                                        onLoaded: (comp) {
-                                          _controller
-                                            ..duration = Duration(seconds: 5)
-                                            ..forward();
-                                        },
-                                        options: LottieOptions(),
-                                      )
-                                    : SizedBox();
-                              },
-                            ),
-                            Selector<FaceDetectionProvider, RecordStatus>(
-                              selector: (context, provider) =>
-                                  provider.recordstatus,
-                              builder: (context, suatus, _) {
-                                return suatus == RecordStatus.END
-                                    ? SizedBox(
-                                        width: AppSize.realWidth / 2,
-                                        height: AppSize.realWidth / 2,
-                                        child: AppImage.getImage(
-                                            ImageType.SUCCESS),
-                                      )
-                                    : SizedBox();
-                              },
-                            ),
-                          ],
-                        ))
+                          Selector<FaceDetectionProvider, bool?>(
+                            selector: (context, provider) =>
+                                provider.isMatchSuccess,
+                            builder: (context, issuccess, _) {
+                              return issuccess == null || issuccess
+                                  ? SizedBox()
+                                  : SizedBox(
+                                      width: AppSize.realWidth / 2,
+                                      height: AppSize.realWidth / 2,
+                                      child: AppImage.getImage(ImageType.FAILD),
+                                    );
+                            },
+                          ),
+                          Selector<FaceDetectionProvider, RecordStatus>(
+                            selector: (context, provider) =>
+                                provider.recordstatus,
+                            builder: (context, status, _) {
+                              return status == RecordStatus.WORKING
+                                  ? Lottie.asset(
+                                      'assets/lottie/face.json',
+                                      controller: _controller
+                                        ..addListener(() {
+                                          if (_controller.isCompleted) {
+                                            _controller.repeat();
+                                          }
+                                        }),
+                                      onLoaded: (comp) {
+                                        _controller
+                                          ..duration = Duration(seconds: 5)
+                                          ..forward();
+                                      },
+                                      options: LottieOptions(),
+                                    )
+                                  : SizedBox();
+                            },
+                          ),
+                          Selector<FaceDetectionProvider, RecordStatus>(
+                            selector: (context, provider) =>
+                                provider.recordstatus,
+                            builder: (context, suatus, _) {
+                              return suatus == RecordStatus.END
+                                  ? SizedBox(
+                                      width: AppSize.realWidth / 2,
+                                      height: AppSize.realWidth / 2,
+                                      child:
+                                          AppImage.getImage(ImageType.SUCCESS),
+                                    )
+                                  : SizedBox();
+                            },
+                          ),
+                        ],
+                      )
                     : Stack(
                         children: [
                           Column(

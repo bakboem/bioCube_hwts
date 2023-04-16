@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/shwt/lib/view/home/home_page.dart
  * Created Date: 2023-01-22 19:13:24
- * Last Modified: 2023-04-02 00:34:06
+ * Last Modified: 2023-04-16 17:39:03
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -12,14 +12,14 @@
  */
 
 import 'dart:io';
-import 'package:hwst/enums/record_status.dart';
-import 'package:hwst/service/key_service.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/enums/image_type.dart';
 import 'package:hwst/enums/verify_type.dart';
+import 'package:hwst/service/key_service.dart';
+import 'package:hwst/enums/record_status.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:hwst/service/hive_service.dart';
 import 'package:hwst/styles/export_common.dart';
@@ -33,20 +33,20 @@ import 'package:hwst/model/common/result_model.dart';
 import 'package:hwst/service/vibration_service.dart';
 import 'package:hwst/view/setting/setting_page.dart';
 import 'package:hwst/service/permission_service.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/view/common/base_app_toast.dart';
 import 'package:hwst/view/common/base_app_dialog.dart';
 import 'package:hwst/service/local_file_servicer.dart';
 import 'package:hwst/view/common/function_of_print.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/buildConfig/biocube_build_config.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:hwst/model/user/user_environment_model.dart';
 import 'package:hwst/view/common/widget_of_divider_line.dart';
 import 'package:hwst/view/common/widget_of_loading_view.dart';
-import 'package:hwst/view/common/widget_of_default_spacing.dart';
-import 'package:hwst/globalProvider/device_status_provider.dart';
 import 'package:hwst/view/home/provider/home_page_provider.dart';
 import 'package:hwst/view/common/widget_of_dialog_contents.dart';
+import 'package:hwst/globalProvider/device_status_provider.dart';
+import 'package:hwst/view/common/widget_of_default_spacing.dart';
 import 'package:hwst/globalProvider/face_detection_provider.dart';
 import 'package:hwst/view/common/widget_of_download_progress.dart';
 import 'package:hwst/globalProvider/home_start_button_provider.dart';
@@ -75,16 +75,32 @@ class _HomePageState extends State<HomePage> {
     ConnectService.startListener();
     Permission.camera.request();
     createTestFile();
-    loadFaceDetectionAndDeepLearningFile(
-      'opencv',
-      ['haarcascade_frontalface_default.xml'],
-    );
-    loadFaceDetectionAndDeepLearningFile(
-      'mnn',
-      ['FaceCubePlusRecognize.mnn'],
-    ).whenComplete(() => _secondThread = SecondThread());
-
+    checkModelFile();
     runBleStart();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _secondThread.secondThreadDestroy();
+    ConnectService.stopListener();
+    pr('dispose home!');
+    super.dispose();
+  }
+
+  void checkModelFile() {
+    if (CacheService.getMnnModelFilePath() == null) {
+      loadFaceDetectionAndDeepLearningFile(
+        'mnn',
+        ['FaceCubePlusRecognize.mnn'],
+      ).whenComplete(() => _secondThread = SecondThread());
+    }
+    if (CacheService.getOpencvModelFilePath() == null) {
+      loadFaceDetectionAndDeepLearningFile(
+        'opencv',
+        ['haarcascade_frontalface_default.xml'],
+      );
+    }
   }
 
   void createTestFile() async {
@@ -108,17 +124,8 @@ class _HomePageState extends State<HomePage> {
                 CacheService.getUserEnvironment()!.isUseBle!
             ? VerifyType.BLE
             : null));
-    var lastVerfyType = CacheService.getLastVerfyType();
+    // var lastVerfyType = CacheService.getLastVerfyType();
     // _pageController.jumpToPage(lastVerfyType.getIndex);
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    _secondThread.secondThreadDestroy();
-    ConnectService.stopListener();
-    pr('dispose home!');
-    super.dispose();
   }
 
   Future<void> loadFaceDetectionAndDeepLearningFile(
@@ -387,11 +394,12 @@ class _HomePageState extends State<HomePage> {
               } else if (isSelectedNfc && isNfcOk && userEvn!.isUseNfc!) {
                 PassKitService.initKit(type: VerifyType.NFC);
               } else if (isSelectedFace && isFaceOk) {
-                // final fp = context.read<FaceDetectionProvider>();
-                // final cp = context.read<CoreVerifyProcessProvider>();
+                final cp = context.read<CoreVerifyProcessProvider>();
                 // fp.setIsFaceFinded(false);
                 // cp.setIsShowCamera(val: true);
-                doFacePreccess(userEvn!);
+                if (!cp.isShowCamera) {
+                  doFacePreccess(userEvn!);
+                }
               } else {
                 routeToSettinsPage(userEvn!);
               }

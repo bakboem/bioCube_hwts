@@ -2,14 +2,12 @@ import 'dart:io';
 import 'dart:developer';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:hwst/enums/record_status.dart';
-import 'package:hwst/service/cache_service.dart';
-import 'package:hwst/service/local_file_servicer.dart';
-import 'package:hwst/view/home/camera/camera_overlay_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:hwst/enums/record_status.dart';
 import 'package:hwst/service/key_service.dart';
 import 'package:hwst/view/common/function_of_print.dart';
 import 'package:hwst/view/common/widget_of_loading_view.dart';
+import 'package:hwst/view/home/camera/camera_overlay_widget.dart';
 import 'package:hwst/globalProvider/face_detection_provider.dart';
 import 'package:hwst/view/home/camera/threadController/first_thread_process.dart';
 
@@ -100,6 +98,7 @@ class _CameraViewPageState extends State<CameraViewPage> {
         DateTime.now().millisecondsSinceEpoch - _lastRun < 500) {
       return;
     }
+
     // calc the scale factor to convert from camera frame coords to screen coords.
     // NOTE!!!! We assume camera frame takes the entire screen width, if that's not the case
     // (like if camera is landscape or the camera frame is limited to some area) then you will
@@ -123,6 +122,7 @@ class _CameraViewPageState extends State<CameraViewPage> {
         fp.setFaceInfo(res['faceInfo']);
         fp.setIsFaceFinded(true);
         fp.startMatchData(_firstThread, res['feat']);
+
         pr('find face x $res');
       }
     } else {

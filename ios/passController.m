@@ -272,6 +272,10 @@
         isNameMatched = false;
     }
     int rssi = [RSSI intValue];
+    // 여기서 보내면 되요.
+    NSString *rssiStr = [NSString stringWithFormat:@"%d",rssi];
+    [self sendData:rssiStr];
+
     if( &rssi > _bleRssi && isNameMatched){
         [self stopBleScan];
         NSString *mandData = [HexUtil dataToHexWithData:advertisementData[@"kCBAdvDataManufacturerData"] ];

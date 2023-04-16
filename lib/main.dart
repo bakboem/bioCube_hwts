@@ -12,6 +12,7 @@ import 'package:hwst/bioCubeApp.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hwst/model/db/user_info_table.dart';
 import 'package:hwst/service/cache_service.dart';
+import 'package:hwst/service/firebase_service.dart';
 import 'package:hwst/service/sound_service.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:hwst/view/common/function_of_print.dart';
@@ -22,6 +23,8 @@ void main() async {
   await WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await Hive.initFlutter();
+
+  await FirebaseService.init();
   Hive.registerAdapter(UserInfoTableAdapter());
   NativeChannelService.init();
   SoundService.init();

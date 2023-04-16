@@ -104,7 +104,6 @@ class _ReceiveThreadOne {
     }
     var result = native_ffi.detectFrame(
         image.width, image.height, rotation, yBuffer, uBuffer, vBuffer);
-
     return result;
   }
 

@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/HWST/lib/view/home/camera/threadController/receive_thread_one_process copy.dart
  * Created Date: 2023-03-14 12:36:47
- * Last Modified: 2023-03-31 12:19:09
+ * Last Modified: 2023-04-16 16:50:33
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -64,7 +64,7 @@ void _handleMessage(data) {
       case 'extractFeature':
         res = _receiveThreadTwo.extractFeature(data.userModel!);
         res as UserInfoTable;
-        pr(res.feature);
+        pr('enen??? ${res.feature}');
         break;
       case 'destroy':
         _receiveThreadTwo.destroy();

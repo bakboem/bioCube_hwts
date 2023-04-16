@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/shwt/lib/bioCubeApp.dart
  * Created Date: 2023-01-22 19:01:08
- * Last Modified: 2023-04-02 02:24:27
+ * Last Modified: 2023-04-14 22:31:10
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -11,9 +11,12 @@
  * ---	---	---	---	---	---	---	---	---	---	---	---	---	---	---	---
  */
 
+import 'dart:async';
+
 import 'package:hwst/router.dart';
 import 'package:flutter/material.dart';
 import 'package:hwst/service/cache_service.dart';
+import 'package:hwst/service/firebase_service.dart';
 import 'package:provider/provider.dart';
 import 'package:hwst/enums/verify_type.dart';
 import 'package:hwst/view/auth/auth_page.dart';
@@ -45,6 +48,7 @@ class BioCubeApp extends StatefulWidget {
 }
 
 class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
+  Timer? timer;
   @override
   void initState() {
     super.initState();
@@ -53,6 +57,7 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    timer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -73,6 +78,7 @@ class _BioCubeAppState extends State<BioCubeApp> with WidgetsBindingObserver {
         CacheService.getLastVerfyType() == VerifyType.BLE;
     if (!_isForeground) {
       hp.setCurrenPage(isLastVerfyTypeWasBle ? 0 : 1);
+      timer?.cancel();
     }
     if (!_isBackground) {
       cp.setIsBackgroundMode(false);

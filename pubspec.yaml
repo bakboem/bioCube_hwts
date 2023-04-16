@@ -44,6 +44,9 @@ dependencies:
   fl_mlkit_text_recognize: ^2.1.0
   lottie: ^2.3.0
   cached_network_image: ^3.2.3
+  flutter_local_notifications: ^8.2.0
+  flutter_windowmanager: ^0.2.0
+  workmanager: ^0.5.1
 
 dev_dependencies:
   flutter_launcher_icons: ^0.11.0
