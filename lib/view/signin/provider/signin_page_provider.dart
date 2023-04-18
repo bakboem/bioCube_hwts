@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/signin/provider/signin_page_provider.dart
  * Created Date: 2023-01-25 12:36:45
- * Last Modified: 2023-03-29 09:06:23
+ * Last Modified: 2023-04-18 12:22:27
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -92,13 +92,15 @@ class SigninPageProvider extends ChangeNotifier {
       pr('not validate');
       return ResultModel(false);
     }
-
+    var userDeviceInfo = await DeviceInfoService.getDeviceInfo();
     Map<String, dynamic> body = {
       'site_code': siteCodeInputStr,
       'login_type': '${signinType.code}',
       'login_value': loginAccountInputStr,
       'access_key': accessKeyInputStr,
+      'l_serial': userDeviceInfo.deviceId
     };
+
     pr(body);
     _api.init(RequestType.REGIST_ACCESS_KEY);
     final result = await _api.request(body: body);

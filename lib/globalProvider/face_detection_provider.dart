@@ -2,7 +2,7 @@
  * Project Name:  [TruePass]
  * File: /Users/bakbeom/work/bioCube/face_kit/truepass/lib/globalProvider/face_detection_provider.dart
  * Created Date: 2023-02-19 15:22:53
- * Last Modified: 2023-04-16 17:45:37
+ * Last Modified: 2023-04-18 12:00:58
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -156,7 +156,7 @@ class FaceDetectionProvider extends ChangeNotifier {
         pr('$count WorkTime :: ${endTime.inMilliseconds} inMilliseconds');
         return temp.isNotEmpty;
       }).whenComplete(() {
-        var bestScore = bestMatchUser?.score!;
+        var bestScore = bestMatchUser?.score;
         var matchedPerson = bestMatchUser?.mPerson!;
         var settingScore = CacheService.getUserEnvironment()!.scoreSetting!;
         if (bestScore != null) {

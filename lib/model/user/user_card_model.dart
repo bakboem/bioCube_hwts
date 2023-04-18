@@ -2,7 +2,7 @@
  * Project Name:  [BIOCUBE] - HWST
  * File: /Users/bakbeom/work/hwst/lib/model/user/user_card_model.dart
  * Created Date: 2023-01-24 00:08:30
- * Last Modified: 2023-02-22 22:44:41
+ * Last Modified: 2023-04-18 11:42:26
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -59,6 +59,7 @@ class UserCardModel {
   String? mCardKeyEdate;
   @JsonKey(name: 'C_name')
   String? cName;
+  // api에는 없는 파람. 하루에 한번만 호출 할때 사용
   @JsonKey(name: 'createDateByLocal')
   DateTime? createDateByLocal;
   @JsonKey(name: 'Sv_Tid')

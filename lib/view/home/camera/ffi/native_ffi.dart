@@ -2,7 +2,7 @@
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/face_kit/truepass/lib/view/home/ffi/native_ffi.dart
  * Created Date: 2023-02-17 11:18:19
- * Last Modified: 2023-04-16 17:27:18
+ * Last Modified: 2023-04-18 13:26:50
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BioCube ALL RIGHTS RESERVED. 
@@ -54,10 +54,10 @@ typedef _CExtractFeature = ffi.Pointer<ffi.Float> Function(
   ffi.Pointer<ffi.Int32> isSuccessful,
   ffi.Bool isYUV,
 );
-typedef _CMatchFeature = ffi.Pointer<ffi.Float> Function(
+typedef _CMatchFeature = ffi.Pointer<Utf8> Function(
   ffi.Pointer<Utf8>,
   ffi.Pointer<Utf8>,
-  ffi.Pointer<ffi.Float> outCount,
+  ffi.Pointer<Utf8>,
 );
 
 /// Dart function signatures
@@ -93,15 +93,14 @@ typedef _ExtractFeature = ffi.Pointer<ffi.Float> Function(
   ffi.Pointer<ffi.Int32> isSuccessful,
   bool isYUV,
 );
-typedef _MatchFeature = ffi.Pointer<ffi.Float> Function(
+typedef _MatchFeature = ffi.Pointer<Utf8> Function(
   ffi.Pointer<Utf8>,
   ffi.Pointer<Utf8>,
-  ffi.Pointer<ffi.Float> outCount,
+  ffi.Pointer<Utf8>,
 );
 // Functions mapping.
 final _VersionFunc _version =
     _lib.lookup<ffi.NativeFunction<_CVersionFunc>>('version').asFunction();
-
 final _InitDetector _initDetector = _lib
     .lookup<ffi.NativeFunction<_CInitDetector>>('initDetector')
     .asFunction();
@@ -272,16 +271,15 @@ UserInfoTable? extractFeature(UserInfoTable user) {
 }
 
 UserInfoTable? matchFeature(UserInfoTable user, String feat) {
-  var featCount = ffi.sizeOf<ffi.Float>();
-  ffi.Pointer<ffi.Float> scoreResult =
-      malloc.allocate<ffi.Float>(featCount * 1);
+  // var carCount = ffi.sizeOf<Utf8>();
+  // ffi.Pointer<Utf8> res_ptr = malloc.allocate<Utf8>(carCount);
+  var scorePtr = '0.000000'.toNativeUtf8();
   var feat1 = feat.toNativeUtf8();
   var feat2 = user.feature!.toNativeUtf8();
-  _matchFeature(feat1, feat2, scoreResult);
-
-  var score = scoreResult.asTypedList(1);
-  user.score = score.single;
-  malloc.free(scoreResult);
+  _matchFeature(feat1, feat2, scorePtr);
+  var score = scorePtr.toDartString();
+  print('res::::$score');
+  user.score = double.tryParse(score) ?? 0;
   return user;
 }
 

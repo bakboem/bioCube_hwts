@@ -1,16 +1,8 @@
 /*
- * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @Date: 2023-02-17 10:31:28
- * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2023-02-28 13:27:32
- * @FilePath: /face_kit/truepass/lib/view/home/provider/home_page_provider.dart
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- */
-/*
  * Project Name:  [HWST]
  * File: /Users/bakbeom/work/truepass/lib/view/home/provider/home_page_provider.dart
  * Created Date: 2023-01-24 00:03:34
- * Last Modified: 2023-02-21 10:38:46
+ * Last Modified: 2023-04-18 11:59:51
  * Author: bakbeom
  * Modified By: bakbeom
  * copyright @ 2023  BIOCUBE ALL RIGHTS RESERVED. 
@@ -44,6 +36,7 @@ class HomePageProvider extends ChangeNotifier {
     } catch (e) {
       pr(e);
     }
+
     final _api = ApiService();
     var info = CacheService.getAccessInfo()!;
     Map<String, dynamic> body = {
@@ -51,9 +44,15 @@ class HomePageProvider extends ChangeNotifier {
       'login_type': info.loginType,
       'login_value': info.loginAccount,
       'access_key': info.accessKey,
+      'l_serial': userDeviceInfo?.deviceId
     };
+    pr(body);
     _api.init(RequestType.GET_USER_CARD);
     final result = await _api.request(body: body);
+    pr(result?.message);
+    pr(result?.body);
+    pr(result?.message);
+    pr(result?.statusCode);
     if (result == null || result.statusCode != 200) {
       isLoadData = false;
       notifyListeners();
@@ -63,9 +62,10 @@ class HomePageProvider extends ChangeNotifier {
     }
     if (result.statusCode == 200) {
       var temp = AccessKeyResponseModel.fromJson(result.body);
-      if (temp.result != 'error') {
+      if (temp.result != 'error' || temp.result != '88') {
         temp.data!.createDateByLocal = DateTime.now();
         CacheService.saveUserCard(temp.data!.toJson());
+        pr(temp.result);
         pr('success');
         isLoadData = false;
         try {
